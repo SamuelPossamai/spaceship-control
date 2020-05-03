@@ -578,69 +578,48 @@ class MainWindow(QMainWindow):
         self.__updateTitle()
 
     @staticmethod
-    def __importScenarioAction():
+    def __importAction(message, fileoptions, filedatatype):
 
-        fdialog = QFileDialog(None, 'Scenario Import Dialog', '',
-                              'TOML files(*.toml) ;; JSON files(*.json) ;;'
-                              'YAML files(*.yml *.yaml)')
+        fdialog = QFileDialog(None, message, '', fileoptions)
         fdialog.setFileMode(QFileDialog.ExistingFiles)
 
         if not fdialog.exec_():
             return
 
-        FileInfo().addScenarios(fdialog.selectedFiles())
+        FileInfo().addFiles(filedatatype, fdialog.selectedFiles())
+
+    @staticmethod
+    def __importScenarioAction():
+        MainWindow.__importAction('Scenario Import Dialog',
+                                  'TOML files(*.toml) ;; JSON files(*.json) ;;'
+                                  'YAML files(*.yml *.yaml)',
+                                  FileInfo.FileDataType.SCENARIO)
 
     @staticmethod
     def __importShipAction():
-
-        fdialog = QFileDialog(None, 'Ship Import Dialog', '',
-                              'TOML files(*.toml) ;; JSON files(*.json) ;;'
-                              'YAML files(*.yml *.yaml)')
-        fdialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if not fdialog.exec_():
-            return
-
-        FileInfo().addShips(fdialog.selectedFiles())
+        MainWindow.__importAction('Ship Import Dialog',
+                                  'TOML files(*.toml) ;; JSON files(*.json) ;;'
+                                  'YAML files(*.yml *.yaml)',
+                                  FileInfo.FileDataType.SHIPMODEL)
 
     @staticmethod
     def __importControllerAction():
-
-        fdialog = QFileDialog(None, 'Controller Import Dialog', '',
-                              'executable files(*)')
-
-        fdialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if not fdialog.exec_():
-            return
-
-        FileInfo().addControllers(fdialog.selectedFiles())
+        MainWindow.__importAction('Controller Import Dialog',
+                                  'executable files(*)',
+                                  FileInfo.FileDataType.CONTROLLER)
 
     @staticmethod
     def __importImageAction():
-
-        fdialog = QFileDialog(None, 'Image Import Dialog', '',
-                              'image files(*.png *.gif)')
-
-        fdialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if not fdialog.exec_():
-            return
-
-        FileInfo().addImages(fdialog.selectedFiles())
+        MainWindow.__importAction('Image Import Dialog',
+                                  'image files(*.png *.gif)',
+                                  FileInfo.FileDataType.IMAGE)
 
     @staticmethod
     def __importObjectAction():
-
-        fdialog = QFileDialog(None, 'Object Import Dialog', '',
-                              'TOML files(*.toml) ;; JSON files(*.json) ;;'
-                              'YAML files(*.yml *.yaml)')
-        fdialog.setFileMode(QFileDialog.ExistingFiles)
-
-        if not fdialog.exec_():
-            return
-
-        FileInfo().addObjects(fdialog.selectedFiles())
+        MainWindow.__importAction('Object Import Dialog',
+                                  'TOML files(*.toml) ;; JSON files(*.json) ;;'
+                                  'YAML files(*.yml *.yaml)',
+                                  FileInfo.FileDataType.OBJECTMODEL)
 
     @staticmethod
     def __importPackageAction():

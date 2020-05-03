@@ -118,21 +118,6 @@ class FileInfo:
 
         return current_node
 
-    def addScenarios(self, files):
-        return self.addFiles(self.FileDataType.SCENARIO, files)
-
-    def addShips(self, files):
-        return self.addFiles(self.FileDataType.SHIPMODEL, files)
-
-    def addControllers(self, files):
-        return self.addFiles(self.FileDataType.CONTROLLER, files)
-
-    def addObjects(self, files):
-        return self.addFiles(self.FileDataType.OBJECTMODEL, files)
-
-    def addImages(self, files):
-        return self.addFiles(self.FileDataType.IMAGE, files)
-
     def addFiles(self, filedatatype, files):
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
