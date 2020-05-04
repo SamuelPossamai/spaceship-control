@@ -50,7 +50,8 @@ class ObjectiveGroup(Objective):
 
     def __init__(self, subobjectives: 'Sequence[Objective]',
                  name: str = 'Objectives list',
-                 description: str = None) -> None:
+                 description: str = None,
+                 required_quantity: int = None) -> None:
 
         if description is None:
             description = f'Complete all {len(subobjectives)} subobjectives'
@@ -58,6 +59,7 @@ class ObjectiveGroup(Objective):
         super().__init__(name, description)
 
         self.__subobjectives = tuple(subobjectives)
+        self.__req_qtd = required_quantity
 
     @property
     def subobjectives(self):
@@ -73,8 +75,13 @@ class ObjectiveGroup(Objective):
         for objective in self.__subobjectives:
             objective.verify(space, ships)
 
-        return all(objective.accomplished()
+        acc_gen = (objective.accomplished()
                    for objective in self.__subobjectives)
+
+        if self.__req_qtd is None:
+            return all(acc_gen)
+
+        return sum(acc_gen) >= self.__req_qtd
 
     @property
     def info(self) -> 'Dict[str, Any]':

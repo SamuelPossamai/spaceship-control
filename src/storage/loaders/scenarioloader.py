@@ -41,7 +41,7 @@ def __createGoToObjective(objective_content) -> 'GoToObjective':
 def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
 
     kwargs = {key: value for key, value in objective_content.items()
-              if key in ('name', 'description')}
+              if key in ('name', 'description', 'required_quantity')}
 
     return ObjectiveGroup(loadObjectives(objective_content['Objective']),
                           **kwargs)
