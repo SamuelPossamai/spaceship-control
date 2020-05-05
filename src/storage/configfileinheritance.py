@@ -59,6 +59,25 @@ def __mergeContentList(child_content, parent_content):
 
     return final_value
 
+def __mergeContentDictWriteParent(child_content, parent_content,
+                                  delete_elements):
+
+    for key, parent_value in parent_content.items():
+
+        if key in delete_elements:
+            continue
+
+        child_value = child_content.get(key)
+        if child_value is None:
+            final_value = parent_value
+        else:
+            final_value = mergeContent(child_value, parent_value)
+
+        if final_value is None:
+            del child_content[key]
+        else:
+            child_content[key] = final_value
+
 def __mergeContentDict(child_content, parent_content):
 
     parent_inheritance_props = parent_content.get('Inheritance')
@@ -85,21 +104,8 @@ def __mergeContentDict(child_content, parent_content):
         if del_elements_prop is not None:
             delete_elements = set(del_elements_prop)
 
-    for key, parent_value in parent_content.items():
-
-        if key in delete_elements:
-            continue
-
-        child_value = child_content.get(key)
-        if child_value is None:
-            final_value = parent_value
-        else:
-            final_value = mergeContent(child_value, parent_value)
-
-        if final_value is None:
-            del child_content[key]
-        else:
-            child_content[key] = final_value
+    __mergeContentDictWriteParent(child_content, parent_content,
+                                  delete_elements)
 
     for element in delete_elements:
         if element in child_content:
