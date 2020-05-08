@@ -11,25 +11,18 @@ class Engine(Actuator):
         def __init__(self, device: 'Device', *args: str) -> None:
             super().__init__(device, 'intensity', 'angle', *args)
 
-    def __init__(self, part: 'StructuralPart',
-                 start_intensity: 'Union[float, int]' = 0,
-                 start_angle: 'Union[float, int]' = 0,
-                 thrust_error_gen: 'ErrorGenerator' = None,
-                 angle_error_gen: 'ErrorGenerator' = None,
-                 position_error_gen: 'ErrorGenerator' = None,
-                 valid_intensities: 'utils.IntervalSet' = None,
-                 valid_angles: 'utils.IntervalSet' = None):
+    def __init__(self, part: 'StructuralPart', **kwargs):
         super().__init__(part, properties={'intensity': Engine.intensity,
                                            'angle': Engine.angle})
 
-        self.__intensity = start_intensity
+        self.__intensity = kwargs.get('start_intensity', 0)
         self.__thrust = self.mapIntensityToThrust(self.__intensity)
-        self.__angle = start_angle
-        self.__thrust_error = thrust_error_gen
-        self.__angle_error = angle_error_gen
-        self.__pos_error = position_error_gen
-        self.__valid_intensities = valid_intensities
-        self.__valid_angles = valid_angles
+        self.__angle = kwargs.get('start_angle', 0)
+        self.__thrust_error = kwargs.get('thrust_error_gen')
+        self.__angle_error = kwargs.get('angle_error_gen')
+        self.__pos_error = kwargs.get('position_error_gen')
+        self.__valid_intensities = kwargs.get('valid_intensities')
+        self.__valid_angles = kwargs.get('valid_angles')
 
     @property
     def intensity(self):
@@ -79,12 +72,12 @@ class Engine(Actuator):
             angle = self.__angle_error(self.__angle_error)
 
         if self.__pos_error is None:
-            x = y = 0
+            x_pos = y_pos = 0
         else:
-            x = self.__pos_error(0)
-            y = self.__pos_error(0)
+            x_pos = self.__pos_error(0)
+            y_pos = self.__pos_error(0)
 
-        self.applyForce(thrust, x, y, angle)
+        self.applyForce(thrust, x_pos, y_pos, angle)
 
     @property
     def mirror(self) -> 'Engine.Mirror':

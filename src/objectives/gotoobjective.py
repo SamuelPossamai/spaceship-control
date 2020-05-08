@@ -25,6 +25,8 @@ class GoToObjective(Objective):
         return pos.get_dist_sqrd(self.__position) < self.__distance_sqrtd
 
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+        del space
+
         return any(self._verifyShip(ship) for ship in ships)
 
     @property
