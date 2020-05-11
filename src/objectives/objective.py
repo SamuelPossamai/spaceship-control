@@ -1,9 +1,20 @@
+"""Classes used to represent a goal.
+
+This module contains classes that are used to represent the goals the
+controllers need to complete.
+"""
 
 from abc import ABC, abstractmethod, abstractproperty
 
 from anytree import Node
 
 class Objective(ABC):
+    """Base class for all objectives.
+
+    This abstract class is the base for all classes that represent a scenario
+    objective.
+
+    """
 
     def __init__(self, name: str, description: str) -> None:
         super().__init__()
@@ -13,17 +24,48 @@ class Objective(ABC):
         self.__acp = False
 
     def accomplished(self) -> bool:
+        """Consult if the objective was accomplished.
+
+        This method is used to know if the goal was accomplished, but it does
+        not check if it is objective is complete now, so a call to 'verify'
+        should be done before calling this method.
+
+        Returns:
+            True if it was accomplished otherwise False.
+
+        """
         return self.__acp
 
     @property
     def description(self) -> str:
+        """Returns the description of the objective.
+
+        This method returns the description of this objective.
+
+        Returns:
+            A string containing the description of this objective.
+        """
         return self.__desc
 
     @property
     def name(self) -> str:
+        """Returns the name of the objective.
+
+        This method returns the name of this objective.
+
+        Returns:
+            A string containing the name of this objective.
+        """
         return self.__name
 
     def verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+        """Verify if the objective is complete.
+
+        If the objective was not accomplished before verify if it is now.
+
+        Returns:
+            True if it was accomplished otherwise False
+        """
 
         if self.__acp is False:
             self.__acp = self._verify(space, ships)
