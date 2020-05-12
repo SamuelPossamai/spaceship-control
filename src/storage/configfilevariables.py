@@ -1,60 +1,73 @@
 
 from simpleeval import simple_eval
 
+def __dictSubVariables(content, enabled, variables):
+
+    if enabled is None:
+        config = content.get('Config')
+
+        if config is None:
+            return True, content
+
+        if config.get('variables_enabled', False) is False:
+            return True, content
+
+    variables_content = content.get('Variable', ())
+
+    new_variables = {variable['id']: variable['value']
+                     for variable in variables_content}
+
+    if variables is None:
+        variables = new_variables
+    else:
+        for dont_override in (variable['id']
+                              for variable in variables_content
+                              if not variable.get('override', True)):
+
+            if dont_override in variables:
+                del new_variables[dont_override]
+
+        variables = variables.copy()
+        variables.update(new_variables)
+
+    for key, value in content.items():
+        new_key = subVariables(key, enabled=True, variables=variables)
+        new_val = subVariables(value, enabled=True, variables=variables)
+
+        content[new_key] = new_val
+
+    return False, None
+
+def __strSubVariables(content, variables):
+
+    if content.startswith('#'):
+        return content[1:]
+    if content.startswith('raw#'):
+        return content[4:]
+    if content.startswith('var#'):
+        return variables[content[4:].strip()]
+    if content.startswith('expr#'):
+        return simple_eval(content[5:], names=variables)
+    if content.startswith('format#'):
+        return content[7:].format(**variables)
+
+    return content
+
 def subVariables(content, enabled=None, variables=None):
 
     if enabled is False:
         return content
 
     if isinstance(content, dict):
-
-        if enabled is None:
-            config = content.get('Config')
-
-            if config is None:
-                return content
-
-            if config.get('variables_enabled', False) is False:
-                return content
-
-        variables_content = content.get('Variable', ())
-
-        new_variables = {variable['id']: variable['value']
-                         for variable in variables_content}
-
-        if variables is None:
-            variables = new_variables
-        else:
-            for dont_override in (variable['id']
-                                  for variable in variables_content
-                                  if not variable.get('override', True)):
-
-                if dont_override in variables:
-                    del new_variables[dont_override]
-
-            variables = variables.copy()
-            variables.update(new_variables)
-
-        for key, value in content.items():
-            new_key = subVariables(key, enabled=True, variables=variables)
-            new_val = subVariables(value, enabled=True, variables=variables)
-
-            content[new_key] = new_val
+        must_return, ret_val = __dictSubVariables(content, enabled, variables)
+        if must_return:
+            return ret_val
 
     elif isinstance(content, list):
         for i, element in enumerate(content):
             content[i] = subVariables(element, enabled=enabled,
                                       variables=variables)
     elif isinstance(content, str):
-        if content.startswith('#'):
-            return content[1:]
-        if content.startswith('raw#'):
-            return content[4:]
-        if content.startswith('var#'):
-            return variables[content[4:].strip()]
-        if content.startswith('expr#'):
-            return simple_eval(content[5:], names=variables)
-        if content.startswith('format#'):
-            return content[7:].format(**variables)
+        return __strSubVariables(content, variables)
 
     return content
