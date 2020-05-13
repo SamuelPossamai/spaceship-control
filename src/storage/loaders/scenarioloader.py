@@ -40,16 +40,21 @@ def __createGoToObjective(objective_content) -> 'GoToObjective':
 
 def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
 
+    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential')
+
     kwargs = {key: value for key, value in objective_content.items()
-              if key in ('name', 'description', 'required_quantity')}
+              if key in valid_kwargs}
 
     return ObjectiveGroup(loadObjectives(objective_content['Objective']),
                           **kwargs)
 
 def __createTimedObjectiveGroup(objective_content) -> 'TimedObjectiveGroup':
 
+    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
+                    'time_limit')
+
     kwargs = {key: value for key, value in objective_content.items()
-              if key in ('name', 'description', 'time_limit')}
+              if key in valid_kwargs}
 
     return TimedObjectiveGroup(loadObjectives(objective_content['Objective']),
                                **kwargs)

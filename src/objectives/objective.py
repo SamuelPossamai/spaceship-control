@@ -93,7 +93,12 @@ class ObjectiveGroup(Objective):
     def __init__(self, subobjectives: 'Sequence[Objective]',
                  name: str = 'Objectives list',
                  description: str = None,
-                 required_quantity: int = None) -> None:
+                 required_quantity: int = None,
+                 sequential: bool = False) -> None:
+
+        if self.__seq and self.__req_qtd is not None:
+            raise ValueError('ObjectiveGroup: It\'s not possible to specify'
+                             ' required_quantity if it\'s sequential')
 
         if description is None:
             description = f'Complete all {len(subobjectives)} subobjectives'
@@ -102,6 +107,7 @@ class ObjectiveGroup(Objective):
 
         self.__subobjectives = tuple(subobjectives)
         self.__req_qtd = required_quantity
+        self.__seq = sequential
 
     @property
     def subobjectives(self):
@@ -113,6 +119,10 @@ class ObjectiveGroup(Objective):
                 for objective in  self.__subobjectives)
 
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+
+        if self.__seq:
+            return all(objective.verify(space, ships)
+                       for objective in self.__subobjectives)
 
         for objective in self.__subobjectives:
             objective.verify(space, ships)
