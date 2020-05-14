@@ -96,7 +96,7 @@ class ObjectiveGroup(Objective):
                  required_quantity: int = None,
                  sequential: bool = False) -> None:
 
-        if self.__seq and self.__req_qtd is not None:
+        if sequential and required_quantity is not None:
             raise ValueError('ObjectiveGroup: It\'s not possible to specify'
                              ' required_quantity if it\'s sequential')
 

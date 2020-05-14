@@ -1,0 +1,49 @@
+
+[[Shape]]
+
+type = 'polygon'
+mass = 10
+
+    [[Shape.Point]]
+
+    x = 20
+
+    [[Shape.Point]]
+
+    x = -20
+    y = 20
+
+    [[Shape.Point]]
+
+    x = -20
+    y = -20
+
+[[Part]]
+
+name = 'core'
+x = 0
+y = 0
+
+[[Actuator]]
+
+part = 'core'
+
+name = 'forward_engine'
+type = 'engine'
+model = 'intensity_range'
+
+min_intensity = 0
+max_intensity = 1
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 10
+
+[[Sensor]]
+
+part = 'core'
+
+type = 'position'
+
+reading_time = 0.1
