@@ -388,6 +388,7 @@ class MainWindow(QMainWindow):
                 ship = self.__loadShip(ship_info, arg_scenario_info.copy(),
                                        FileInfo())
             except Exception as err:
+                raise
                 self.clear()
                 QMessageBox.warning(self, 'Error', (
                     f'An error occurred loading a ship({ship_info.model}): \n'
@@ -441,6 +442,7 @@ class MainWindow(QMainWindow):
 
             brect = image_item.boundingRect()
             image_item.setOffset(-brect.width()/2, -brect.height()/2)
+            image_item.setZValue(-1)
 
             self.__ui.view.scene().addItem(image_item)
 

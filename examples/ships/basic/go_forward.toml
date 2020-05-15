@@ -1,4 +1,15 @@
 
+[[Image]]
+
+path = '.go_forward.png'
+
+x = 0
+y = 0
+
+width = 40
+
+z_value = 100
+
 [[Shape]]
 
 type = 'polygon'
