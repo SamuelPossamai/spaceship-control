@@ -101,7 +101,12 @@ class ObjectiveGroup(Objective):
                              ' required_quantity if it\'s sequential')
 
         if description is None:
-            description = f'Complete all {len(subobjectives)} subobjectives'
+            if required_quantity is not None:
+                description = f'Complete {required_quantity} subobjectives'
+            else:
+                description = f'Complete all {len(subobjectives)} subobjectives'
+                if sequential:
+                    description += ' successively'
 
         super().__init__(name, description)
 
