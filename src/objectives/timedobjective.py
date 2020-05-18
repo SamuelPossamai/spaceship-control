@@ -21,7 +21,8 @@ class TimedObjectiveGroup(ObjectiveGroup):
 
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
 
+        print(time.time() - self.__start_time)
         if time.time() - self.__start_time > self.__time_limit:
             return False
 
-        return super()._verify()
+        return super()._verify(space, ships)

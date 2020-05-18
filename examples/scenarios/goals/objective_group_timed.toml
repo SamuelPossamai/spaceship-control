@@ -1,0 +1,72 @@
+
+[Scenario]
+
+name = 'Objective.list.required_quantity'
+debug = true
+
+[[Ship]]
+
+name = 'ship'
+model = '..basic/go_forward'
+controller = '..basic/go_forward.py'
+
+x = 0
+y = 0
+angle = 0
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 0
+y = 0
+
+width = 20
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 200
+y = 0
+
+width = 20
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 400
+y = 0
+
+width = 20
+
+[[Objective]]
+
+type = 'timed-list'
+
+time_limit = 15
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 0
+    y = 0
+
+    distance = 10
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 200
+    y = 0
+
+    distance = 10
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 400
+    y = 0
+
+    distance = 10
