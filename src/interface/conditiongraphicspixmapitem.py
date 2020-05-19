@@ -127,8 +127,6 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
             new_angle = self.__angle_offset_func.evaluate(**self.__names,
                                                           **kwargs)
 
-            print(new_angle)
-
             if not isclose(self.__angle_offset_calc, new_angle,
                            rel_tol=0, abs_tol=0.5):
 

@@ -555,8 +555,8 @@ class MainWindow(QMainWindow):
             self.__comm_engine.step()
 
             self.__objectives_complete = all(
-                objective.verify(self.__space, ships)
-                for objective in self.__scenario_objectives)
+                tuple(objective.verify(self.__space, ships)
+                for objective in self.__scenario_objectives))
 
             if self.__condition_graphic_items:
                 timestamp = time.time()

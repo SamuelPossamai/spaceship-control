@@ -70,3 +70,34 @@ time_limit = 15
     y = 0
 
     distance = 10
+
+[[Objective]]
+
+type = 'list'
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 0
+    y = 0
+
+    distance = 10
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 200
+    y = 0
+
+    distance = 10
+
+    [[Objective.Objective]]
+
+    type = 'goto'
+
+    x = 400
+    y = 0
+
+    distance = 10
