@@ -8,13 +8,15 @@ class TimedObjectiveGroup(ObjectiveGroup):
     def __init__(self, subobjectives: 'Sequence[Objective]',
                  time_limit: 'Union[int, float]',
                  name: str = 'Timed objectives list',
-                 description: str = None) -> None:
+                 description: str = None,
+                 **kwargs) -> None:
 
         if description is None:
-            description = (f'Complete all {len(subobjectives)} subobjectives'
-                           f' in {time_limit} seconds')
+            description = self._getDefaultDescription(
+                subobjectives, name=name, description=description, **kwargs)
+            description += f' in {time_limit} seconds'
 
-        super().__init__(subobjectives, name=name, description=description)
+        super().__init__(subobjectives, name=name, **kwargs)
 
         self.__start_time = time.time()
         self.__time_limit = time_limit

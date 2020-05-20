@@ -101,12 +101,9 @@ class ObjectiveGroup(Objective):
                              ' required_quantity if it\'s sequential')
 
         if description is None:
-            if required_quantity is not None:
-                description = f'Complete {required_quantity} subobjectives'
-            else:
-                description = f'Complete all {len(subobjectives)} subobjectives'
-                if sequential:
-                    description += ' successively'
+            description = self._getDefaultDescription(
+                subobjectives, name=name, description=description,
+                required_quantity=required_quantity, sequential=sequential)
 
         super().__init__(name, description)
 
@@ -146,6 +143,20 @@ class ObjectiveGroup(Objective):
             'objectives':
                 [objective.toDict() for objective in self.__subobjectives]
         }
+
+    @staticmethod
+    def _getDefaultDescription(subobjectives: 'Sequence[Objective]',
+                               **kwargs) -> str:
+
+        required_quantity = kwargs.get('required_quantity')
+        if required_quantity is not None:
+            return f'Complete {required_quantity} subobjectives'
+
+        description = f'Complete all {len(subobjectives)} subobjectives'
+        if kwargs.get('sequential'):
+            description += ' successively'
+
+        return description
 
 def createObjectiveTree(objective: 'Union[Objective, Sequence[Objective]]',
                         parent: 'Node' = None) -> 'Node':
