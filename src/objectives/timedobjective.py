@@ -16,7 +16,7 @@ class TimedObjectiveGroup(ObjectiveGroup):
                 subobjectives, name=name, description=description, **kwargs)
             description += f' in {time_limit} seconds'
 
-        super().__init__(subobjectives, name=name, **kwargs)
+        super().__init__(subobjectives, name=name, description=description, **kwargs)
 
         self.__start_time = time.time()
         self.__time_limit = time_limit
