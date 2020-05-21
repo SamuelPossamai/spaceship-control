@@ -22,6 +22,10 @@ class Objective(ABC):
         self.__name = name
         self.__desc = description
         self.__acp = False
+        self.__failed = False
+
+    def failed(self) -> bool:
+        return self.__failed
 
     def accomplished(self) -> bool:
         """Consult if the objective was accomplished.
@@ -59,22 +63,27 @@ class Objective(ABC):
         return self.__name
 
     def verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
-        """Verify if the objective is complete.
-
-        If the objective was not accomplished before verify if it is now.
+        """Verify if the objective is complete or if it was failed.
 
         Returns:
             True if it was accomplished otherwise False
         """
 
-        if self.__acp is False:
-            self.__acp = self._verify(space, ships)
+        if self.__acp is False and self.__failed is False:
+            if self._verify(space, ships) is True:
+                self.__acp = True
+                return True
+            self.__failed = self._hasFailed(space, ships)
 
         return self.__acp
 
     @abstractmethod
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
         pass
+
+    def _hasFailed(self, space: 'pymunk.Space',
+                   ships: 'Sequence[Device]') -> bool:
+        return False
 
     def toDict(self) -> 'Dict[str, Any]':
         return {
@@ -136,6 +145,16 @@ class ObjectiveGroup(Objective):
             return all(acc_gen)
 
         return sum(acc_gen) >= self.__req_qtd
+
+    def _hasFailed(self, space: 'pymunk.Space',
+                   ships: 'Sequence[Device]') -> bool:
+
+        failed_gen = (objective.failed() for objective in self.__subobjectives)
+
+        if self.__req_qtd is None:
+            return any(failed_gen)
+
+        return sum(failed_gen) > (len(self.__subobjectives) - self.__req_qtd)
 
     @property
     def info(self) -> 'Dict[str, Any]':
