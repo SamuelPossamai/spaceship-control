@@ -46,13 +46,18 @@ sys.path.pop(0)
 class ObjectiveNodeValue(NodeValue):
 
     def __init__(self, objective):
-        super().__init__(f'✗ {objective.name}', objective.description)
+        super().__init__(objective.name, objective.description)
 
         self.__objective = objective
 
     def update(self):
-        symbol = '✓' if self.__objective.accomplished() else '✗'
-        self.name = f'{symbol} {self.__objective.name}'
+        if self.__objective.accomplished():
+            symbol = '✓ '
+        elif self.__objective.failed():
+            symbol = '✗ '
+        else:
+            symbol = ''
+        self.name = f'{symbol}{self.__objective.name}'
 
 class MainWindow(QMainWindow):
 
