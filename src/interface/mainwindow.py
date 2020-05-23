@@ -568,6 +568,13 @@ class MainWindow(QMainWindow):
                 for dyn_gitem in self.__condition_graphic_items:
                     dyn_gitem.evaluate(timestamp=timestamp)
 
+
+        if self.__objectives_complete and \
+            self.__ui.actionSimulationAutoRestart.isChecked():
+
+            self.loadScenario(self.__current_scenario)
+            return
+
         for node_value in self.__objectives_node_value:
             node_value.update()
 

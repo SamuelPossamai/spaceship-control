@@ -161,7 +161,14 @@
     <addaction name="actionImportPackage"/>
     <addaction name="menuImportData"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Simulation</string>
+    </property>
+    <addaction name="actionSimulationAutoRestart"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSettings"/>
   </widget>
   <action name="actionLoadScenario">
    <property name="text">
@@ -221,6 +228,14 @@
   <action name="actionImportObject">
    <property name="text">
     <string>Object</string>
+   </property>
+  </action>
+  <action name="actionSimulationAutoRestart">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto Restart</string>
    </property>
   </action>
  </widget>
