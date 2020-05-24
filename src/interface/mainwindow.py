@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         self.__ships = []
         self.__objects = []
         self.__scenario_objectives = []
-        self.__objectives_complete = False
+        self.__objectives_result = None
         self.__current_scenario = None
 
         self.__widgets = []
@@ -149,9 +149,11 @@ class MainWindow(QMainWindow):
         if self.__current_scenario is None:
             self.setWindowTitle(self.__title_basename)
         else:
-            if not self.__scenario_objectives:
+            if not self.__scenario_objectives or \
+                self.__objectives_result is None:
+
                 suffix = ''
-            elif self.__objectives_complete:
+            elif self.__objectives_result is True:
                 suffix = ' ✓'
             else:
                 suffix = ' ✗'
@@ -559,17 +561,25 @@ class MainWindow(QMainWindow):
 
             self.__comm_engine.step()
 
-            self.__objectives_complete = all(
+            objectives_complete = all(
                 tuple(objective.verify(self.__space, ships)
                 for objective in self.__scenario_objectives))
+
+            if objectives_complete:
+                self.__objectives_result = True
+            else:
+                if any(tuple(objective.failed()
+                             for objective in self.__scenario_objectives)):
+                    self.__objectives_result = False
+                else:
+                    self.__objectives_result = None
 
             if self.__condition_graphic_items:
                 timestamp = time.time()
                 for dyn_gitem in self.__condition_graphic_items:
                     dyn_gitem.evaluate(timestamp=timestamp)
 
-
-        if self.__objectives_complete and \
+        if self.__objectives_result is not None and \
             self.__ui.actionSimulationAutoRestart.isChecked():
 
             self.loadScenario(self.__current_scenario)
