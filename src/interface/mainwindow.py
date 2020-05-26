@@ -61,7 +61,7 @@ class ObjectiveNodeValue(NodeValue):
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, one_shot=False):
 
         super().__init__(parent=parent)
 
@@ -143,6 +143,8 @@ class MainWindow(QMainWindow):
 
         self.__debug_messages_text_browsers = {}
         self.__condition_graphic_items = []
+
+        self.__one_shot = one_shot
 
     def __updateTitle(self):
 
@@ -579,11 +581,13 @@ class MainWindow(QMainWindow):
                 for dyn_gitem in self.__condition_graphic_items:
                     dyn_gitem.evaluate(timestamp=timestamp)
 
-        if self.__objectives_result is not None and \
-            self.__ui.actionSimulationAutoRestart.isChecked():
-
-            self.loadScenario(self.__current_scenario)
-            return
+        if self.__objectives_result is not None:
+            if self.__one_shot is True:
+                self.close()
+                return
+            if self.__ui.actionSimulationAutoRestart.isChecked():
+                self.loadScenario(self.__current_scenario)
+                return
 
         for node_value in self.__objectives_node_value:
             node_value.update()
