@@ -61,11 +61,19 @@ class FileInfo:
         self.__path = \
             Path.home().joinpath('.local/share/spaceshipcontrol').resolve()
         self.__dist_data_path = Path(__file__).parent.parent.resolve()
+        self.__config_file_path = Path.home().joinpath(
+            '.local/spaceshipcontrol/config.toml').resolve()
 
         if self.__dist_data_path.name == 'src':
             self.__dist_data_path = self.__dist_data_path.parent
 
         self.__path.mkdir(parents=True, exist_ok=True)
+        self.__config_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            self.__config_content = toml.load(self.__config_file_path)
+        except FileNotFoundError:
+            self.__config_content = {}
 
         create_n_link_example_dirs = ['controllers', 'ships', 'scenarios',
                                       'objects', 'images']
@@ -89,6 +97,24 @@ class FileInfo:
             FileInfo.__instance = super().__new__(cls)
 
         return FileInfo.__instance
+
+    def readConfiguration(*args, default=None, value_type=None):
+        current = self.__config_content
+        for arg in args:
+            if isinstance(current, dict):
+                new_current = self.__config_content.get(arg)
+                if new_current is None:
+                    return default
+            else:
+                return default
+
+        if value_type is not None:
+            try:
+                return value_type(current)
+            except Exception:
+                return default
+
+        return current
 
     def listFilesTree(self, filedatatype):
 
