@@ -146,6 +146,9 @@ class MainWindow(QMainWindow):
 
         self.__one_shot = one_shot
 
+        self.__ui.actionSimulationAutoRestart.setChecked(
+            FileInfo().readConfig('Simulation', 'auto_restart', default=False))
+
     def __updateTitle(self):
 
         if self.__current_scenario is None:

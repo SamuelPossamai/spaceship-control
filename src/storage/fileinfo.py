@@ -62,7 +62,7 @@ class FileInfo:
             Path.home().joinpath('.local/share/spaceshipcontrol').resolve()
         self.__dist_data_path = Path(__file__).parent.parent.resolve()
         self.__config_file_path = Path.home().joinpath(
-            '.local/spaceshipcontrol/config.toml').resolve()
+            '.config/spaceshipcontrol/config.toml').resolve()
 
         if self.__dist_data_path.name == 'src':
             self.__dist_data_path = self.__dist_data_path.parent
@@ -98,12 +98,12 @@ class FileInfo:
 
         return FileInfo.__instance
 
-    def readConfiguration(*args, default=None, value_type=None):
+    def readConfig(self, *args, default=None, value_type=None):
         current = self.__config_content
         for arg in args:
             if isinstance(current, dict):
-                new_current = self.__config_content.get(arg)
-                if new_current is None:
+                current = current.get(arg)
+                if current is None:
                     return default
             else:
                 return default
