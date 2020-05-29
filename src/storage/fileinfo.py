@@ -116,6 +116,29 @@ class FileInfo:
 
         return current
 
+    def writeConfig(self, value, *args):
+
+        if not args:
+            raise Exception('FileInfo.writeConfig: Path must be specified')
+
+        previous = None
+        current = self.__config_content
+
+        for arg in args:
+            new_current = current.get(arg)
+            if not isinstance(new_current, dict):
+                previous[arg] = {}
+
+            previous = current
+            current = new_current
+
+        previous[args[-1]] = value
+
+    def saveConfig(self):
+
+        with open(self.__config_file_path, 'w') as file:
+            toml.dump(self.__config_content, file)
+
     def listFilesTree(self, filedatatype):
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
