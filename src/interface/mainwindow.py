@@ -129,6 +129,9 @@ class MainWindow(QMainWindow):
         self.__ui.deviceInterfaceComboBox.currentIndexChanged.connect(
             self.__deviceInterfaceComboBoxIndexChange)
 
+        self.__ui.actionSimulationAutoRestart.toggled.connect(
+            self.__autoRestartOptionToggled)
+
         self.__title_basename = 'Spaceship Control'
 
         view_geometry = self.__ui.view.geometry()
@@ -711,3 +714,9 @@ class MainWindow(QMainWindow):
     def __openObjectAction():
         MainWindow.__openAction('Choose object model',
                                 FileInfo.FileDataType.OBJECTMODEL)
+
+    @staticmethod
+    def __autoRestartOptionToggled(checked):
+        fileinfo = FileInfo()
+        fileinfo.writeConfig(checked, 'Simulation', 'auto_restart')
+        fileinfo.saveConfig()
