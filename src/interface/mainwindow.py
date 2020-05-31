@@ -90,48 +90,6 @@ class MainWindow(QMainWindow):
         self.__widgets = []
         self.__objectives_node_value = []
 
-        self.__ui.actionLoadScenario.triggered.connect(
-            self.__loadScenarioAction)
-
-        self.__ui.actionImportScenario.triggered.connect(
-            self.__importScenarioAction)
-
-        self.__ui.actionImportShip.triggered.connect(
-            self.__importShipAction)
-
-        self.__ui.actionImportController.triggered.connect(
-            self.__importControllerAction)
-
-        self.__ui.actionImportImage.triggered.connect(
-            self.__importImageAction)
-
-        self.__ui.actionImportObject.triggered.connect(
-            self.__importObjectAction)
-
-        self.__ui.actionOpenScenario.triggered.connect(
-            self.__openScenarioAction)
-
-        self.__ui.actionOpenShip.triggered.connect(
-            self.__openShipAction)
-
-        self.__ui.actionOpenController.triggered.connect(
-            self.__openControllerAction)
-
-        self.__ui.actionOpenImage.triggered.connect(
-            self.__openImageAction)
-
-        self.__ui.actionOpenObject.triggered.connect(
-            self.__openObjectAction)
-
-        self.__ui.actionImportPackage.triggered.connect(
-            self.__importPackageAction)
-
-        self.__ui.deviceInterfaceComboBox.currentIndexChanged.connect(
-            self.__deviceInterfaceComboBoxIndexChange)
-
-        self.__ui.actionSimulationAutoRestart.toggled.connect(
-            self.__autoRestartOptionToggled)
-
         self.__title_basename = 'Spaceship Control'
 
         view_geometry = self.__ui.view.geometry()
@@ -151,6 +109,8 @@ class MainWindow(QMainWindow):
 
         self.__ui.actionSimulationAutoRestart.setChecked(
             FileInfo().readConfig('Simulation', 'auto_restart', default=False))
+
+        self.__initConnections()
 
     def __updateTitle(self):
 
@@ -403,7 +363,6 @@ class MainWindow(QMainWindow):
                 ship = self.__loadShip(ship_info, arg_scenario_info.copy(),
                                        FileInfo())
             except Exception as err:
-                raise
                 self.clear()
                 QMessageBox.warning(self, 'Error', (
                     f'An error occurred loading a ship({ship_info.model}): \n'
@@ -571,7 +530,7 @@ class MainWindow(QMainWindow):
 
             objectives_complete = all(
                 tuple(objective.verify(self.__space, ships)
-                for objective in self.__scenario_objectives))
+                      for objective in self.__scenario_objectives))
 
             if objectives_complete:
                 self.__objectives_result = True
@@ -720,3 +679,47 @@ class MainWindow(QMainWindow):
         fileinfo = FileInfo()
         fileinfo.writeConfig(checked, 'Simulation', 'auto_restart')
         fileinfo.saveConfig()
+
+    def __initConnections(self):
+
+        self.__ui.actionLoadScenario.triggered.connect(
+            self.__loadScenarioAction)
+
+        self.__ui.actionImportScenario.triggered.connect(
+            self.__importScenarioAction)
+
+        self.__ui.actionImportShip.triggered.connect(
+            self.__importShipAction)
+
+        self.__ui.actionImportController.triggered.connect(
+            self.__importControllerAction)
+
+        self.__ui.actionImportImage.triggered.connect(
+            self.__importImageAction)
+
+        self.__ui.actionImportObject.triggered.connect(
+            self.__importObjectAction)
+
+        self.__ui.actionOpenScenario.triggered.connect(
+            self.__openScenarioAction)
+
+        self.__ui.actionOpenShip.triggered.connect(
+            self.__openShipAction)
+
+        self.__ui.actionOpenController.triggered.connect(
+            self.__openControllerAction)
+
+        self.__ui.actionOpenImage.triggered.connect(
+            self.__openImageAction)
+
+        self.__ui.actionOpenObject.triggered.connect(
+            self.__openObjectAction)
+
+        self.__ui.actionImportPackage.triggered.connect(
+            self.__importPackageAction)
+
+        self.__ui.deviceInterfaceComboBox.currentIndexChanged.connect(
+            self.__deviceInterfaceComboBoxIndexChange)
+
+        self.__ui.actionSimulationAutoRestart.toggled.connect(
+            self.__autoRestartOptionToggled)
