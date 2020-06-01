@@ -16,15 +16,24 @@ class Objective(ABC):
 
     """
 
-    def __init__(self, name: str, description: str) -> None:
+    def __init__(self, name: str, description: str,
+                 required: bool = None, negation: bool = False) -> None:
         super().__init__()
 
         self.__name = name
         self.__desc = description
         self.__acp = False
         self.__failed = False
+        self.__neg = negation
+
+        if required is None:
+            self.__required = not negation
 
     def failed(self) -> bool:
+
+        if self.__neg is True:
+            return self.__acp
+
         return self.__failed
 
     def accomplished(self) -> bool:
@@ -38,6 +47,13 @@ class Objective(ABC):
             True if it was accomplished otherwise False.
 
         """
+
+        if self.__required is False:
+            return not self.failed()
+
+        if self.__neg is True:
+            return self.__failed
+
         return self.__acp
 
     @property
@@ -72,10 +88,10 @@ class Objective(ABC):
         if self.__acp is False and self.__failed is False:
             if self._verify(space, ships) is True:
                 self.__acp = True
-                return True
-            self.__failed = self._hasFailed(space, ships)
+            else:
+                self.__failed = self._hasFailed(space, ships)
 
-        return self.__acp
+        return self.accomplished()
 
     @abstractmethod
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
