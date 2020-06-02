@@ -113,6 +113,10 @@ class Objective(ABC):
     def info(self) -> 'Dict[str, Any]':
         pass
 
+    def reset(self) -> None:
+        self.__acp = False
+        self.__failed = False
+
 class ObjectiveGroup(Objective):
 
     def __init__(self, subobjectives: 'Sequence[Objective]',
