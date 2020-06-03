@@ -123,7 +123,8 @@ class ObjectiveGroup(Objective):
                  name: str = 'Objectives list',
                  description: str = None,
                  required_quantity: int = None,
-                 sequential: bool = False) -> None:
+                 sequential: bool = False,
+                 times: int = 1) -> None:
 
         if sequential and required_quantity is not None:
             raise ValueError('ObjectiveGroup: It\'s not possible to specify'
@@ -139,6 +140,8 @@ class ObjectiveGroup(Objective):
         self.__subobjectives = tuple(subobjectives)
         self.__req_qtd = required_quantity
         self.__seq = sequential
+        self.__times = times
+        self.__times_left = times
 
     @property
     def subobjectives(self):
@@ -149,7 +152,8 @@ class ObjectiveGroup(Objective):
         return ((objective, objective.accomplished())
                 for objective in  self.__subobjectives)
 
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def __verifyInteral(self, space: 'pymunk.Space',
+                        ships: 'Sequence[Device]') -> bool:
 
         if self.__seq:
             return all(objective.verify(space, ships)
@@ -165,6 +169,14 @@ class ObjectiveGroup(Objective):
             return all(acc_gen)
 
         return sum(acc_gen) >= self.__req_qtd
+
+    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+
+        if self.__verifyInteral(space, ships) is True:
+            self.__times_left -= 1
+
+        if self.__times_left <= 0:
+            return True
 
     def _hasFailed(self, space: 'pymunk.Space',
                    ships: 'Sequence[Device]') -> bool:
@@ -196,6 +208,11 @@ class ObjectiveGroup(Objective):
             description += ' successively'
 
         return description
+
+    def reset(self) -> None:
+        super().reset()
+
+        self.__times_left = times
 
 def createObjectiveTree(objective: 'Union[Objective, Sequence[Objective]]',
                         parent: 'Node' = None) -> 'Node':
