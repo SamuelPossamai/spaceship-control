@@ -97,8 +97,11 @@ class Objective(ABC):
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
         pass
 
-    def _hasFailed(self, space: 'pymunk.Space',
+    @staticmethod
+    def _hasFailed(space: 'pymunk.Space',
                    ships: 'Sequence[Device]') -> bool:
+        del space
+        del ships
         return False
 
     def toDict(self) -> 'Dict[str, Any]':
@@ -178,6 +181,8 @@ class ObjectiveGroup(Objective):
         if self.__times_left <= 0:
             return True
 
+        return False
+
     def _hasFailed(self, space: 'pymunk.Space',
                    ships: 'Sequence[Device]') -> bool:
 
@@ -212,7 +217,7 @@ class ObjectiveGroup(Objective):
     def reset(self) -> None:
         super().reset()
 
-        self.__times_left = times
+        self.__times_left = self.__times
 
 def createObjectiveTree(objective: 'Union[Objective, Sequence[Objective]]',
                         parent: 'Node' = None) -> 'Node':
