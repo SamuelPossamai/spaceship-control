@@ -58,6 +58,12 @@ class FileInfo:
     }
 
     def __init__(self):
+
+        if self.__already_initialized:
+            return
+
+        self.__already_initialized = True
+
         self.__path = \
             Path.home().joinpath('.local/share/spaceshipcontrol').resolve()
         self.__dist_data_path = Path(__file__).parent.parent.resolve()
@@ -93,10 +99,12 @@ class FileInfo:
                        example_dir_path)
 
     def __new__(cls):
-        if FileInfo.__instance is None:
-            FileInfo.__instance = super().__new__(cls)
 
-        return FileInfo.__instance
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__instance.__already_initialized = False
+
+        return cls.__instance
 
     def readConfig(self, *args, default=None, value_type=None):
         current = self.__config_content
@@ -127,7 +135,7 @@ class FileInfo:
         for arg in args:
             new_current = current.get(arg)
             if not isinstance(new_current, dict):
-                previous[arg] = {}
+                new_current = current[arg] = {}
 
             previous = current
             current = new_current

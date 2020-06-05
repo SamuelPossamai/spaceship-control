@@ -112,6 +112,16 @@ class MainWindow(QMainWindow):
 
         self.__initConnections()
 
+        self.resize(FileInfo().readConfig('Window', 'width',
+                                          default=self.width()),
+                    FileInfo().readConfig('Window', 'height',
+                                          default=self.height()))
+
+    def resizeEvent(self, event):
+        FileInfo().writeConfig(event.size().width(), 'Window', 'width')
+        FileInfo().writeConfig(event.size().height(), 'Window', 'height')
+        FileInfo().saveConfig()
+
     def __updateTitle(self):
 
         if self.__current_scenario is None:
