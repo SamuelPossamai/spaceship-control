@@ -112,10 +112,16 @@ class MainWindow(QMainWindow):
 
         self.__initConnections()
 
-        self.resize(FileInfo().readConfig('Window', 'width',
-                                          default=self.width()),
-                    FileInfo().readConfig('Window', 'height',
-                                          default=self.height()))
+        self.setGeometry(
+            FileInfo().readConfig('Window', 'x', default=self.x()),
+            FileInfo().readConfig('Window', 'y', default=self.y()),
+            FileInfo().readConfig('Window', 'width', default=self.width()),
+            FileInfo().readConfig('Window', 'height', default=self.height()))
+
+    def moveEvent(self, event):
+        FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
+        FileInfo().writeConfig(event.pos().y(), 'Window', 'y')
+        FileInfo().saveConfig()
 
     def resizeEvent(self, event):
         FileInfo().writeConfig(event.size().width(), 'Window', 'width')
