@@ -1,5 +1,5 @@
 
-from pymunk import Circle, Poly
+from pymunk import Circle, Poly, Segment
 
 def __createCircleShape(info: 'Dict[str, Any]') -> 'Circle':
 
@@ -24,10 +24,36 @@ def __createPolyShape(info: 'Dict[str, Any]') -> 'Poly':
 
     return shape
 
+def __createLineShape(info: 'Dict[str, Any]') -> 'Segment':
+
+    points = info.get('Point', ())
+
+    if len(point) != 2:
+        raise ValueError('Line must have exactly two points')
+
+    points = tuple((point.get('x', 0), point.get('y', 0))
+                   for point in info['Point'])
+
+    if points[0] == points[1]:
+        raise ValueError('Start and end of the line must be different')
+
+    thickness = info.get('thickness', 1)
+    if thickness <= 0:
+        raise ValueError('Line thickness must be greater than 0')
+
+    shape = Segment(None, points[0], points[1], info.get('thickness', 1))
+
+    shape.mass = info['mass']
+    shape.elasticity = info.get('elasticity', 0.5)
+    shape.friction = info.get('friction', 0.5)
+
+    return shape
+
 __SHAPE_CREATE_FUNCTIONS = {
 
     'circle': __createCircleShape,
-    'polygon': __createPolyShape
+    'polygon': __createPolyShape,
+    'line': __createLineShape
 }
 
 def __createShape(info: 'Dict[str, Any]') -> 'Shape':
