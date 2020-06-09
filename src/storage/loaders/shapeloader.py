@@ -59,11 +59,11 @@ def __createLineShape(info: 'Dict[str, Any]') -> 'Segment':
 
     points = info.get('Point', ())
 
-    if len(point) != 2:
+    if len(points) != 2:
         raise ValueError('Line must have exactly two points')
 
     points = tuple((point.get('x', 0), point.get('y', 0))
-                   for point in info['Point'])
+                   for point in points)
 
     if points[0] == points[1]:
         raise ValueError('Start and end of the line must be different')

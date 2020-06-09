@@ -51,6 +51,13 @@ model = '.object1'
 x = 100
 y = 100
 
+[[Object]]
+
+model = '.basic/line'
+
+x = 100
+y = 300
+
 [[Image]]
 
 path = '.example.png'

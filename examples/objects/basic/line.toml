@@ -1,0 +1,21 @@
+
+[Config]
+
+static = true
+
+[[Shape]]
+
+id = 'line'
+type = 'line'
+thickness = 2.5
+
+    [[Shape.Point]]
+
+    id = 'begin'
+    x = -40
+
+    [[Shape.Point]]
+
+    id = 'end'
+    x = 40
+

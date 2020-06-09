@@ -62,12 +62,13 @@ class CircleDrawingPart(EllipseDrawingPart):
 
 class LineDrawingPart(DrawingPart):
 
-    def __init__(self, start, end, color=None) -> None:
+    def __init__(self, start, end, color=None, width=None) -> None:
         super().__init__()
 
         self.__start = start
         self.__end = end
         self.__color = color
+        self.__width = width
 
     def boundingRect(self) -> QRectF:
         start_x = self.__start.x()
@@ -77,9 +78,12 @@ class LineDrawingPart(DrawingPart):
         return QRectF(start_x, start_y, end_x - start_x, end_y - start_y)
 
     def _paint(self, painter, option, widget) -> None:
-        if self.__color is not None:
+        if self.__color is not None or self.__width is not None:
             pen = painter.pen()
-            pen.setColor(self.__color)
+            if self.__color is not None:
+                pen.setColor(self.__color)
+            if self.__width is not None:
+                pen.setWidthF(self.__width)
             painter.setPen(pen)
 
         painter.drawLine(self.__start, self.__end)
@@ -143,6 +147,12 @@ class ObjectGraphicsItem(QGraphicsItem):
                 points = tuple(QPointF(point.x, point.y) for point in
                                shape.get_vertices())
                 self.__parts.append(PolyDrawingPart(points, color=color))
+
+            elif isinstance(shape, pymunk.Segment):
+                self.__parts.append(LineDrawingPart(
+                    QPointF(shape.a.x, shape.a.y),
+                    QPointF(shape.b.x, shape.a.y),
+                    color=color, width=shape.radius))
 
         self.__bounding_rect = QRectF(0, 0, 0, 0)
         for part in self.__parts:
