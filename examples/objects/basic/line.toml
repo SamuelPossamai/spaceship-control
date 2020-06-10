@@ -1,21 +1,34 @@
 
 [Config]
 
+variables_enabled = true
 static = true
+
+[[Variable]]
+
+id = 'size'
+value = 100
+override = false
+
+[[Variable]]
+
+id = 'thickness'
+value = 2.5
+override = false
 
 [[Shape]]
 
 id = 'line'
 type = 'line'
-thickness = 2.5
+thickness = 'var# thickness'
 
     [[Shape.Point]]
 
     id = 'begin'
-    x = -40
+    x = 'expr# -size/2'
 
     [[Shape.Point]]
 
     id = 'end'
-    x = 40
+    x = 'expr# size/2'
 

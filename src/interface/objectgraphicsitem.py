@@ -149,10 +149,21 @@ class ObjectGraphicsItem(QGraphicsItem):
                 self.__parts.append(PolyDrawingPart(points, color=color))
 
             elif isinstance(shape, pymunk.Segment):
-                self.__parts.append(LineDrawingPart(
-                    QPointF(shape.a.x, shape.a.y),
-                    QPointF(shape.b.x, shape.a.y),
-                    color=color, width=shape.radius))
+
+                radius = shape.radius
+                points = (QPointF(shape.a.x, shape.a.y + radius),
+                          QPointF(shape.a.x, shape.a.y - radius),
+                          QPointF(shape.b.x, shape.b.y - radius),
+                          QPointF(shape.b.x, shape.b.y + radius))
+
+                self.__parts.append(PolyDrawingPart(
+                    points, color=color))
+                self.__parts.append(CircleDrawingPart(
+                    radius, color=color,
+                    offset=QPointF(shape.a.x, shape.a.y)))
+                self.__parts.append(CircleDrawingPart(
+                    radius, color=color,
+                    offset=QPointF(shape.b.x, shape.b.y)))
 
         self.__bounding_rect = QRectF(0, 0, 0, 0)
         for part in self.__parts:
