@@ -1,0 +1,45 @@
+
+[[Object]]
+
+model = '.line'
+
+[[Object.Variable]]
+
+id = 'size'
+value = 100
+
+[[Object]]
+
+model = '.line'
+angle = -30
+x = 95
+y = -25
+
+[[Object.Variable]]
+
+id = 'size'
+value = 100
+
+[[Object]]
+
+model = '.line'
+angle = -60
+x = 165
+y = -95
+
+[[Object.Variable]]
+
+id = 'size'
+value = 100
+
+[[Object]]
+
+model = '.line'
+angle = 0
+x = 190
+y = -500
+
+[[Object.Variable]]
+
+id = 'size'
+value = 1000

@@ -13,7 +13,8 @@ from ...devices.communicationdevices import CommunicationEngine
 StaticImageInfo = namedtuple('StaticImageInfo',
                              ('name', 'width', 'height', 'x', 'y'))
 
-ObjectInfo = namedtuple('ObjectInfo', ('model', 'position', 'angle'))
+ObjectInfo = namedtuple('ObjectInfo', (
+    'model', 'position', 'angle', 'variables'))
 
 ShipInfo = namedtuple('ShipInfo', (
     'name', 'model', 'controller', 'position', 'angle', 'variables'))
@@ -122,7 +123,17 @@ def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
     position = (obj_content.get('x', 0), obj_content.get('y', 0))
     angle = pi*obj_content.get('angle', 0)/180
 
-    return ObjectInfo(model=model, position=position, angle=angle)
+
+    variables_content = obj_content.get('Variable')
+
+    if variables_content:
+        variables = {variable['id']: variable['value']
+                     for variable in variables_content}
+    else:
+        variables = None
+
+    return ObjectInfo(model=model, position=position, angle=angle,
+                      variables=variables)
 
 def __readImageInfo(image_content, prefixes) -> 'StaticImageInfo':
 

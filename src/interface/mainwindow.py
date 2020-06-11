@@ -357,7 +357,8 @@ class MainWindow(QMainWindow):
 
             obj_model = '/'.join(obj_model)
 
-        object_info = fileinfo.loadObject(obj_model, self.__space)
+        object_info = fileinfo.loadObject(obj_model, self.__space,
+                                          variables=obj_info.variables)
 
         body = object_info.body
 
@@ -487,8 +488,9 @@ class MainWindow(QMainWindow):
 
         self.__space.reindex_static()
 
-        for widget in self.__ships[0][2]:
-            widget.show()
+        if self.__ships:
+            for widget in self.__ships[0][2]:
+                widget.show()
 
         self.__objectives_node_value = []
         if self.__scenario_objectives:

@@ -277,7 +277,7 @@ class FileInfo:
 
         return content
 
-    def __getObjectContent(self, object_model):
+    def __getObjectContent(self, object_model, variables=None):
 
         content = self.__getContent(object_model, self.FileDataType.OBJECTMODEL,
                                     'Inexistent object model named \'{name}\'')
@@ -287,7 +287,7 @@ class FileInfo:
         dictutils.mergeMatch(content, ('Shape',), ('Point', 'points'), 'Point',
                              absolute=True)
 
-        configfilevariables.subVariables(content)
+        configfilevariables.subVariables(content, variables=variables)
 
         return content
 
@@ -319,11 +319,11 @@ class FileInfo:
         return shiploader.loadShip(ship_content, name, space, prefixes=prefixes,
                                    communication_engine=communication_engine)
 
-    def loadObject(self, model, space):
+    def loadObject(self, model, space, variables=None):
 
         prefixes = model.split('/')[:-1]
 
-        obj_content = self.__getObjectContent(model)
+        obj_content = self.__getObjectContent(model, variables=variables)
 
         obj_content = configfileinheritance.mergeInheritedFiles(
             obj_content, self.__getObjectContent, prefixes=prefixes)
