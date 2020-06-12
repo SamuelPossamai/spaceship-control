@@ -35,7 +35,7 @@ value = 100
 [[Object]]
 
 model = '.line'
-angle = 0
+angle = -90
 x = 190
 y = -500
 

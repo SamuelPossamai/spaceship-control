@@ -169,9 +169,8 @@ class ObjectGraphicsItem(QGraphicsItem):
         for part in self.__parts:
             self.__bounding_rect |= part.boundingRect()
 
-    @staticmethod
-    def boundingRect() -> QRectF:
-        return QRectF(-100, -100, 200, 200)
+    def boundingRect(self) -> QRectF:
+        return self.__bounding_rect
 
     def paint(self, painter, option, widget) -> None:
 
