@@ -741,3 +741,14 @@ class MainWindow(QMainWindow):
 
         self.__ui.actionSimulationAutoRestart.toggled.connect(
             self.__autoRestartOptionToggled)
+
+    def keyPressEvent(self, event):
+
+        key = event.key()
+        modifiers = event.modifiers()
+
+        if modifiers == Qt.ControlModifier:
+            if key == Qt.Key_Equal:
+                self.__ui.view.scale(1.25, 1.25)
+            elif key == Qt.Key_Minus:
+                self.__ui.view.scale(1/1.25, 1/1.25)
