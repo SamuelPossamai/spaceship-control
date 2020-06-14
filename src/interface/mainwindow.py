@@ -752,3 +752,7 @@ class MainWindow(QMainWindow):
                 self.__ui.view.scale(1.25, 1.25)
             elif key == Qt.Key_Minus:
                 self.__ui.view.scale(1/1.25, 1/1.25)
+            elif key == Qt.Key_A:
+                self.__ui.view.rotate(-5)
+            elif key == Qt.Key_D:
+                self.__ui.view.rotate(5)
