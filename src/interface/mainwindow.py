@@ -106,6 +106,7 @@ class MainWindow(QMainWindow):
         self.__condition_graphic_items = []
 
         self.__one_shot = one_shot
+        self.__start_scenario_time = None
 
         self.__ui.actionSimulationAutoRestart.setChecked(
             FileInfo().readConfig('Simulation', 'auto_restart', default=False))
@@ -156,6 +157,8 @@ class MainWindow(QMainWindow):
         self.__ui.deviceInterfaceComboBox.clear()
         self.__ui.deviceInterfaceComponents.show()
         self.__ui.treeView.show()
+
+        self.__start_scenario_time = None
 
         with self.__lock:
             self.__space.remove(*self.__space.bodies, *self.__space.shapes)
@@ -442,6 +445,7 @@ class MainWindow(QMainWindow):
         self.clear()
 
         fileinfo = FileInfo()
+        self.__start_scenario_time = time.time()
 
         try:
             scenario_info = fileinfo.loadScenario(scenario)
@@ -529,6 +533,14 @@ class MainWindow(QMainWindow):
         gitem.prepareGeometryChange()
         gitem.setRotation(180*body.angle/pi)
 
+    def __saveStatistics(self):
+
+        FileInfo().saveStatistics({
+            'success': self.__objectives_result,
+            'scenario': self.__current_scenario,
+            'time': time.time() - self.__start_scenario_time
+        })
+
     def __timerTimeout(self):
 
         if self.__current_scenario is None:
@@ -561,14 +573,18 @@ class MainWindow(QMainWindow):
 
             if self.__condition_graphic_items:
                 timestamp = time.time()
+                if self.__start_scenario_time is not None:
+                    timestamp -= self.__start_scenario_time
                 for dyn_gitem in self.__condition_graphic_items:
                     dyn_gitem.evaluate(timestamp=timestamp)
 
         if self.__objectives_result is not None:
             if self.__one_shot is True:
+                self.__saveStatistics()
                 self.close()
                 return
             if self.__ui.actionSimulationAutoRestart.isChecked():
+                self.__saveStatistics()
                 self.loadScenario(self.__current_scenario)
                 return
 

@@ -64,6 +64,8 @@ class FileInfo:
 
         self.__already_initialized = True
 
+        self.__statistics_file = None
+
         self.__path = \
             Path.home().joinpath('.local/share/spaceshipcontrol').resolve()
         self.__dist_data_path = Path(__file__).parent.parent.resolve()
@@ -156,6 +158,22 @@ class FileInfo:
             Node(filedatatype_info.path),
             remove_suffix=filedatatype_info.list_remove_suffix,
             blacklist=filedatatype_info.list_blacklist)
+
+    @property
+    def statistics_filepath(self):
+        return self.__statistics_file
+
+    @statistics_filepath.setter
+    def statistics_filepath(self, filepath):
+        self.__statistics_file = filepath
+
+    def saveStatistics(self, statistics):
+
+        if self.__statistics_file is None:
+            return
+
+        with open(self.__statistics_file, 'w') as file:
+            yaml.dump(statistics, file)
 
     def __listTree(self, base_path, current_node, blacklist=(),
                    remove_suffix=True):
