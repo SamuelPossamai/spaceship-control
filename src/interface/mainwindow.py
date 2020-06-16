@@ -61,7 +61,7 @@ class ObjectiveNodeValue(NodeValue):
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None, one_shot=False):
+    def __init__(self, parent=None, one_shot=False, time_limit=None):
 
         super().__init__(parent=parent)
 
@@ -107,6 +107,7 @@ class MainWindow(QMainWindow):
 
         self.__one_shot = one_shot
         self.__start_scenario_time = None
+        self.__time_limit = time_limit
 
         self.__ui.actionSimulationAutoRestart.setChecked(
             FileInfo().readConfig('Simulation', 'auto_restart', default=False))
@@ -533,12 +534,24 @@ class MainWindow(QMainWindow):
         gitem.prepareGeometryChange()
         gitem.setRotation(180*body.angle/pi)
 
+    def __objectivesTimedOut(self):
+
+        if self.__time_limit is None or self.__start_scenario_time is None:
+            return False
+
+        return time.time() - self.__start_scenario_time > self.__time_limit
+
     def __saveStatistics(self):
+
+        scenario_time = time.time() - self.__start_scenario_time
+
+        if self.__time_limit is not None and scenario_time > self.__time_limit:
+            scenario_time = self.__time_limit
 
         FileInfo().saveStatistics({
             'success': self.__objectives_result,
             'scenario': self.__current_scenario,
-            'time': time.time() - self.__start_scenario_time
+            'time': scenario_time
         })
 
     def __timerTimeout(self):
@@ -565,8 +578,11 @@ class MainWindow(QMainWindow):
             if objectives_complete:
                 self.__objectives_result = True
             else:
-                if any(tuple(objective.failed()
-                             for objective in self.__scenario_objectives)):
+
+                if self.__objectivesTimedOut() or any(
+                    tuple(objective.failed()
+                          for objective in self.__scenario_objectives)):
+
                     self.__objectives_result = False
                 else:
                     self.__objectives_result = None

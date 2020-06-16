@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QApplication
 from .interface.mainwindow import MainWindow
 from .storage.fileinfo import FileInfo
 
-ProgramArgsInfo = namedtuple('ProgramArgsInfo', ('scenario', 'one_shot'))
+ProgramArgsInfo = namedtuple('ProgramArgsInfo', (
+    'scenario', 'one_shot', 'time_limit'))
 
 def getProgramArguments():
 
@@ -19,6 +20,8 @@ def getProgramArguments():
     parser.add_argument('-f', '--file-path', help=(
         'Path to the file where information about the results of the last run '
         'will be stored'))
+    parser.add_argument('-t', '--time-limit', type=float, help=(
+        'If specified, the objectives will fail after \'n\' seconds'))
 
     args = parser.parse_args()
 
@@ -30,7 +33,8 @@ def getProgramArguments():
     if args.file_path is not None:
         FileInfo().statistics_filepath = args.file_path
 
-    return ProgramArgsInfo(scenario=args.scenario, one_shot=args.one_shot)
+    return ProgramArgsInfo(scenario=args.scenario, one_shot=args.one_shot,
+                           time_limit=args.time_limit)
 
 def main():
 
@@ -38,7 +42,8 @@ def main():
 
     app = QApplication(sys.argv)
 
-    window = MainWindow(one_shot=program_args.one_shot)
+    window = MainWindow(one_shot=program_args.one_shot,
+                        time_limit=program_args.time_limit)
     window.show()
 
     if program_args.scenario is not None:
