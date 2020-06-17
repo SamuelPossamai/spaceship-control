@@ -14,7 +14,7 @@ except ImportError:
 
 from PyQt5.QtWidgets import (
     QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QGraphicsPixmapItem,
-    QTextBrowser, QGraphicsItemGroup
+    QTextBrowser, QGraphicsItemGroup, QTabWidget, QTabBar, QApplication
 )
 from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtCore import QTimer, Qt
@@ -119,6 +119,13 @@ class MainWindow(QMainWindow):
             FileInfo().readConfig('Window', 'y', default=self.y()),
             FileInfo().readConfig('Window', 'width', default=self.width()),
             FileInfo().readConfig('Window', 'height', default=self.height()))
+
+        self.__ui.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.__ui.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.__ui.view.setFocusPolicy(Qt.NoFocus)
+        self.__ui.treeView.setFocusPolicy(Qt.NoFocus)
+
+        self.setFocusPolicy(Qt.StrongFocus)
 
     def moveEvent(self, event):
         FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
@@ -788,3 +795,8 @@ class MainWindow(QMainWindow):
                 self.__ui.view.rotate(-5)
             elif key == Qt.Key_D:
                 self.__ui.view.rotate(5)
+        else:
+            if key == Qt.Key_Left or key == Qt.Key_Right or key == Qt.Key_Up \
+                or key == Qt.Key_Down:
+
+                self.__ui.view.keyPressEvent(event)
