@@ -19,12 +19,11 @@ class TimedObjectiveGroup(ObjectiveGroup):
         super().__init__(subobjectives, name=name, description=description,
                          **kwargs)
 
-        self.__time_limit_val = time_limit
-        self.__time_limit = time.time() + time_limit
+        self.__time_limit = time_limit
 
     def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
 
-        if time.time() > self.__time_limit:
+        if time.time() > self.started_at + self.__time_limit:
             return False
 
         return super()._verify(space, ships)
@@ -32,10 +31,7 @@ class TimedObjectiveGroup(ObjectiveGroup):
     def _hasFailed(self, space: 'pymunk.Space',
                    ships: 'Sequence[Device]') -> bool:
 
-        if time.time() > self.__time_limit:
+        if time.time() > self.started_at + self.__time_limit:
             return True
 
         return super()._hasFailed(space, ships)
-
-    def reset(self) -> None:
-        self.__time_limit = time.time() + self.__time_limit

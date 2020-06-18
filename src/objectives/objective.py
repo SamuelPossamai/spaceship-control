@@ -5,6 +5,7 @@ controllers need to complete.
 """
 
 from abc import ABC, abstractmethod, abstractproperty
+import time
 
 from anytree import Node
 
@@ -25,6 +26,7 @@ class Objective(ABC):
         self.__acp = False
         self.__failed = False
         self.__neg = negation
+        self.__start = time.time()
 
         if required is None:
             self.__required = not negation
@@ -35,6 +37,10 @@ class Objective(ABC):
             return self.__acp
 
         return self.__failed
+
+    @property
+    def started_at(self):
+        return self.__start
 
     def accomplished(self) -> bool:
         """Consult if the objective was accomplished.
@@ -119,6 +125,7 @@ class Objective(ABC):
     def reset(self) -> None:
         self.__acp = False
         self.__failed = False
+        self.__start = time.time()
 
 class ObjectiveGroup(Objective):
 
