@@ -548,17 +548,36 @@ class MainWindow(QMainWindow):
 
         return time.time() - self.__start_scenario_time > self.__time_limit
 
+    def __createObjectivesRecord(self, node, current_time):
+
+        objective = node.name
+
+        return {
+            'name': objective.name,
+            'desc': objective.description,
+            'accomplished': objective.accomplished(),
+            'failed': objective.failed(),
+            'children': [self.__createObjectivesRecord(child, current_time)
+                         for child in node.children]
+        }
+
+
     def __saveStatistics(self):
 
-        scenario_time = time.time() - self.__start_scenario_time
+        current_time = time.time()
+        scenario_time = current_time - self.__start_scenario_time
 
         if self.__time_limit is not None and scenario_time > self.__time_limit:
             scenario_time = self.__time_limit
 
+        objectives = createObjectiveTree(self.__scenario_objectives)
+
         FileInfo().saveStatistics({
             'success': self.__objectives_result,
             'scenario': self.__current_scenario,
-            'time': scenario_time
+            'time': scenario_time,
+            'objectives': [self.__createObjectivesRecord(child, current_time)
+                           for child in objectives.children]
         })
 
     def __timerTimeout(self):

@@ -229,6 +229,13 @@ class ObjectiveGroup(Objective):
 def createObjectiveTree(objective: 'Union[Objective, Sequence[Objective]]',
                         parent: 'Node' = None) -> 'Node':
 
+    if not isinstance(objective, Objective):
+        node = Node(None)
+        for obj in objective:
+            createObjectiveTree(obj, parent=node)
+
+        return node
+
     current_node = Node(objective, parent=parent)
 
     if isinstance(objective, ObjectiveGroup):
