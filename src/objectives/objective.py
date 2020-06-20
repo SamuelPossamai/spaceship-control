@@ -27,6 +27,7 @@ class Objective(ABC):
         self.__failed = False
         self.__neg = negation
         self.__start = time.time()
+        self.__finish = None
 
         if required is None:
             self.__required = not negation
@@ -41,6 +42,10 @@ class Objective(ABC):
     @property
     def started_at(self):
         return self.__start
+
+    @property
+    def finished_at(self):
+        return self.__finish
 
     def accomplished(self) -> bool:
         """Consult if the objective was accomplished.
@@ -94,8 +99,10 @@ class Objective(ABC):
         if self.__acp is False and self.__failed is False:
             if self._verify(space, ships) is True:
                 self.__acp = True
-            else:
-                self.__failed = self._hasFailed(space, ships)
+                self.__finish = time.time()
+            elif self._hasFailed(space, ships):
+                self.__failed = True
+                self.__finish = time.time()
 
         return self.accomplished()
 
@@ -126,6 +133,7 @@ class Objective(ABC):
         self.__acp = False
         self.__failed = False
         self.__start = time.time()
+        self.__finish = None
 
 class ObjectiveGroup(Objective):
 

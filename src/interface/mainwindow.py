@@ -552,11 +552,18 @@ class MainWindow(QMainWindow):
 
         objective = node.name
 
+        finished_at = objective.finished_at
+        if finished_at is None:
+            time_to_result = None
+        else:
+            time_to_result = finished_at - objective.started_at
+
         return {
             'name': objective.name,
             'desc': objective.description,
             'accomplished': objective.accomplished(),
             'failed': objective.failed(),
+            'time': time_to_result,
             'children': [self.__createObjectivesRecord(child, current_time)
                          for child in node.children]
         }
