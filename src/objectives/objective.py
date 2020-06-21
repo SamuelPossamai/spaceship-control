@@ -18,7 +18,8 @@ class Objective(ABC):
     """
 
     def __init__(self, name: str, description: str,
-                 required: bool = None, negation: bool = False) -> None:
+                 required: bool = None, negation: bool = False,
+                 valid_ships: 'Sequence[str]' = None) -> None:
         super().__init__()
 
         self.__name = name
@@ -28,6 +29,10 @@ class Objective(ABC):
         self.__neg = negation
         self.__start = time.time()
         self.__finish = None
+        if valid_ships is None:
+            self.__valid_ships = None
+        else:
+            self.__valid_ships = set(valid_ships)
 
         if required is None:
             self.__required = not negation
@@ -40,11 +45,15 @@ class Objective(ABC):
         return self.__failed
 
     @property
-    def started_at(self):
+    def valid_ships(self) -> 'Sequence[str]':
+        return self.__valid_ships
+
+    @property
+    def started_at(self) -> 'float':
         return self.__start
 
     @property
-    def finished_at(self):
+    def finished_at(self) -> 'Optional[float]':
         return self.__finish
 
     def accomplished(self) -> bool:
@@ -89,12 +98,15 @@ class Objective(ABC):
         """
         return self.__name
 
-    def verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def verify(self, space: 'pymunk.Space', ships: 'Sequence[Structure]') -> bool:
         """Verify if the objective is complete or if it was failed.
 
         Returns:
             True if it was accomplished otherwise False
         """
+
+        if self.__valid_ships is not None:
+            ships = tuple(ship for ship in ships if ship in self.__valid_ships)
 
         if self.__acp is False and self.__failed is False:
             if self._verify(space, ships) is True:
@@ -107,12 +119,12 @@ class Objective(ABC):
         return self.accomplished()
 
     @abstractmethod
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Structure]') -> bool:
         pass
 
     @staticmethod
     def _hasFailed(space: 'pymunk.Space',
-                   ships: 'Sequence[Device]') -> bool:
+                   ships: 'Sequence[Structure]') -> bool:
         del space
         del ships
         return False
