@@ -35,13 +35,14 @@ def __createGoToObjective(objective_content) -> 'GoToObjective':
     distance = objective_content['distance']
 
     kwargs = {key: value for key, value in objective_content.items()
-              if key in ('name', 'description')}
+              if key in ('name', 'description', 'negation', 'valid_ships')}
 
     return GoToObjective(position, distance, **kwargs)
 
 def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
 
-    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential')
+    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
+                    'negation', 'valid_ships')
 
     kwargs = {key: value for key, value in objective_content.items()
               if key in valid_kwargs}
@@ -52,7 +53,7 @@ def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
 def __createTimedObjectiveGroup(objective_content) -> 'TimedObjectiveGroup':
 
     valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
-                    'time_limit')
+                    'time_limit', 'negation', 'valid_ships')
 
     kwargs = {key: value for key, value in objective_content.items()
               if key in valid_kwargs}
