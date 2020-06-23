@@ -106,7 +106,8 @@ class Objective(ABC):
         """
 
         if self.__valid_ships is not None:
-            ships = tuple(ship for ship in ships if ship in self.__valid_ships)
+            ships = tuple(
+                ship for ship in ships if ship.name in self.__valid_ships)
 
         if self.__acp is False and self.__failed is False:
             if self._verify(space, ships) is True:
@@ -154,7 +155,8 @@ class ObjectiveGroup(Objective):
                  description: str = None,
                  required_quantity: int = None,
                  sequential: bool = False,
-                 times: int = 1) -> None:
+                 times: int = 1,
+                 **kwargs) -> None:
 
         if sequential and required_quantity is not None:
             raise ValueError('ObjectiveGroup: It\'s not possible to specify'
@@ -165,7 +167,7 @@ class ObjectiveGroup(Objective):
                 subobjectives, name=name, description=description,
                 required_quantity=required_quantity, sequential=sequential)
 
-        super().__init__(name, description)
+        super().__init__(name, description, **kwargs)
 
         self.__subobjectives = tuple(subobjectives)
         self.__req_qtd = required_quantity

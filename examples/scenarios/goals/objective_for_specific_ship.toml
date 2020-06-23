@@ -1,0 +1,52 @@
+
+[Scenario]
+
+name = 'Objective.valid_ships'
+debug = true
+
+[[Ship]]
+
+name = 'not_valid'
+model = '..basic/go_forward'
+controller = '..basic/go_forward.py'
+
+x = 0
+y = 0
+angle = 0
+
+[[Ship]]
+
+name = 'valid'
+model = '..basic/go_forward'
+controller = '..basic/go_forward.py'
+
+x = -50
+y = 0
+angle = 0
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 0
+y = 0
+
+width = 20
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 100
+y = 0
+
+width = 20
+
+[[Objective]]
+
+type = 'goto'
+
+x = 100
+y = 0
+
+distance = 10
+
+valid_ships = ['valid']

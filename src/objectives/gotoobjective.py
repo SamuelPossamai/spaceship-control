@@ -5,7 +5,8 @@ from .objective import Objective
 
 class GoToObjective(Objective):
 
-    def __init__(self, position, distance, name=None, description=None):
+    def __init__(self, position, distance, name=None, description=None,
+                 **kwargs):
         if name is None:
             name = f'Go to position({position[0]}, {position[1]})'
 
@@ -14,7 +15,7 @@ class GoToObjective(Objective):
                            f'{position[0]}, {position[1]}, the maximum distance'
                            f' accepted is {distance}')
 
-        super().__init__(name, description)
+        super().__init__(name, description, **kwargs)
 
         self.__position = Vec2d(position)
         self.__distance = distance
