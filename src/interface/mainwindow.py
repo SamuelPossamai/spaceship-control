@@ -826,3 +826,13 @@ class MainWindow(QMainWindow):
                 or key == Qt.Key_Down:
 
                 self.__ui.view.keyPressEvent(event)
+            if key >= Qt.Key_0 and key <= Qt.Key_9:
+
+                value = 9 if key == Qt.Key_0 else key - Qt.Key_1
+                try:
+                    _, ship_item, _, _ = self.__ships[value]
+                    self.__ui.view.centerOn(ship_item.pos())
+                except IndexError:
+                    pass
+
+
