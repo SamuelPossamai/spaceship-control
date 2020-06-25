@@ -127,6 +127,10 @@ class MainWindow(QMainWindow):
 
         self.setFocusPolicy(Qt.StrongFocus)
 
+        big_int = 2**30
+        self.__ui.view.scene().setSceneRect(-big_int, -big_int,
+                                            2*big_int, 2*big_int)
+
     def moveEvent(self, event):
         FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
         FileInfo().writeConfig(event.pos().y(), 'Window', 'y')
