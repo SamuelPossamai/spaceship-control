@@ -120,6 +120,8 @@ class MainWindow(QMainWindow):
             FileInfo().readConfig('Window', 'width', default=self.width()),
             FileInfo().readConfig('Window', 'height', default=self.height()))
 
+        self.__center_view_on = None
+
         self.__ui.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.__ui.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.__ui.view.setFocusPolicy(Qt.NoFocus)
@@ -171,6 +173,7 @@ class MainWindow(QMainWindow):
         self.__ui.treeView.show()
 
         self.__start_scenario_time = None
+        self.__center_view_on = None
 
         with self.__lock:
             self.__space.remove(*self.__space.bodies, *self.__space.shapes)
@@ -596,6 +599,9 @@ class MainWindow(QMainWindow):
         if self.__current_scenario is None:
             return
 
+        if self.__center_view_on is not None:
+            self.__ui.view.centerOn(self.__center_view_on)
+
         ships = tuple(ship for ship, _, _, _ in self.__ships)
         with self.__lock:
             self.__space.step(0.02)
@@ -819,24 +825,33 @@ class MainWindow(QMainWindow):
         if modifiers == Qt.ControlModifier:
             if key == Qt.Key_Equal:
                 self.__ui.view.scale(1.25, 1.25)
+                return
             elif key == Qt.Key_Minus:
                 self.__ui.view.scale(1/1.25, 1/1.25)
+                return
             elif key == Qt.Key_A:
                 self.__ui.view.rotate(-5)
+                return
             elif key == Qt.Key_D:
                 self.__ui.view.rotate(5)
+                return
         else:
             if key == Qt.Key_Left or key == Qt.Key_Right or key == Qt.Key_Up \
                 or key == Qt.Key_Down:
 
                 self.__ui.view.keyPressEvent(event)
-            if key >= Qt.Key_0 and key <= Qt.Key_9:
+                return
 
-                value = 9 if key == Qt.Key_0 else key - Qt.Key_1
-                try:
-                    _, ship_item, _, _ = self.__ships[value]
-                    self.__ui.view.centerOn(ship_item.pos())
-                except IndexError:
-                    pass
+        if key >= Qt.Key_0 and key <= Qt.Key_9:
+
+            value = 9 if key == Qt.Key_0 else key - Qt.Key_1
+            try:
+                _, ship_item, _, _ = self.__ships[value]
+            except IndexError:
+                pass
+            else:
+                self.__ui.view.centerOn(ship_item.pos())
+                if modifiers == Qt.ControlModifier:
+                    self.__center_view_on = ship_item
 
 
