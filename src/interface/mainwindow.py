@@ -61,7 +61,8 @@ class ObjectiveNodeValue(NodeValue):
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None, one_shot=False, time_limit=None):
+    def __init__(self, parent=None, one_shot=False, time_limit=None,
+                 follow_ship=None):
 
         super().__init__(parent=parent)
 
@@ -104,6 +105,8 @@ class MainWindow(QMainWindow):
 
         self.__debug_messages_text_browsers = {}
         self.__condition_graphic_items = []
+
+        self.__ship_to_follow = follow_ship
 
         self.__one_shot = one_shot
         self.__start_scenario_time = None
@@ -409,6 +412,15 @@ class MainWindow(QMainWindow):
                 return None
 
             ships[i] = ship
+
+        if self.__ship_to_follow is not None:
+            try:
+                _, ship_item, _, _ = ships[self.__ship_to_follow]
+            except IndexError:
+                pass
+            else:
+                self.__ui.view.centerOn(ship_item.pos())
+                self.__center_view_on = ship_item
 
         return ships
 
