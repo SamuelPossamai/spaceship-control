@@ -14,7 +14,7 @@ except ImportError:
 
 from PyQt5.QtWidgets import (
     QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QGraphicsPixmapItem,
-    QTextBrowser, QGraphicsItemGroup, QTabWidget, QTabBar, QApplication
+    QTextBrowser
 )
 from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtCore import QTimer, Qt
@@ -25,9 +25,8 @@ import anytree
 
 # pylint: disable=relative-beyond-top-level
 
-from .objectgraphicsitem import ObjectGraphicsItem
 from .choosefromtreedialog import ChooseFromTreeDialog
-from .conditiongraphicspixmapitem import ConditionGraphicsPixmapItem
+from .loadgraphicitem import loadGraphicItem
 
 from ..storage.fileinfo import FileInfo
 
@@ -214,84 +213,6 @@ class MainWindow(QMainWindow):
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
 
-    @staticmethod
-    def __getSizeScale(cur_width, cur_height, after_width, after_height):
-
-        width_scale = height_scale = 1
-        if after_height is None:
-            if after_width is not None:
-                width_scale = height_scale = after_width/cur_width
-        elif after_width is None:
-            width_scale = height_scale = after_height/cur_height
-        else:
-            width_scale = after_width/cur_width
-            height_scale = after_height/cur_height
-
-        return width_scale, height_scale
-
-    def __loadGraphicItemImagePart(self, image, condition_variables):
-
-        pixmap = QPixmap(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
-                                            image.name))
-
-        image_x_is_expr = isinstance(image.x, str)
-        image_y_is_expr = isinstance(image.y, str)
-        image_angle_is_expr = isinstance(image.angle, str)
-
-        width_scale, height_scale = self.__getSizeScale(
-            pixmap.width(), pixmap.height(), image.width, image.height)
-
-        if not image_angle_is_expr:
-            pixmap = pixmap.transformed(QTransform().rotate(image.angle))
-
-        if image_angle_is_expr or image_x_is_expr or image_y_is_expr or \
-            image.condition:
-
-            gitem_part = ConditionGraphicsPixmapItem(
-                image.condition, pixmap,
-                names=condition_variables)
-            self.__condition_graphic_items.append(gitem_part)
-        else:
-            gitem_part = QGraphicsPixmapItem(pixmap)
-
-        gitem_part.setTransform(QTransform().scale(width_scale, height_scale))
-
-        if image_angle_is_expr:
-            gitem_part.setAngleOffsetExpression(image.angle)
-
-        x_offset = 0
-        if image_x_is_expr:
-            gitem_part.setXOffsetExpression(image.x, multiplier=1/width_scale)
-        else:
-            x_offset = image.x/width_scale
-
-        y_offset = 0
-        if image_y_is_expr:
-            gitem_part.setYOffsetExpression(image.y, multiplier=1/height_scale)
-        else:
-            y_offset = image.y/height_scale
-
-        gitem_part.setOffset(x_offset - pixmap.width()/2,
-                             y_offset - pixmap.height()/2)
-
-        gitem_part.setZValue(image.z_value)
-
-        return gitem_part
-
-    def __loadGraphicItem(self, shapes, images, condition_variables=None,
-                          default_color=Qt.blue):
-
-        if not images:
-            return ObjectGraphicsItem(shapes, color=default_color)
-
-        gitem = QGraphicsItemGroup()
-
-        for image in images:
-            gitem.addToGroup(self.__loadGraphicItemImagePart(
-                image, condition_variables))
-
-        return gitem
-
     def __loadShip(self, ship_info, arg_scenario_info, fileinfo):
 
         arg_scenario_info['starting-position'] = ship_info.position
@@ -351,9 +272,11 @@ class MainWindow(QMainWindow):
 
         self.__debug_msg_queues[ship.name] = msg_queue
 
-        ship_gitem = self.__loadGraphicItem(
+        ship_gitem, condition_graphic_items = loadGraphicItem(
             ship.body.shapes, loaded_ship.images,
             condition_variables={'ship': ship.mirror})
+
+        self.__condition_graphic_items.extend(condition_graphic_items)
 
         self.__ui.view.scene().addItem(ship_gitem)
 
@@ -386,8 +309,10 @@ class MainWindow(QMainWindow):
         body.position = obj_info.position
         body.angle = obj_info.angle
 
-        object_gitem = self.__loadGraphicItem(
+        object_gitem, condition_graphic_items = loadGraphicItem(
             body.shapes, object_info.images, default_color=Qt.gray)
+
+        self.__condition_graphic_items.extend(condition_graphic_items)
 
         self.__ui.view.scene().addItem(object_gitem)
 
