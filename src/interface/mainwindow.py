@@ -135,6 +135,8 @@ class MainWindow(QMainWindow):
         self.__ui.view.scene().setSceneRect(-big_int, -big_int,
                                             2*big_int, 2*big_int)
 
+        self.setFocus()
+
     def moveEvent(self, event):
         FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
         FileInfo().writeConfig(event.pos().y(), 'Window', 'y')
@@ -368,29 +370,14 @@ class MainWindow(QMainWindow):
 
     def __loadStaticImages(self, static_images):
 
-        for image_info in static_images:
-            pixmap = QPixmap(FileInfo().getPath(
-                FileInfo.FileDataType.IMAGE, image_info.name))
-            height = image_info.height
-            width = image_info.width
+        if static_images:
+            for image_info in static_images:
+                image_item, condition_graphic_items = loadGraphicItem(
+                    None, (image_info,), group_z_value=-1)
 
-            if height is None:
-                if width is not None:
-                    pixmap = pixmap.scaledToWidth(width)
-            elif width is None:
-                pixmap = pixmap.scaledToHeight(height)
-            else:
-                pixmap = pixmap.scaled(width, height)
+                self.__condition_graphic_items.extend(condition_graphic_items)
 
-            image_item = QGraphicsPixmapItem(pixmap)
-
-            image_item.setPos(image_info.x, image_info.y)
-
-            brect = image_item.boundingRect()
-            image_item.setOffset(-brect.width()/2, -brect.height()/2)
-            image_item.setZValue(-1)
-
-            self.__ui.view.scene().addItem(image_item)
+                self.__ui.view.scene().addItem(image_item)
 
     def loadScenario(self, scenario):
 

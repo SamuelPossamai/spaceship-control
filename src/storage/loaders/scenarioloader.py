@@ -2,6 +2,8 @@
 from math import pi
 from collections import namedtuple
 
+from .imageloader import loadImages
+
 from ..configfileinheritance import resolvePrefix
 
 from ...objectives.objective import ObjectiveGroup
@@ -9,9 +11,6 @@ from ...objectives.gotoobjective import GoToObjective
 from ...objectives.timedobjective import TimedObjectiveGroup
 
 from ...devices.communicationdevices import CommunicationEngine
-
-StaticImageInfo = namedtuple('StaticImageInfo',
-                             ('name', 'width', 'height', 'x', 'y'))
 
 ObjectInfo = namedtuple('ObjectInfo', (
     'model', 'position', 'angle', 'variables'))
@@ -136,17 +135,6 @@ def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
     return ObjectInfo(model=model, position=position, angle=angle,
                       variables=variables)
 
-def __readImageInfo(image_content, prefixes) -> 'StaticImageInfo':
-
-    image_path = image_content['path']
-
-    image_path, _ = resolvePrefix(image_path, prefixes)
-    return StaticImageInfo(image_path,
-                           width=image_content.get('width'),
-                           height=image_content.get('height'),
-                           x=image_content.get('x', 0),
-                           y=image_content.get('y', 0))
-
 def loadPhysicsEngine(engine_info: 'Dict[str, Any]'):
 
     gravity_dict = engine_info.get('Gravity')
@@ -185,8 +173,7 @@ def loadScenario(scenario_info: 'Dict[str, Any]',
     objects = tuple(__readObjectInfo(obj, prefixes)
                     for obj in scenario_info.get('Object', ()))
 
-    images = tuple(__readImageInfo(image, prefixes)
-                   for image in scenario_info.get('Image', ()))
+    images = loadImages(scenario_info.get('Image', ()), prefixes)
 
     hidden_user_interface = scenario_content.get('hide_user_interface', False)
 

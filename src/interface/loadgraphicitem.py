@@ -73,12 +73,19 @@ def __loadGraphicItemImagePart(image, condition_variables,
     return gitem_part
 
 def loadGraphicItem(shapes, images, condition_variables=None,
-                    default_color=Qt.blue):
+                    default_color=Qt.blue, group_z_value=0):
 
     if not images:
-        return ObjectGraphicsItem(shapes, color=default_color), ()
+        if shapes is None:
+            return None, ()
+
+        gitem = ObjectGraphicsItem(shapes, color=default_color)
+        gitem.setZValue(group_z_value)
+
+        return gitem, ()
 
     gitem = QGraphicsItemGroup()
+    gitem.setZValue(group_z_value)
 
     condition_graphic_items = []
     for image in images:
