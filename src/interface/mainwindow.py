@@ -61,7 +61,7 @@ class ObjectiveNodeValue(NodeValue):
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None, one_shot=False, time_limit=None,
-                 follow_ship=None):
+                 follow_ship=None, start_zoom=None):
 
         super().__init__(parent=parent)
 
@@ -134,6 +134,9 @@ class MainWindow(QMainWindow):
         big_int = 2**30
         self.__ui.view.scene().setSceneRect(-big_int, -big_int,
                                             2*big_int, 2*big_int)
+
+        if start_zoom is not None:
+            self.__ui.view.scale(start_zoom, start_zoom)
 
         self.setFocus()
 

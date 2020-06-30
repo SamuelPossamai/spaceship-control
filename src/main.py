@@ -9,7 +9,7 @@ from .interface.mainwindow import MainWindow
 from .storage.fileinfo import FileInfo
 
 ProgramArgsInfo = namedtuple('ProgramArgsInfo', (
-    'scenario', 'one_shot', 'time_limit', 'follow_ship'))
+    'scenario', 'one_shot', 'time_limit', 'follow_ship', 'start_zoom'))
 
 def getProgramArguments():
 
@@ -24,6 +24,7 @@ def getProgramArguments():
         'If specified, the objectives will fail after \'n\' seconds'))
     parser.add_argument('--follow', type=int, help=(
         'Start following the ship number \'n\''))
+    parser.add_argument('--zoom', type=float, help='Starting zoom')
 
     args = parser.parse_args()
 
@@ -36,7 +37,8 @@ def getProgramArguments():
         FileInfo().statistics_filepath = args.file_path
 
     return ProgramArgsInfo(scenario=args.scenario, one_shot=args.one_shot,
-                           time_limit=args.time_limit, follow_ship=args.follow)
+                           time_limit=args.time_limit, follow_ship=args.follow,
+                           start_zoom=args.zoom)
 
 def main():
 
@@ -46,7 +48,8 @@ def main():
 
     window = MainWindow(one_shot=program_args.one_shot,
                         time_limit=program_args.time_limit,
-                        follow_ship=program_args.follow_ship)
+                        follow_ship=program_args.follow_ship,
+                        start_zoom=program_args.start_zoom)
     window.show()
 
     if program_args.scenario is not None:
