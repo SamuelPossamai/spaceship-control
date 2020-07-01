@@ -762,6 +762,11 @@ class MainWindow(QMainWindow):
             elif key == Qt.Key_D:
                 self.__ui.view.rotate(5)
                 return
+            elif key == Qt.Key_R:
+                self.__ui.view.fitInView(
+                    self.__ui.view.scene().itemsBoundingRect(),
+                    Qt.KeepAspectRatio)
+                return
         else:
             if key == Qt.Key_Left or key == Qt.Key_Right or key == Qt.Key_Up \
                 or key == Qt.Key_Down:
