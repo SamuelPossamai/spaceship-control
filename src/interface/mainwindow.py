@@ -13,10 +13,8 @@ except ImportError:
     from queue import Queue as SimpleQueue
 
 from PyQt5.QtWidgets import (
-    QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QGraphicsPixmapItem,
-    QTextBrowser
+    QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QTextBrowser
 )
-from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtCore import QTimer, Qt
 
 import pymunk
@@ -38,7 +36,8 @@ from ..objectives.objective import createObjectiveTree
 sys.path.insert(0, str(Path(__file__).parent))
 
 # imported here so it is not imported in a different path
-from nodetreeview import NodeValue # pylint: disable=wrong-import-position
+
+from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position
 UiMainWindow, _ = FileInfo().loadUi('mainwindow.ui') # pylint: disable=invalid-name
 sys.path.pop(0)
 
@@ -140,12 +139,12 @@ class MainWindow(QMainWindow):
 
         self.setFocus()
 
-    def moveEvent(self, event):
+    def moveEvent(self, event): # pylint: disable=no-self-use
         FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
         FileInfo().writeConfig(event.pos().y(), 'Window', 'y')
         FileInfo().saveConfig()
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event): # pylint: disable=no-self-use
         FileInfo().writeConfig(event.size().width(), 'Window', 'width')
         FileInfo().writeConfig(event.size().height(), 'Window', 'height')
         FileInfo().saveConfig()
@@ -550,8 +549,8 @@ class MainWindow(QMainWindow):
             else:
 
                 if self.__objectivesTimedOut() or any(
-                    tuple(objective.failed()
-                          for objective in self.__scenario_objectives)):
+                        tuple(objective.failed()
+                              for objective in self.__scenario_objectives)):
 
                     self.__objectives_result = False
                 else:
@@ -753,28 +752,26 @@ class MainWindow(QMainWindow):
             if key == Qt.Key_Equal:
                 self.__ui.view.scale(1.25, 1.25)
                 return
-            elif key == Qt.Key_Minus:
+            if key == Qt.Key_Minus:
                 self.__ui.view.scale(1/1.25, 1/1.25)
                 return
-            elif key == Qt.Key_A:
+            if key == Qt.Key_A:
                 self.__ui.view.rotate(-5)
                 return
-            elif key == Qt.Key_D:
+            if key == Qt.Key_D:
                 self.__ui.view.rotate(5)
                 return
-            elif key == Qt.Key_R:
+            if key == Qt.Key_R:
                 self.__ui.view.fitInView(
                     self.__ui.view.scene().itemsBoundingRect(),
                     Qt.KeepAspectRatio)
                 return
         else:
-            if key == Qt.Key_Left or key == Qt.Key_Right or key == Qt.Key_Up \
-                or key == Qt.Key_Down:
-
+            if key in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down):
                 self.__ui.view.keyPressEvent(event)
                 return
 
-        if key >= Qt.Key_0 and key <= Qt.Key_9:
+        if Qt.Key_0 <= key <= Qt.Key_9:
 
             value = 9 if key == Qt.Key_0 else key - Qt.Key_1
             try:
@@ -785,5 +782,3 @@ class MainWindow(QMainWindow):
                 self.__ui.view.centerOn(ship_item.pos())
                 if modifiers == Qt.ControlModifier:
                     self.__center_view_on = ship_item
-
-
