@@ -1,16 +1,10 @@
 
 import sys
-import json
 import time
 from math import pi
 from threading import Lock
 from pathlib import Path
 from queue import Empty as EmptyQueueException
-
-try:
-    from queue import SimpleQueue
-except ImportError:
-    from queue import Queue as SimpleQueue
 
 from PyQt5.QtWidgets import (
     QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QTextBrowser
@@ -25,6 +19,7 @@ import anytree
 
 from .choosefromtreedialog import ChooseFromTreeDialog
 from .loadgraphicitem import loadGraphicItem
+from .loadship import loadShip
 
 from ..storage.fileinfo import FileInfo
 
@@ -217,75 +212,37 @@ class MainWindow(QMainWindow):
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
 
-    def __loadShip(self, ship_info, arg_scenario_info, fileinfo):
+    def __chooseShipDialog(self, ship_options):
+        return self.__getOptionDialog('Choose ship model', ship_options)
 
-        arg_scenario_info['starting-position'] = ship_info.position
+    def __chooseControllerDialog(self, controller_options):
+        return self.__getOptionDialog('Choose controller', controller_options)
 
-        json_info = json.dumps(arg_scenario_info)
+    def __loadShip(self, ship_info, arg_scenario_info):
 
-        ship_model = ship_info.model
-        ship_model_is_tuple = isinstance(ship_model, tuple)
+        loaded_ship_info = loadShip(
+            self.__space, ship_info, arg_scenario_info, self.__lock,
+            ship_options_dialog=self.__chooseShipDialog,
+            controller_options_dialog=self.__chooseControllerDialog,
+            communication_engine=self.__comm_engine)
 
-        if ship_model_is_tuple or ship_model is None:
-            if ship_model_is_tuple:
-                ship_options = tuple(anytree.Node(model_option)
-                                     for model_option in ship_model)
-            else:
-                ship_options = fileinfo.listFilesTree(
-                    FileInfo.FileDataType.SHIPMODEL).children
+        ship = loaded_ship_info[0]
+        ship_gitem = loaded_ship_info[1]
+        thread = loaded_ship_info[3]
 
-            ship_model = self.__getOptionDialog('Choose ship model',
-                                                ship_options)
-
-            if ship_model is None:
-                return None
-
-            ship_model = '/'.join(ship_model)
-
-        loaded_ship = fileinfo.loadShip(
-            ship_model, ship_info.name, self.__space,
-            communication_engine=self.__comm_engine,
-            variables=ship_info.variables)
-
-        ship = loaded_ship.device
-
-        self.__widgets = loaded_ship.widgets
-        ship.body.position = ship_info.position
-        ship.body.angle = ship_info.angle
+        self.__widgets = loaded_ship_info[2]
 
         for widget in self.__widgets:
             widget.setParent(self.__ui.deviceInterfaceComponents)
 
-        ship_controller = ship_info.controller
+        self.__debug_msg_queues[ship.name] = loaded_ship_info[4]
 
-        if ship_controller is None:
-
-            controller_options = fileinfo.listFilesTree(
-                FileInfo.FileDataType.CONTROLLER).children
-            ship_controller = self.__getOptionDialog('Choose controller',
-                                                     controller_options)
-
-            if ship_controller is None:
-                return None
-
-            ship_controller = '/'.join(ship_controller)
-
-        msg_queue = SimpleQueue()
-        thread = fileinfo.loadController(ship_controller, ship, json_info,
-                                         msg_queue, self.__lock)
-
-        self.__debug_msg_queues[ship.name] = msg_queue
-
-        ship_gitem, condition_graphic_items = loadGraphicItem(
-            ship.body.shapes, loaded_ship.images,
-            condition_variables={'ship': ship.mirror})
-
-        self.__condition_graphic_items.extend(condition_graphic_items)
+        self.__condition_graphic_items.extend(loaded_ship_info[5])
 
         self.__ui.view.scene().addItem(ship_gitem)
 
         self.__ui.deviceInterfaceComboBox.addItem(
-            f'{ship_info.name} ({ship_model})')
+            f'{ship_info.name} ({ship_info.model})')
 
         thread.start()
 
@@ -327,8 +284,7 @@ class MainWindow(QMainWindow):
         ships = [None]*len(ships_info)
         for i, ship_info in enumerate(ships_info):
             try:
-                ship = self.__loadShip(ship_info, arg_scenario_info.copy(),
-                                       FileInfo())
+                ship = self.__loadShip(ship_info, arg_scenario_info.copy())
             except Exception as err:
                 self.clear()
                 QMessageBox.warning(self, 'Error', (
