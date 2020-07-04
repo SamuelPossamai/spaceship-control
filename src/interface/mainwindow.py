@@ -105,8 +105,12 @@ class MainWindow(QMainWindow):
         self.__start_scenario_time = None
         self.__time_limit = time_limit
 
-        self.__ui.actionSimulationAutoRestart.setChecked(
-            FileInfo().readConfig('Simulation', 'auto_restart', default=False))
+        self.__ui.actionSimulationAutoRestart.setChecked(bool(
+            FileInfo().readConfig('Simulation', 'auto_restart', default=False)))
+
+        self.__ui.actionFitAllOnStart.setChecked(bool(
+            FileInfo().readConfig('Simulation', 'fit_all_on_start',
+                                  default=False)))
 
         self.__initConnections()
 
@@ -421,6 +425,11 @@ class MainWindow(QMainWindow):
             self.__debug_messages_text_browsers[ship.name] = tbrowser
             self.__ui.debugMessagesTabWidget.addTab(tbrowser, ship.name)
 
+        if self.__ui.actionFitAllOnStart.isChecked():
+            self.__timerTimeout()
+            self.__ui.view.fitInView(
+                self.__ui.view.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+
     @staticmethod
     def __updateGraphicsItem(body, gitem):
 
@@ -655,6 +664,12 @@ class MainWindow(QMainWindow):
         fileinfo.writeConfig(checked, 'Simulation', 'auto_restart')
         fileinfo.saveConfig()
 
+    @staticmethod
+    def __fitAllOnStartToggled(checked):
+        fileinfo = FileInfo()
+        fileinfo.writeConfig(checked, 'Simulation', 'fit_all_on_start')
+        fileinfo.saveConfig()
+
     def __initConnections(self):
 
         self.__ui.actionLoadScenario.triggered.connect(
@@ -698,6 +713,9 @@ class MainWindow(QMainWindow):
 
         self.__ui.actionSimulationAutoRestart.toggled.connect(
             self.__autoRestartOptionToggled)
+
+        self.__ui.actionFitAllOnStart.toggled.connect(
+            self.__fitAllOnStartToggled)
 
     def keyPressEvent(self, event):
 

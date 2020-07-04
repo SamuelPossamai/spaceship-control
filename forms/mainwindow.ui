@@ -166,6 +166,7 @@
      <string>Simulation</string>
     </property>
     <addaction name="actionSimulationAutoRestart"/>
+    <addaction name="actionFitAllOnStart"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
@@ -236,6 +237,14 @@
    </property>
    <property name="text">
     <string>Auto Restart</string>
+   </property>
+  </action>
+  <action name="actionFitAllOnStart">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Fit all on start</string>
    </property>
   </action>
  </widget>
