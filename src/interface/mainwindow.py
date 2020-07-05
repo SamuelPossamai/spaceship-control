@@ -55,7 +55,7 @@ class ObjectiveNodeValue(NodeValue):
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None, one_shot=False, time_limit=None,
-                 follow_ship=None, start_zoom=None):
+                 follow_ship=None, start_zoom=None, timer_interval=100):
 
         super().__init__(parent=parent)
 
@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         self.__timer = QTimer(self)
         self.__timer.timeout.connect(self.__timerTimeout)
 
-        self.__timer.setInterval(100)
+        self.__timer.setInterval(timer_interval)
         self.__timer.start()
 
         self.__space = pymunk.Space()

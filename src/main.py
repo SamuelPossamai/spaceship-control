@@ -9,7 +9,8 @@ from .interface.mainwindow import MainWindow
 from .storage.fileinfo import FileInfo
 
 ProgramArgsInfo = namedtuple('ProgramArgsInfo', (
-    'scenario', 'one_shot', 'time_limit', 'follow_ship', 'start_zoom'))
+    'scenario', 'one_shot', 'time_limit', 'follow_ship', 'start_zoom',
+    'timer_interval'))
 
 def getProgramArguments():
 
@@ -25,6 +26,8 @@ def getProgramArguments():
     parser.add_argument('--follow', type=int, help=(
         'Start following the ship number \'n\''))
     parser.add_argument('--zoom', type=float, help='Starting zoom')
+    parser.add_argument('--timer-interval', type=int, default=100, help=(
+        'Time in milliseconds between each simulation \'step\''))
 
     args = parser.parse_args()
 
@@ -36,9 +39,12 @@ def getProgramArguments():
     if args.file_path is not None:
         FileInfo().statistics_filepath = args.file_path
 
-    return ProgramArgsInfo(scenario=args.scenario, one_shot=args.one_shot,
-                           time_limit=args.time_limit, follow_ship=args.follow,
-                           start_zoom=args.zoom)
+    return ProgramArgsInfo(scenario=args.scenario,
+                           one_shot=args.one_shot,
+                           time_limit=args.time_limit,
+                           follow_ship=args.follow,
+                           start_zoom=args.zoom,
+                           timer_interval=args.timer_interval)
 
 def main():
 
@@ -49,7 +55,8 @@ def main():
     window = MainWindow(one_shot=program_args.one_shot,
                         time_limit=program_args.time_limit,
                         follow_ship=program_args.follow_ship,
-                        start_zoom=program_args.start_zoom)
+                        start_zoom=program_args.start_zoom,
+                        timer_interval=program_args.timer_interval)
     window.show()
 
     if program_args.scenario is not None:
