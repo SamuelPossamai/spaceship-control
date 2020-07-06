@@ -13,7 +13,7 @@ override = false
 [[Variable]]
 
 id = 'thickness'
-value = 2.5
+value = 5
 override = false
 
 [[Shape]]

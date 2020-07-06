@@ -1,12 +1,17 @@
 
+# Smaller polygon
+
 [[Object]]
 
 model = '.line'
+angle = 0
+x = -450
+y = 0
 
     [[Object.Variable]]
 
     id = 'size'
-    value = 100
+    value = 1000
 
 [[Object]]
 
@@ -32,7 +37,7 @@ y = -95
     id = 'size'
     value = 100
 
-    [[Object]]
+[[Object]]
 
 model = '.line'
 angle = -90
@@ -68,3 +73,220 @@ y = -1255
     id = 'size'
     value = 100
 
+[[Object]]
+
+model = '.line'
+angle = 0
+x = -450
+y = -1279
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 1000
+
+[[Object]]
+
+model = '.line'
+angle = 30
+x = -995
+y = -25
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 100
+
+[[Object]]
+
+model = '.line'
+angle = 60
+x = -1065
+y = -95
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 100
+
+    [[Object]]
+
+model = '.line'
+angle = 90
+x = -1090
+y = -640
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 1000
+
+[[Object]]
+
+model = '.line'
+angle = -60
+x = -1065
+y = -1185
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 100
+
+[[Object]]
+
+model = '.line'
+angle = -30
+x = -995
+y = -1255
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 100
+
+# Bigger polygon
+
+[[Object]]
+
+model = '.line'
+angle = 0
+x = -450
+y = 700
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 2000
+
+[[Object]]
+
+model = '.line'
+angle = -30
+x = 640
+y = 650
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = -60
+x = 775
+y = 510
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = -90
+x = 825
+y = -680
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 2180
+
+[[Object]]
+
+model = '.line'
+angle = 60
+x = 775
+y = -1850
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = 30
+x = 635
+y = -1990
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = 0
+x = -448
+y = -2040
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 2000
+
+[[Object]]
+
+model = '.line'
+angle = 30
+x = -1540
+y = 650
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = 60
+x = -1675
+y = 510
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = 90
+x = -1725
+y = -680
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 2180
+
+[[Object]]
+
+model = '.line'
+angle = -60
+x = -1675
+y = -1850
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
+
+[[Object]]
+
+model = '.line'
+angle = -30
+x = -1535
+y = -1990
+
+    [[Object.Variable]]
+
+    id = 'size'
+    value = 200
