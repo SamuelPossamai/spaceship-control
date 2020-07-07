@@ -114,7 +114,7 @@ part = 'part1'
 
 name = 'engine1'
 type = 'engine'
-model = 'intensity_range'
+model = 'linear'
 
 min_intensity = -4
 max_intensity = 4
@@ -135,7 +135,7 @@ part = 'part2'
 
 name = 'engine2'
 type = 'engine'
-model = 'intensity_range'
+model = 'linear'
 
 min_intensity = 0
 max_intensity = 4
@@ -151,7 +151,7 @@ part = 'part3'
 
 name = 'engine3'
 type = 'engine'
-model = 'intensity_range'
+model = 'linear'
 
 min_intensity = 0
 max_intensity = 4

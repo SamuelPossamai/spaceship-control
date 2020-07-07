@@ -98,11 +98,12 @@ class Ship:
         self.__device = Device()
         self.__sensor_devices = {}
         self.__interface_devices = {}
+        self.__engine_devices = {}
         self.__console_printer = Ship.ConsolePrinter(self)
         self.__keyboard_reader = Ship.KeyboardReader(self)
         self.__message_buffer = ''
 
-        self.__find_position_devices(self.__device)
+        self.__find_devices(self.__device)
 
         console = self.__interface_devices.get('console-text-display')
         if console:
@@ -193,7 +194,7 @@ class Ship:
     def device(self):
         return self.__device
 
-    def __find_position_devices(self, device):
+    def __find_devices(self, device):
 
         if device.type_ in ('position-sensor', 'angle-sensor'):
             reading_time = float(device.sendMessage('reading-time'))
@@ -222,12 +223,20 @@ class Ship:
                 devices.append(sensor_info)
             return
 
+        if device.type_ in ('engine', 'linear-engine'):
+            devices = self.__engine_devices.get(device.type_)
+            if devices is None:
+                self.__interface_devices[device.type_] = [device]
+            else:
+                devices.append(sensor_info)
+            return
+
         children = device.children
         if children is None:
             return
 
         for child in device.children:
-            self.__find_position_devices(child)
+            self.__find_devices(child)
 
 def send(message):
 

@@ -11,9 +11,13 @@ class Engine(Actuator):
         def __init__(self, device: 'Device', *args: str) -> None:
             super().__init__(device, 'intensity', 'angle', *args)
 
-    def __init__(self, part: 'StructuralPart', **kwargs):
-        super().__init__(part, properties={'intensity': Engine.intensity,
-                                           'angle': Engine.angle})
+    def __init__(self, part: 'StructuralPart', device_type: str ='engine',
+                 **kwargs):
+        super().__init__(part, device_type=device_type,
+                         properties={
+                             'intensity': Engine.intensity,
+                             'angle': Engine.angle
+                         })
 
         self.__intensity = kwargs.get('start_intensity', 0)
         self.__thrust = self.mapIntensityToThrust(self.__intensity)
@@ -59,12 +63,15 @@ class Engine(Actuator):
     def mapIntensityToThrust(self, intensity) -> 'Union[float, int]':
         pass
 
-    def actuate(self) -> None:
+    def actuate(self, base_thrust: float = None) -> None:
+
+        if base_thrust is None:
+            base_thrust = self.__thrust
 
         if self.__thrust_error is None:
-            thrust = self.__thrust
+            thrust = base_thrust
         else:
-            thrust = self.__thrust_error(self.__thrust)
+            thrust = self.__thrust_error(base_thrust)
 
         if self.__angle_error is None:
             angle = self.__angle
@@ -86,26 +93,17 @@ class Engine(Actuator):
 class LinearEngine(Engine):
 
     def __init__(self, part: 'StructuralPart',
-                 intensity_multiplier: 'Union[float, int]' = 1,
-                 intensity_offset: 'Union[float, int]' = 0,
-                 **kwargs: 'Any') -> None:
-
-        self.__int_mult = intensity_multiplier
-        self.__int_off = intensity_offset
-
-        super().__init__(part, **kwargs)
-
-    def mapIntensityToThrust(self, intensity) -> 'Union[float, int]':
-        return self.__int_off + intensity*self.__int_mult
-
-class LimitedLinearEngine(LinearEngine):
-
-    def __init__(self, part: 'StructuralPart',
                  min_intensity: 'Union[float, int]',
                  max_intensity: 'Union[float, int]',
                  min_angle: 'Union[float, int]',
                  max_angle: 'Union[float, int]',
+                 intensity_multiplier: 'Union[float, int]' = 1,
+                 intensity_offset: 'Union[float, int]' = 0,
+                 device_type: str = 'liner-engine',
                  **kwargs: 'Any') -> None:
+
+        self.__int_mult = intensity_multiplier
+        self.__int_off = intensity_offset
 
         valid_intensities = IntervalSet((Interval(min_intensity,
                                                   max_intensity),))
@@ -113,4 +111,8 @@ class LimitedLinearEngine(LinearEngine):
                                              max_angle),))
 
         super().__init__(part, valid_intensities=valid_intensities,
-                         valid_angles=valid_angles, **kwargs)
+                         valid_angles=valid_angles,
+                         device_type=device_type, **kwargs)
+
+    def mapIntensityToThrust(self, intensity) -> 'Union[float, int]':
+        return self.__int_off + intensity*self.__int_mult

@@ -107,7 +107,7 @@ part = 'part'
 
 name = 'engine'
 type = 'engine'
-model = 'intensity_range'
+model = 'linear'
 
 min_intensity = -4
 max_intensity = 4

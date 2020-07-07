@@ -7,7 +7,7 @@ from ...utils.errorgenerator import ErrorGenerator
 
 from ...devices.structure import Structure, StructuralPart
 from ...devices.sensors import PositionSensor, AngleSensor, SpeedSensor
-from ...devices.engine import LimitedLinearEngine
+from ...devices.engine import LinearEngine
 from ...devices.interfacedevice import (
     TextDisplayDevice, ButtonDevice, KeyboardReceiverDevice, ConsoleDevice
 )
@@ -55,15 +55,18 @@ def __engineErrorKwargs(
         'Position': 'position_error_gen'
     })
 
-def __createLimitedLinearEngine(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[LimitedLinearEngine, Sequence[QWidget]]':
+def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart) \
+    -> 'Tuple[LinearEngine, Sequence[QWidget]]':
 
-    return LimitedLinearEngine(part, info['min_intensity'],
-                               info['max_intensity'], info['min_angle'],
-                               info['max_angle'],
-                               intensity_multiplier=info.get('intensity_mult',
-                                                             1),
-                               **__engineErrorKwargs(info)), ()
+    return LinearEngine(
+        part,
+        info['min_intensity'],
+        info['max_intensity'],
+        info['min_angle'],
+        info['max_angle'],
+        intensity_multiplier=info.get('intensity_mult', 1),
+        intensity_offset=info.get('intensity_offset', 0),
+        **__engineErrorKwargs(info)), ()
 
 def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart) \
     -> 'Tuple[PositionSensor, Sequence[QWidget]]':
@@ -173,7 +176,7 @@ def __createConfSender(info: 'Dict[str, Any]', part: StructuralPart,
 
 __DEVICE_CREATE_FUNCTIONS = {
 
-    ('Actuator', 'engine', 'intensity_range'): __createLimitedLinearEngine,
+    ('Actuator', 'engine', 'linear'): __createLinearEngine,
     ('Sensor', 'position', None): __createPositionSensor,
     ('Sensor', 'angle', None): __createAngleSensor,
     ('Sensor', 'speed', None): __createSpeedSensor,

@@ -41,7 +41,7 @@ part = 'core'
 
 name = 'forward_engine'
 type = 'engine'
-model = 'intensity_range'
+model = 'linear'
 
 min_intensity = 0
 max_intensity = 1
