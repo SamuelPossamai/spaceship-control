@@ -18,6 +18,7 @@ import anytree
 # pylint: disable=relative-beyond-top-level
 
 from .choosefromtreedialog import ChooseFromTreeDialog
+from .helpdialog import HelpDialog
 from .loadgraphicitem import loadGraphicItem
 from .loadship import loadShip
 
@@ -717,6 +718,9 @@ class MainWindow(QMainWindow):
         self.__ui.actionFitAllOnStart.toggled.connect(
             self.__fitAllOnStartToggled)
 
+        self.__ui.actionHelpHandbook.triggered.connect(
+            self.__showHelp)
+
     def keyPressEvent(self, event):
 
         key = event.key()
@@ -756,3 +760,7 @@ class MainWindow(QMainWindow):
                 self.__ui.view.centerOn(ship_item.pos())
                 if modifiers == Qt.ControlModifier:
                     self.__center_view_on = ship_item
+
+    @staticmethod
+    def __showHelp():
+        HelpDialog().exec_()
