@@ -27,7 +27,8 @@ class FileInfo:
     __instance = None
 
     FileDataType = Enum('FileDataType', ('CONTROLLER', 'SHIPMODEL', 'SCENARIO',
-                                         'OBJECTMODEL', 'IMAGE', 'UIDESIGN'))
+                                         'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
+                                         'HANDBOOK'))
 
     __DataTypeInfoType = namedtuple('DataTypeInfoType',
                                     ('path', 'use_dist_path', 'suffix_list',
@@ -54,7 +55,9 @@ class FileInfo:
             'images', False, None, False, (),
             ('*.gif', '*.png'), 0o644),
         FileDataType.UIDESIGN: __DataTypeInfoType(
-            'forms', True, ('.ui',), True, (), None, None)
+            'forms', True, ('.ui',), True, (), None, None),
+        FileDataType.HANDBOOK: __DataTypeInfoType(
+            'docs/handbook', True, ('*.toml',), True, (), None, None)
     }
 
     def __init__(self):

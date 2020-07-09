@@ -30,13 +30,20 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="NodeTreeView" name="treeView"/>
    </item>
    <item>
     <widget class="QTextBrowser" name="textBrowser"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NodeTreeView</class>
+   <extends>QTreeView</extends>
+   <header>nodetreeview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

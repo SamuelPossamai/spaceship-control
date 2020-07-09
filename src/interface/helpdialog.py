@@ -23,3 +23,6 @@ class HelpDialog(QDialog):
 
         self.__ui = UiHelpWidget()
         self.__ui.setupUi(self)
+
+        self.__ui.treeView.addNodes(FileInfo().listFilesTree(
+            FileInfo.FileDataType.HANDBOOK).children)
