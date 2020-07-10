@@ -30,10 +30,14 @@ class FileInfo:
                                          'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
                                          'HANDBOOK'))
 
+    FileMetadataType = Enum('FileMetadataType', (
+        'ABSENT', 'INTERNAL'))
+
     __DataTypeInfoType = namedtuple('DataTypeInfoType',
                                     ('path', 'use_dist_path', 'suffix_list',
                                      'list_remove_suffix', 'list_blacklist',
-                                     'package_glob_list', 'files_mode'))
+                                     'package_glob_list', 'files_mode',
+                                     'metadata_type'))
 
     __CONF_FILE_SUFFIX_LIST = ('.toml', '.json', '.yaml', '.yml')
     __CONF_FILE_GLOB_LIST = tuple(
@@ -41,23 +45,30 @@ class FileInfo:
 
     __DATA_TYPE_INFO = {
         FileDataType.CONTROLLER: __DataTypeInfoType(
-            'controllers', False, None, False, ('__pycache__',), ('*',), 0o555),
+            'controllers', False, None, False, ('__pycache__',), ('*',), 0o555,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.SHIPMODEL: __DataTypeInfoType(
             'ships', False, __CONF_FILE_SUFFIX_LIST, True, (),
-            __CONF_FILE_GLOB_LIST, 0o644),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.SCENARIO: __DataTypeInfoType(
             'scenarios', False, __CONF_FILE_SUFFIX_LIST, True, (),
-            __CONF_FILE_GLOB_LIST, 0o644),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.OBJECTMODEL: __DataTypeInfoType(
             'objects', False, __CONF_FILE_SUFFIX_LIST, True, (),
-            __CONF_FILE_GLOB_LIST, 0o644),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.IMAGE: __DataTypeInfoType(
             'images', False, None, False, (),
-            ('*.gif', '*.png'), 0o644),
+            ('*.gif', '*.png'), 0o644,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.UIDESIGN: __DataTypeInfoType(
-            'forms', True, ('.ui',), True, (), None, None),
+            'forms', True, ('.ui',), True, (), None, None,
+            metadata_type=FileMetadataType.ABSENT),
         FileDataType.HANDBOOK: __DataTypeInfoType(
-            'docs/handbook', True, ('*.toml',), True, (), None, None)
+            'docs/handbook', True, ('*.toml',), True, (), None, None,
+            metadata_type=FileMetadataType.INTERNAL)
     }
 
     def __init__(self):
@@ -152,15 +163,21 @@ class FileInfo:
         with open(self.__config_file_path, 'w') as file:
             toml.dump(self.__config_content, file)
 
-    def listFilesTree(self, filedatatype):
+    def listFilesTree(self, filedatatype, use_metadata=True):
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
+
+        if use_metadata:
+            metadata_type = filedatatype_info.metadata_type
+        else:
+            metadata_type = self.FileMetadataType.ABSENT
 
         return self.__listTree(
             self.getPath(filedatatype),
             Node(filedatatype_info.path),
             remove_suffix=filedatatype_info.list_remove_suffix,
-            blacklist=filedatatype_info.list_blacklist)
+            blacklist=filedatatype_info.list_blacklist,
+            metadata_type=metadata_type)
 
     @property
     def statistics_filepath(self):
@@ -178,21 +195,42 @@ class FileInfo:
         with open(self.__statistics_file, 'w') as file:
             yaml.dump(statistics, file)
 
+    def __readMetadata(self, path, metadata_type):
+
+        if metadata_type == self.FileMetadataType.INTERNAL:
+            if path.suffix == '.toml':
+                try:
+                    return toml.load(path).get('Metadata', {})
+                except (FileNotFoundError, toml.decoder.TomlDecodeError):
+                    return {}
+        return {}
+
     def __listTree(self, base_path, current_node, blacklist=(),
-                   remove_suffix=True):
+                   remove_suffix=True, metadata_type=None):
 
         for path in sorted(base_path.iterdir()):
 
             if path.name in blacklist:
                 continue
 
+            original_path = path
+
             if remove_suffix is True:
                 path = path.with_suffix('')
 
-            new_node = Node(path.name, parent=current_node)
+            name = path.name
+
+            if metadata_type is not None:
+                metadata = self.__readMetadata(original_path, metadata_type)
+                metadata_name = metadata.get('name')
+                if metadata_name is not None:
+                    name = str(metadata_name)
+
+            new_node = Node(name, parent=current_node)
             if path.is_dir():
                 self.__listTree(path, new_node, blacklist=blacklist,
-                                remove_suffix=remove_suffix)
+                                remove_suffix=remove_suffix,
+                                metadata_type=metadata_type)
 
         return current_node
 
