@@ -39,7 +39,7 @@ class ChooseFromTreeDialog(QDialog):
 
     def __dialogAccepted(self):
         self.__result = tuple(
-            item.text() for item in self.__ui.treeView.selectedItemPath())
+            item.data() for item in self.__ui.treeView.selectedItemPath())
 
     def __treeViewClicked(self):
 

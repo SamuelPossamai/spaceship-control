@@ -4,10 +4,11 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 class NodeValue:
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, label=None):
         self.__name = name
         self.__desc = description
         self.__item = None
+        self.__label = label
 
     @property
     def name(self):
@@ -16,8 +17,23 @@ class NodeValue:
     @name.setter
     def name(self, new_val):
         self.__name = new_val
-        if self.__item is not None:
+        if self.__label is None and self.__item is not None:
             self.__item.setText(new_val)
+
+    @property
+    def label(self):
+        if self.__label is None:
+            return self.__name
+        return self.__label
+
+    @label.setter
+    def label(self, new_val):
+        self.__label = new_val
+        if self.__item is not None:
+            if self.__label is None:
+                self.__item.setText(self.__name)
+            else:
+                self.__item.setText(self.__label)
 
     @property
     def description(self):
@@ -78,14 +94,18 @@ class NodeTreeView(QTreeView):
             set_item = True
             node_desc = node_value.description
             node_name = node_value.name
+            node_label = node_value.label
         elif isinstance(node_value, tuple):
             node_desc = node_value[1]
             node_name = node_value[0]
+            node_label = node_name
         else:
             node_name = node_value
+            node_label = node_name
             node_desc = None
 
-        item = QStandardItem(node_name)
+        item = QStandardItem(node_label)
+        item.setData(node_name)
 
         if node_desc:
             item.setToolTip(node_desc)

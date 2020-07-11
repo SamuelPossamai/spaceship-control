@@ -1,5 +1,6 @@
 
 import os
+import sys
 import shutil
 from pathlib import Path
 import subprocess
@@ -21,6 +22,11 @@ from .loaders import (
 )
 
 from ..utils import dictutils
+
+# sys.path manipulation so it is not imported in a different path
+sys.path.insert(0, str(Path(__file__).parent.parent.joinpath('interface')))
+from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position
+sys.path.pop(0)
 
 class FileInfo:
 
@@ -202,8 +208,8 @@ class FileInfo:
                 try:
                     return toml.load(path).get('Metadata', {})
                 except (FileNotFoundError, toml.decoder.TomlDecodeError):
-                    return {}
-        return {}
+                    return None
+        return None
 
     def __listTree(self, base_path, current_node, blacklist=(),
                    remove_suffix=True, metadata_type=None):
@@ -222,9 +228,12 @@ class FileInfo:
 
             if metadata_type is not None:
                 metadata = self.__readMetadata(original_path, metadata_type)
-                metadata_name = metadata.get('name')
-                if metadata_name is not None:
-                    name = str(metadata_name)
+
+                if metadata:
+                    label = str(metadata.get('name', name))
+                    desc = metadata.get('description', '')
+                    if desc is not None:
+                        name = NodeValue(name, str(desc), label=label)
 
             new_node = Node(name, parent=current_node)
             if path.is_dir():

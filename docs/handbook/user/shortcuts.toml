@@ -2,6 +2,7 @@
 [Metadata]
 
 name = 'Shortcuts'
+description = 'Program shortcuts'
 
 [Paragraph]
 
