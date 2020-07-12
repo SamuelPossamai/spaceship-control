@@ -4,8 +4,9 @@ import sys
 import shutil
 from pathlib import Path
 import subprocess
-from enum import Enum
+from enum import Enum, Flag, auto as flagAuto
 from collections import namedtuple
+from fnmatch import fnmatch
 
 import json
 import toml
@@ -36,8 +37,10 @@ class FileInfo:
                                          'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
                                          'HANDBOOK'))
 
-    FileMetadataType = Enum('FileMetadataType', (
-        'ABSENT', 'INTERNAL'))
+    class FileMetadataType(Flag):
+        ABSENT = 0
+        FILE_INTERNAL = flagAuto()
+        DIRECTORY = flagAuto()
 
     __DataTypeInfoType = namedtuple('DataTypeInfoType',
                                     ('path', 'use_dist_path', 'suffix_list',
@@ -74,7 +77,8 @@ class FileInfo:
             metadata_type=FileMetadataType.ABSENT),
         FileDataType.HANDBOOK: __DataTypeInfoType(
             'docs/handbook', True, ('*.toml',), True, (), None, None,
-            metadata_type=FileMetadataType.INTERNAL)
+            metadata_type=(FileMetadataType.FILE_INTERNAL |
+                           FileMetadataType.DIRECTORY))
     }
 
     def __init__(self):
@@ -173,16 +177,25 @@ class FileInfo:
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
+        blacklist = []
         if use_metadata:
             metadata_type = filedatatype_info.metadata_type
+
+            if metadata_type & self.FileMetadataType.DIRECTORY:
+                blacklist.append('__metadata__.*')
         else:
             metadata_type = self.FileMetadataType.ABSENT
+
+        if blacklist:
+            blacklist.extend(filedatatype_info.list_blacklist)
+        else:
+            blacklist = filedatatype_info.list_blacklist
 
         return self.__listTree(
             self.getPath(filedatatype),
             Node(filedatatype_info.path),
             remove_suffix=filedatatype_info.list_remove_suffix,
-            blacklist=filedatatype_info.list_blacklist,
+            blacklist=blacklist,
             metadata_type=metadata_type)
 
     @property
@@ -201,22 +214,32 @@ class FileInfo:
         with open(self.__statistics_file, 'w') as file:
             yaml.dump(statistics, file)
 
-    def __readMetadata(self, path, metadata_type):
+    def __readMetadata(self, path, metadata_type, is_directory):
 
-        if metadata_type == self.FileMetadataType.INTERNAL:
-            if path.suffix == '.toml':
+        if is_directory:
+            if metadata_type & self.FileMetadataType.DIRECTORY:
                 try:
-                    return toml.load(path).get('Metadata', {})
+                    return toml.load(path.joinpath('__metadata__.toml')).get(
+                        'Metadata', {})
                 except (FileNotFoundError, toml.decoder.TomlDecodeError):
-                    return None
+                    pass
+        else:
+            if metadata_type & self.FileMetadataType.FILE_INTERNAL:
+                if path.suffix == '.toml':
+                    try:
+                        return toml.load(path).get('Metadata', {})
+                    except (FileNotFoundError, toml.decoder.TomlDecodeError):
+                        pass
+
         return None
 
     def __listTree(self, base_path, current_node, blacklist=(),
                    remove_suffix=True, metadata_type=None):
 
         for path in sorted(base_path.iterdir()):
+            is_directory = path.is_dir()
 
-            if path.name in blacklist:
+            if any(fnmatch(path.name, match_str) for match_str in blacklist):
                 continue
 
             original_path = path
@@ -227,7 +250,8 @@ class FileInfo:
             name = path.name
 
             if metadata_type is not None:
-                metadata = self.__readMetadata(original_path, metadata_type)
+                metadata = self.__readMetadata(
+                    original_path, metadata_type, is_directory)
 
                 if metadata:
                     label = str(metadata.get('name', name))
@@ -236,7 +260,7 @@ class FileInfo:
                         name = NodeValue(name, str(desc), label=label)
 
             new_node = Node(name, parent=current_node)
-            if path.is_dir():
+            if is_directory:
                 self.__listTree(path, new_node, blacklist=blacklist,
                                 remove_suffix=remove_suffix,
                                 metadata_type=metadata_type)
