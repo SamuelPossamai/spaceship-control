@@ -264,6 +264,8 @@ class FileInfo:
                 self.__listTree(path, new_node, blacklist=blacklist,
                                 remove_suffix=remove_suffix,
                                 metadata_type=metadata_type)
+                if not new_node.children:
+                    new_node.parent = None
 
         return current_node
 
