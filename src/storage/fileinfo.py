@@ -55,7 +55,7 @@ class FileInfo:
     __DATA_TYPE_INFO = {
         FileDataType.CONTROLLER: __DataTypeInfoType(
             'controllers', False, None, False, ('__pycache__',), ('*',), 0o555,
-            metadata_type=FileMetadataType.ABSENT),
+            metadata_type=FileMetadataType.DIRECTORY),
         FileDataType.SHIPMODEL: __DataTypeInfoType(
             'ships', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
@@ -173,7 +173,8 @@ class FileInfo:
         with open(self.__config_file_path, 'w') as file:
             toml.dump(self.__config_content, file)
 
-    def listFilesTree(self, filedatatype, use_metadata=True):
+    def listFilesTree(self, filedatatype, use_metadata=True,
+                      show_meta_files=False, show_hidden_files=False):
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
@@ -181,8 +182,9 @@ class FileInfo:
         if use_metadata:
             metadata_type = filedatatype_info.metadata_type
 
-            if metadata_type & self.FileMetadataType.DIRECTORY:
-                blacklist.append('__metadata__.*')
+            if show_meta_files is False:
+                if metadata_type & self.FileMetadataType.DIRECTORY:
+                    blacklist.append('__metadata__.*')
         else:
             metadata_type = self.FileMetadataType.ABSENT
 
@@ -196,7 +198,8 @@ class FileInfo:
             Node(filedatatype_info.path),
             remove_suffix=filedatatype_info.list_remove_suffix,
             blacklist=blacklist,
-            metadata_type=metadata_type)
+            metadata_type=metadata_type,
+            can_hide_files=not show_hidden_files)
 
     @property
     def statistics_filepath(self):
@@ -219,22 +222,21 @@ class FileInfo:
         if is_directory:
             if metadata_type & self.FileMetadataType.DIRECTORY:
                 try:
-                    return toml.load(path.joinpath('__metadata__.toml')).get(
-                        'Metadata', {})
+                    return toml.load(path.joinpath('__metadata__.toml'))
                 except (FileNotFoundError, toml.decoder.TomlDecodeError):
                     pass
         else:
             if metadata_type & self.FileMetadataType.FILE_INTERNAL:
                 if path.suffix == '.toml':
                     try:
-                        return toml.load(path).get('Metadata', {})
+                        return toml.load(path).get('Metadata')
                     except (FileNotFoundError, toml.decoder.TomlDecodeError):
                         pass
 
         return None
 
     def __listTree(self, base_path, current_node, blacklist=(),
-                   remove_suffix=True, metadata_type=None):
+                   remove_suffix=True, metadata_type=None, can_hide_files=True):
 
         for path in sorted(base_path.iterdir()):
             is_directory = path.is_dir()
@@ -254,6 +256,9 @@ class FileInfo:
                     original_path, metadata_type, is_directory)
 
                 if metadata:
+                    if can_hide_files and metadata.get('hide', False):
+                        continue
+
                     label = str(metadata.get('name', name))
                     desc = metadata.get('description', '')
                     if desc is not None:
@@ -263,7 +268,8 @@ class FileInfo:
             if is_directory:
                 self.__listTree(path, new_node, blacklist=blacklist,
                                 remove_suffix=remove_suffix,
-                                metadata_type=metadata_type)
+                                metadata_type=metadata_type,
+                                can_hide_files=can_hide_files)
                 if not new_node.children:
                     new_node.parent = None
 

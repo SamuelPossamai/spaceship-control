@@ -629,7 +629,9 @@ class MainWindow(QMainWindow):
     def __openAction(text, filedatatype):
 
         filepath = MainWindow.__getOptionDialog(
-            text, FileInfo().listFilesTree(filedatatype).children)
+            text, FileInfo().listFilesTree(filedatatype,
+                                           show_meta_files=True,
+                                           show_hidden_files=True).children)
 
         if filepath is not None:
             FileInfo().openFile(filedatatype, '/'.join(filepath))
