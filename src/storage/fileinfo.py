@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 import subprocess
 from enum import Enum, Flag, auto as flagAuto
-from collections import namedtuple
+from typing import NamedTuple
 from fnmatch import fnmatch
 
 import json
@@ -29,24 +29,31 @@ sys.path.insert(0, str(Path(__file__).parent.parent.joinpath('interface')))
 from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position
 sys.path.pop(0)
 
+class _FileInfo_FileMetadataType(Flag):
+    ABSENT = 0
+    FILE_INTERNAL = flagAuto()
+    DIRECTORY = flagAuto()
+
 class FileInfo:
 
     __instance = None
 
     FileDataType = Enum('FileDataType', ('CONTROLLER', 'SHIPMODEL', 'SCENARIO',
                                          'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
-                                         'HANDBOOK'))
+                                         'HANDBOOK', 'METADATA'))
 
-    class FileMetadataType(Flag):
-        ABSENT = 0
-        FILE_INTERNAL = flagAuto()
-        DIRECTORY = flagAuto()
+    FileMetadataType = _FileInfo_FileMetadataType
 
-    __DataTypeInfoType = namedtuple('DataTypeInfoType',
-                                    ('path', 'use_dist_path', 'suffix_list',
-                                     'list_remove_suffix', 'list_blacklist',
-                                     'package_glob_list', 'files_mode',
-                                     'metadata_type'))
+    class __DataTypeInfoType(NamedTuple):
+        path: str
+        use_dist_path: bool = False
+        suffix_list: 'Sequence[str]' = ()
+        list_remove_suffix: bool = False
+        list_blacklist: 'Sequence[str]' = ()
+        package_glob_list: 'Sequence[str]' = None
+        files_mode: int = None
+        metadata_type: 'FileMetadataType' = _FileInfo_FileMetadataType.ABSENT
+        use_root_path: bool = False
 
     __CONF_FILE_SUFFIX_LIST = ('.toml', '.json', '.yaml', '.yml')
     __CONF_FILE_GLOB_LIST = tuple(
@@ -78,7 +85,11 @@ class FileInfo:
         FileDataType.HANDBOOK: __DataTypeInfoType(
             'docs/handbook', True, ('*.toml',), True, (), None, None,
             metadata_type=(FileMetadataType.FILE_INTERNAL |
-                           FileMetadataType.DIRECTORY))
+                           FileMetadataType.DIRECTORY)),
+        FileDataType.METADATA: __DataTypeInfoType(
+            '/', False, __CONF_FILE_SUFFIX_LIST, True, (),
+            None, None, metadata_type=FileMetadataType.ABSENT,
+            use_root_path=True),
     }
 
     def __init__(self):
@@ -222,11 +233,18 @@ class FileInfo:
         if is_directory:
             if metadata_type & self.FileMetadataType.DIRECTORY:
                 try:
-                    return toml.load(path.joinpath('__metadata__.toml'))
-                except (FileNotFoundError, toml.decoder.TomlDecodeError):
+                    return self.__getContent(str(path.joinpath('__metadata__')),
+                                             self.FileDataType.METADATA)
+                except Exception:
                     pass
         else:
             if metadata_type & self.FileMetadataType.FILE_INTERNAL:
+                try:
+                    return self.__getContent(
+                        path, self.FileDataType.METADATA,
+                        suffix_specified=True).get('Metadata')
+                except Exception:
+                    pass
                 if path.suffix == '.toml':
                     try:
                         return toml.load(path).get('Metadata')
@@ -323,12 +341,19 @@ class FileInfo:
 
         return None, None
 
-    def __getContent(self, basename, filedatatype, inexistent_message):
+    def __getContent(self, basename, filedatatype, inexistent_message=None,
+                     suffix_specified=False):
 
-        filepath, suffix = self.__findSuffix(
-            basename, filedatatype, ('.toml', '.json', '.yaml', '.yml'))
+        if suffix_specified:
+            filepath = self.getPath(filedatatype, basename)
+            suffix = Path(basename).suffix
+        else:
+            filepath, suffix = self.__findSuffix(
+                basename, filedatatype, ('.toml', '.json', '.yaml', '.yml'))
 
         if filepath is None:
+            if inexistent_message is None:
+                return None
             raise Exception(inexistent_message.format(name=basename))
 
         if suffix == '.json':
@@ -470,7 +495,9 @@ class FileInfo:
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
-        if filedatatype_info.use_dist_path:
+        if filedatatype_info.use_root_path:
+            basepath = Path('/')
+        elif filedatatype_info.use_dist_path:
             basepath = self.__dist_data_path
         else:
             basepath = self.__path
