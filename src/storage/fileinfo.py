@@ -32,6 +32,7 @@ sys.path.pop(0)
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
     FILE_INTERNAL = flagAuto()
+    FILE_EXTERNAL = flagAuto()
     DIRECTORY = flagAuto()
 
 class FileInfo:
@@ -62,7 +63,8 @@ class FileInfo:
     __DATA_TYPE_INFO = {
         FileDataType.CONTROLLER: __DataTypeInfoType(
             'controllers', False, None, False, ('__pycache__',), ('*',), 0o555,
-            metadata_type=FileMetadataType.DIRECTORY),
+            metadata_type=(FileMetadataType.DIRECTORY |
+                           FileMetadataType.FILE_EXTERNAL)),
         FileDataType.SHIPMODEL: __DataTypeInfoType(
             'ships', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
@@ -196,6 +198,9 @@ class FileInfo:
             if show_meta_files is False:
                 if metadata_type & self.FileMetadataType.DIRECTORY:
                     blacklist.append('__metadata__.*')
+
+                if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
+                    blacklist.append('*.__metadata__.*')
         else:
             metadata_type = self.FileMetadataType.ABSENT
 
@@ -240,16 +245,27 @@ class FileInfo:
         else:
             if metadata_type & self.FileMetadataType.FILE_INTERNAL:
                 try:
-                    return self.__getContent(
+                    content = self.__getContent(
                         path, self.FileDataType.METADATA,
-                        suffix_specified=True).get('Metadata')
+                        suffix_specified=True)
                 except Exception:
                     pass
-                if path.suffix == '.toml':
-                    try:
-                        return toml.load(path).get('Metadata')
-                    except (FileNotFoundError, toml.decoder.TomlDecodeError):
-                        pass
+                else:
+                    if content is not None and 'Metadata' in content:
+                        content = content['Metadata']
+
+            if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
+
+                external_file_path = path.with_suffix(
+                    ''.join(path.suffixes) + '.__metadata__')
+                try:
+                    content = self.__getContent(
+                        str(external_file_path), self.FileDataType.METADATA)
+                except Exception:
+                    pass
+                else:
+                    if content is not None:
+                        return content
 
         return None
 
