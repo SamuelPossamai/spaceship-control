@@ -34,6 +34,8 @@ class _FileInfo_FileMetadataType(Flag):
     FILE_INTERNAL = flagAuto()
     FILE_EXTERNAL = flagAuto()
     DIRECTORY = flagAuto()
+    CONF_FILE_DEFAULT = FILE_INTERNAL | DIRECTORY
+    GENERIC_FILE_DEFAULT = FILE_EXTERNAL | DIRECTORY
 
 class FileInfo:
 
@@ -63,20 +65,19 @@ class FileInfo:
     __DATA_TYPE_INFO = {
         FileDataType.CONTROLLER: __DataTypeInfoType(
             'controllers', False, None, False, ('__pycache__',), ('*',), 0o555,
-            metadata_type=(FileMetadataType.DIRECTORY |
-                           FileMetadataType.FILE_EXTERNAL)),
+            metadata_type=FileMetadataType.GENERIC_FILE_DEFAULT),
         FileDataType.SHIPMODEL: __DataTypeInfoType(
             'ships', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
-            metadata_type=FileMetadataType.ABSENT),
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.SCENARIO: __DataTypeInfoType(
             'scenarios', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
-            metadata_type=FileMetadataType.ABSENT),
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.OBJECTMODEL: __DataTypeInfoType(
             'objects', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
-            metadata_type=FileMetadataType.ABSENT),
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.IMAGE: __DataTypeInfoType(
             'images', False, None, False, (),
             ('*.gif', '*.png'), 0o644,
@@ -86,8 +87,7 @@ class FileInfo:
             metadata_type=FileMetadataType.ABSENT),
         FileDataType.HANDBOOK: __DataTypeInfoType(
             'docs/handbook', True, ('*.toml',), True, (), None, None,
-            metadata_type=(FileMetadataType.FILE_INTERNAL |
-                           FileMetadataType.DIRECTORY)),
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.METADATA: __DataTypeInfoType(
             '/', False, __CONF_FILE_SUFFIX_LIST, True, (),
             None, None, metadata_type=FileMetadataType.ABSENT,
@@ -246,13 +246,13 @@ class FileInfo:
             if metadata_type & self.FileMetadataType.FILE_INTERNAL:
                 try:
                     content = self.__getContent(
-                        path, self.FileDataType.METADATA,
+                        str(path), self.FileDataType.METADATA,
                         suffix_specified=True)
                 except Exception:
                     pass
                 else:
                     if content is not None and 'Metadata' in content:
-                        content = content['Metadata']
+                        return content['Metadata']
 
             if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
 

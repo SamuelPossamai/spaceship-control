@@ -1,0 +1,6 @@
+
+name = 'Communication'
+description = '''
+Scenarios using communications, the implementation of the communications is \
+present in the controllers\
+'''

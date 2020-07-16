@@ -1,7 +1,15 @@
 
+[Metadata]
+
+name = 'Basic Send Receive'
+description = '''
+Example using basic communication between two ships, one sends a message and \
+the other receives it\
+'''
+
 [Scenario]
 
-name = 'example1'
+name = 'Basic Send Receive'
 debug = true
 
 [[Ship]]
