@@ -233,6 +233,17 @@ class FileInfo:
         with open(self.__statistics_file, 'w') as file:
             yaml.dump(statistics, file)
 
+    def getHandbookText(self, section):
+
+        content = self.__getContent(section, self.FileDataType.HANDBOOK)
+        paragraphs = content.get('Paragraph', ())
+
+        if paragraphs:
+            return '\n'.join(
+                paragraph.get('content', '') for paragraph in paragraphs)
+
+        return ''
+
     def __readMetadata(self, path, metadata_type, is_directory):
 
         if is_directory:

@@ -4,6 +4,14 @@
 name = 'Shortcuts'
 description = 'Program shortcuts'
 
-[Paragraph]
+[[Paragraph]]
 
-content = "Just testing"
+content = "'Ctrl' + '=' = zoom in"
+
+[[Paragraph]]
+
+content = "'Ctrl' + '-' = zoom out"
+
+[[Paragraph]]
+
+content = "'Ctrl' + 'R' = restore zoom"
