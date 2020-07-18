@@ -4,8 +4,6 @@ from abc import abstractmethod
 import time
 import math
 
-from pymunk import Vec2d
-
 from .device import DeviceGroup, DefaultDevice
 
 from ..utils.errorgenerator import ErrorGenerator
@@ -68,8 +66,10 @@ class StructuralPart(DeviceGroup):
         body = self.__structure.body
         body_angle = body.angle
 
+        offset = (x + self.__offset[0], y + self.__offset[1])
+
         body.apply_impulse_at_local_point((math.cos(angle)*val,
-                                           math.sin(angle)*val), self.__offset)
+                                           math.sin(angle)*val), offset)
 
     @property
     def position(self) -> 'Tuple[float, float]':
