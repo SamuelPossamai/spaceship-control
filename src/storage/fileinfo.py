@@ -26,7 +26,7 @@ from ..utils import dictutils
 
 # sys.path manipulation so it is not imported in a different path
 sys.path.insert(0, str(Path(__file__).parent.parent.joinpath('interface')))
-from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position
+from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position, import-error
 sys.path.pop(0)
 
 class _FileInfo_FileMetadataType(Flag):
@@ -96,7 +96,7 @@ class FileInfo:
 
     def __init__(self):
 
-        if self.__already_initialized:
+        if self.__already_initialized: # pylint: disable=access-member-before-definition
             return
 
         self.__already_initialized = True

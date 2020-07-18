@@ -58,15 +58,14 @@ class StructuralPart(DeviceGroup):
         self.__offset = offset
         self.__structure = structure
 
-    def applyForce(self, val, x, y, angle) -> None:
+    def applyForce(self, val, x_pos, y_pos, angle) -> None:
 
         if self.__structure is None:
             return
 
         body = self.__structure.body
-        body_angle = body.angle
 
-        offset = (x + self.__offset[0], y + self.__offset[1])
+        offset = (x_pos + self.__offset[0], y_pos + self.__offset[1])
 
         body.apply_impulse_at_local_point((math.cos(angle)*val,
                                            math.sin(angle)*val), offset)
@@ -194,8 +193,8 @@ class Actuator(DefaultDevice):
 
         self.__part = part
 
-    def applyForce(self, val, x, y, angle) -> None:
-        self.__part.applyForce(val, x, y, angle)
+    def applyForce(self, val, x_pos, y_pos, angle) -> None:
+        self.__part.applyForce(val, x_pos, y_pos, angle)
 
     @property
     def structural_part(self) -> StructuralPart:
