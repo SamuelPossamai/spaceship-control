@@ -1,4 +1,6 @@
 
+from pymunk import Vec2d, ShapeFilter
+
 from math import pi, cos, sin
 
 from .structure import Sensor, MultiSensor
@@ -47,3 +49,26 @@ class SpeedSensor(Sensor):
         vel = self.structural_part.velocity
         angle = self.__off_angle + self.structural_part.angle
         return vel[0]*cos(angle) + vel[1]*sin(angle)
+
+class LineDetectSensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='line-dist-sensor', **kwargs)
+
+    def read(self):
+        structure = self.structural_part.structure
+        space = structure.space
+
+        dist_max = 1000
+
+        pos = self.structural_part.position
+        segment_end = Vec2d(dist_max, 0)
+        segment_end.angle = self.structural_part.angle
+
+        result = space.segment_query_first(pos, pos + segment_end, 1,
+                                           ShapeFilter())
+
+        if result.shape is None:
+            return dist_max
+
+        return result.point.get_distance(pos)
