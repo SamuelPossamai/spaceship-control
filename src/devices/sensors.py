@@ -58,17 +58,20 @@ class LineDetectSensor(Sensor):
     def read(self):
         structure = self.structural_part.structure
         space = structure.space
+        body = structure.body
 
         dist_max = 1000
 
         pos = self.structural_part.position
         segment_end = Vec2d(dist_max, 0)
-        segment_end.angle = self.structural_part.angle
+        segment_end.angle = -self.structural_part.angle
 
-        result = space.segment_query_first(pos, pos + segment_end, 1,
-                                           ShapeFilter())
+        collisions = space.segment_query(pos, pos + segment_end, 10,
+                                         ShapeFilter())
 
-        if result.shape is None:
+        collisions = [col for col in collisions if col.shape.body is not body]
+
+        if not collisions:
             return dist_max
 
-        return result.point.get_distance(pos)
+        return collisions[0].point.get_distance(pos)

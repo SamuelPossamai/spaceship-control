@@ -108,6 +108,15 @@ type = 'speed'
 
 reading_time = 0.5
 
+[[Sensor]]
+
+part = 'part1'
+
+type = 'detect'
+model = 'linear-distance'
+
+reading_time = 0.2
+
 [[Actuator]]
 
 part = 'part1'

@@ -57,6 +57,8 @@ while True:
         send(f'1:0: set-property intensity {engine_two_intensity}')
         send(f'2:0: set-property intensity {engine_three_intensity}')
 
+        debug('Distance: ', send(f'0:4: read'))
+
     except BrokenPipeError:
         break
     except Exception as err:
