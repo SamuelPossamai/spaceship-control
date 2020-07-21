@@ -52,19 +52,21 @@ class SpeedSensor(Sensor):
 
 class LineDetectSensor(Sensor):
 
-    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+    def __init__(self, *args: 'Any', distance=None, angle=None,
+                 **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='line-dist-sensor', **kwargs)
+
+        self.__max_dist = 1000 if distance is None else distance
+        self.__angle = 0 if angle is None else pi*angle/180
 
     def read(self):
         structure = self.structural_part.structure
         space = structure.space
         body = structure.body
 
-        dist_max = 1000
-
         pos = self.structural_part.position
-        segment_end = Vec2d(dist_max, 0)
-        segment_end.angle = -self.structural_part.angle
+        segment_end = Vec2d(self.__max_dist, 0)
+        segment_end.angle = -self.structural_part.angle + self.__angle
 
         collisions = space.segment_query(pos, pos + segment_end, 10,
                                          ShapeFilter())
@@ -72,6 +74,6 @@ class LineDetectSensor(Sensor):
         collisions = [col for col in collisions if col.shape.body is not body]
 
         if not collisions:
-            return dist_max
+            return self.__max_dist
 
         return collisions[0].point.get_distance(pos)

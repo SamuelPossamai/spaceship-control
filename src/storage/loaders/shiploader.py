@@ -98,7 +98,9 @@ def __createObstacleDistanceSensor(info: 'Dict[str, Any]',
 
     return LineDetectSensor(part, info['reading_time'],
                             read_error_max=info.get('error_max', 0),
-                            read_offset_max=info.get('offset_max', 0)), ()
+                            read_offset_max=info.get('offset_max', 0),
+                            angle=info.get('angle'),
+                            distance=info.get('distance')), ()
 
 def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart) \
     -> 'Tuple[TextDisplayDevice, Sequence[QWidget]]':
