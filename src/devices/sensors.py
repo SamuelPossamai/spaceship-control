@@ -66,7 +66,7 @@ class LineDetectSensor(Sensor):
 
         pos = self.structural_part.position
         segment_end = Vec2d(self.__max_dist, 0)
-        segment_end.angle = -self.structural_part.angle + self.__angle
+        segment_end.angle = self.structural_part.angle + self.__angle
 
         collisions = space.segment_query(pos, pos + segment_end, 10,
                                          ShapeFilter())
