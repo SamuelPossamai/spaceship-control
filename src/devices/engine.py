@@ -99,7 +99,7 @@ class LinearEngine(Engine):
                  max_angle: 'Union[float, int]',
                  intensity_multiplier: 'Union[float, int]' = 1,
                  intensity_offset: 'Union[float, int]' = 0,
-                 device_type: str = 'liner-engine',
+                 device_type: str = 'linear-engine',
                  **kwargs: 'Any') -> None:
 
         self.__int_mult = intensity_multiplier

@@ -10,6 +10,8 @@ __device_comm_read = sys.__stdin__
 
 class Device:
 
+    _DEVICE_TYPE_MAP = {}
+
     def __init__(self, device_path=''):
 
         self.__device_path = device_path
@@ -23,8 +25,13 @@ class Device:
             else:
                 dev_path_prefix = device_path
 
-            self.__children = tuple(Device(device_path=f'{device_path}{i}:')
-                                    for i in range(children_count))
+            children = []
+            for i in range(children_count):
+                child_type = self.sendMessage(f'{i}: device-type')
+                child_class = self._DEVICE_TYPE_MAP.get(child_type, Device)
+                children.append(child_class(device_path=f'{device_path}{i}:'))
+
+            self.__children = tuple(children)
         else:
             self.__children = None
 
@@ -68,10 +75,30 @@ class Device:
     def sendMessage(self, message):
         return send(self.__device_path + message)
 
-SensorInfo = collections.namedtuple('SensorInfo', ('reading_time',
-                                                    'max_error',
-                                                    'max_offset',
-                                                    'estimated_offset'))
+class Engine(Device):
+
+    def __init__(self, device_path=''):
+        super().__init__(device_path=device_path)
+
+        self.__intensity = None
+
+    @property
+    def intensity():
+        if self.__intensity is None:
+            self.__intensity = self.sendMessage('get-property intensity')
+
+        return self.__intensity
+
+    @intensity.setter
+    def intensity(value):
+        self.__intensity = None
+        self.sendMessage(f'set-property intensity {value}')
+
+Device._DEVICE_TYPE_MAP['engine'] = Engine
+Device._DEVICE_TYPE_MAP['linear-engine'] = Engine
+
+SensorInfo = collections.namedtuple('SensorInfo', (
+    'reading_time', 'max_error', 'max_offset', 'estimated_offset'))
 
 class Ship:
 
@@ -140,6 +167,12 @@ class Ship:
             self.__message_buffer = ''
 
         time.sleep(max(seconds - (time.time() - start_time), 0))
+
+    def listEngines(self, engine_type):
+        if engine_type is None:
+            return self.__engine_devices
+
+        return self.__engine_devices.get(engine_type, ())
 
     @property
     def console_printer(self):
