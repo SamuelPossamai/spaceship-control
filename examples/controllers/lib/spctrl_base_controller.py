@@ -77,8 +77,8 @@ class Device:
 
 class Engine(Device):
 
-    def __init__(self, device_path=''):
-        super().__init__(device_path=device_path)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.__intensity = None
 
@@ -96,6 +96,45 @@ class Engine(Device):
 
 Device._DEVICE_TYPE_MAP['engine'] = Engine
 Device._DEVICE_TYPE_MAP['linear-engine'] = Engine
+
+class Sensor(Device):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        try:
+            self.__reading_time = float(self.sendMessage('reading-time'))
+            self.__max_offset = float(self.sendMessage('max-offset'))
+            self.__max_error = float(
+                self.sendMessage('max-error')) - self.__max_offset
+        except ValueError:
+            self.__reading_time = self.__max_offset = self.__max_error = None
+
+    @property
+    def reading_time(self):
+        return self.__reading_time
+
+    @property
+    def max_error(self):
+        return self.__max_error
+
+    @property
+    def max_offset(self):
+        return self.__max_offset
+
+    def read(self, subdevice=None):
+        if subdevice is None:
+            msg = 'read'
+        else:
+            msg = f'{subdevice}:read'
+
+        try:
+            return float(self.sendMessage(msg))
+        except ValueError:
+            return float('NaN')
+
+Device._DEVICE_TYPE_MAP['position-sensor'] = Sensor
+Device._DEVICE_TYPE_MAP['angle-sensor'] = Sensor
 
 SensorInfo = collections.namedtuple('SensorInfo', (
     'reading_time', 'max_error', 'max_offset', 'estimated_offset'))
@@ -204,10 +243,9 @@ class Ship:
         if not position_devices:
             return None
 
-        device = position_devices[0][0]
+        device = position_devices[0]
 
-        return (float(device.sendMessage('x:read')),
-                float(device.sendMessage('y:read')))
+        return (device.read('x'), device.read('y'))
 
     @property
     def angle(self):
@@ -219,9 +257,9 @@ class Ship:
         if not position_devices:
             return None
 
-        device = position_devices[0][0]
+        device = position_devices[0]
 
-        return float(device.sendMessage('read'))
+        return float(device.read())
 
     @property
     def device(self):
@@ -229,22 +267,13 @@ class Ship:
 
     def __find_devices(self, device):
 
-        if device.type_ in ('position-sensor', 'angle-sensor'):
-            reading_time = float(device.sendMessage('reading-time'))
-            max_offset = float(device.sendMessage('max-offset'))
-            max_error = float(device.sendMessage('max-error')) - max_offset
-            info = SensorInfo(reading_time=reading_time,
-                              max_error=max_error,
-                              max_offset=max_offset,
-                              estimated_offset=0)
-
-            sensor_info = (device, info)
+        if isinstance(device, Sensor):
 
             devices = self.__sensor_devices.get(device.type_)
             if devices is None:
-                self.__sensor_devices[device.type_] = [sensor_info]
+                self.__sensor_devices[device.type_] = [device]
             else:
-                devices.append(sensor_info)
+                devices.append(device)
             return
 
         if device.type_ in ('text-display', 'console-text-display',
@@ -256,7 +285,7 @@ class Ship:
                 devices.append(sensor_info)
             return
 
-        if device.type_ in ('engine', 'linear-engine'):
+        if isinstance(device, Engine):
             devices = self.__engine_devices.get(device.type_)
             if devices is None:
                 self.__interface_devices[device.type_] = [device]
