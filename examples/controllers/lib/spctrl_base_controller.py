@@ -83,14 +83,14 @@ class Engine(Device):
         self.__intensity = None
 
     @property
-    def intensity():
+    def intensity(self):
         if self.__intensity is None:
             self.__intensity = self.sendMessage('get-property intensity')
 
         return self.__intensity
 
     @intensity.setter
-    def intensity(value):
+    def intensity(self, value):
         self.__intensity = None
         self.sendMessage(f'set-property intensity {value}')
 
@@ -135,6 +135,7 @@ class Sensor(Device):
 
 Device._DEVICE_TYPE_MAP['position-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['angle-sensor'] = Sensor
+Device._DEVICE_TYPE_MAP['speed-sensor'] = Sensor
 
 SensorInfo = collections.namedtuple('SensorInfo', (
     'reading_time', 'max_error', 'max_offset', 'estimated_offset'))
@@ -207,7 +208,7 @@ class Ship:
 
         time.sleep(max(seconds - (time.time() - start_time), 0))
 
-    def listEngines(self, engine_type):
+    def listEngines(self, engine_type=None):
         if engine_type is None:
             return self.__engine_devices
 
@@ -262,6 +263,20 @@ class Ship:
         return float(device.read())
 
     @property
+    def speed(self):
+        if not self.__sensor_devices:
+            return None
+
+        position_devices = self.__sensor_devices.get('speed-sensor')
+
+        if not position_devices:
+            return None
+
+        device = position_devices[0]
+
+        return device.read()
+
+    @property
     def device(self):
         return self.__device
 
@@ -288,9 +303,9 @@ class Ship:
         if isinstance(device, Engine):
             devices = self.__engine_devices.get(device.type_)
             if devices is None:
-                self.__interface_devices[device.type_] = [device]
+                self.__engine_devices[device.type_] = [device]
             else:
-                devices.append(sensor_info)
+                devices.append(device)
             return
 
         children = device.children

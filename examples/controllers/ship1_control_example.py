@@ -13,6 +13,8 @@ debug(sys.argv[1:])
 print('\n   Spaceship Control')
 print('\n\n This is just an example controller')
 
+engines = ship.listEngines('linear-engine')
+
 while True:
     try:
         if send('1:2: clicked') == '1':
@@ -45,7 +47,7 @@ while True:
 
         debug(commands)
 
-        debug('Speed:', send('0:3: read'))
+        debug('Speed:', ship.speed)
 
         pos = ship.position
         angle = ship.angle
@@ -53,9 +55,11 @@ while True:
         ship.displayPrint(f'<font color={colors[color_id]}>{pos[0]:.1f}, '
                           f'{pos[1]:.1f} ({angle:.1f}º)</font>')
 
-        send(f'0:0: set-property intensity {engine_one_intensity}')
-        send(f'1:0: set-property intensity {engine_two_intensity}')
-        send(f'2:0: set-property intensity {engine_three_intensity}')
+        debug(engines)
+
+        engines[0].intensity = engine_one_intensity
+        engines[1].intensity = engine_two_intensity
+        engines[2].intensity = engine_three_intensity
 
         debug('Distance: ', send(f'0:4: read'))
 
