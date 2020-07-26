@@ -297,7 +297,7 @@ class Ship:
             if devices is None:
                 self.__interface_devices[device.type_] = [device]
             else:
-                devices.append(sensor_info)
+                devices.append(device)
             return
 
         if isinstance(device, Engine):
