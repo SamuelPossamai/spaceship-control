@@ -189,8 +189,8 @@ part = 'part2'
 name = 'button1'
 type = 'button'
 
-x = 30
-y = 70
+x = 5
+y = 28
 
 [[InterfaceDevice]]
 

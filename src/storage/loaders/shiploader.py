@@ -137,12 +137,15 @@ def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart) \
 
     return device, (button,)
 
-def __createButton(_info: 'Dict[str, Any]', _part: StructuralPart) \
+def __createButton(info: 'Dict[str, Any]', _part: StructuralPart) \
     -> 'Tuple[ButtonDevice, Sequence[QWidget]]':
 
     device = ButtonDevice()
 
     button = device.widget
+
+    button.setGeometry(info.get('x', 0), info.get('y', 0),
+                       info.get('width', 20), info.get('height', 20))
 
     return device, (button,)
 
