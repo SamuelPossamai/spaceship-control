@@ -1,0 +1,176 @@
+
+[[Image]]
+
+path = '.ships/halfmoon.png'
+width = 40
+height = 60
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 15
+
+x = -26
+y = -20
+
+condition = 'ship.accessDevice(0, 0).intensity > 0'
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 15
+
+x = -26
+y = 20
+
+condition = 'ship.accessDevice(0, 1).intensity > 0'
+
+[[Shape]]
+
+id = 'poly-shape'
+type = 'polygon'
+mass = 3
+
+    [[Shape.Point]]
+
+    id = 'p1'
+    x = -20
+    y = -30
+
+    [[Shape.Point]]
+
+    id = 'p2'
+    x = -20
+    y = 30
+
+    [[Shape.Point]]
+
+    id = 'p3'
+    x = 15
+    y = 30
+
+    [[Shape.Point]]
+
+    id = 'p4'
+    x = 20
+    y = 0
+
+    [[Shape.Point]]
+
+    id = 'p5'
+    x = 15
+    y = -30
+
+[[Part]]
+
+name = 'center'
+x = 0
+y = 0
+
+[[Part]]
+
+name = 'wing1'
+x = 0
+y = 50
+
+[[Part]]
+
+name = 'wing2'
+x = 0
+y = -50
+
+[[Sensor]]
+
+part = 'center'
+
+name = 'speed-sensor'
+type = 'speed'
+
+reading_time = 0.5
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = -90
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = -45
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 0
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 45
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 90
+
+reading_time = 0.1
+
+[[Actuator]]
+
+part = 'wing1'
+
+name = 'wing1-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 10
+
+[[Actuator]]
+
+part = 'wing2'
+
+name = 'wing2-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 10
