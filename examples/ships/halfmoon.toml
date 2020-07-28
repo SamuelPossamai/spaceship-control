@@ -13,7 +13,7 @@ width = 15
 x = -26
 y = -20
 
-condition = 'ship.accessDevice(0, 0).intensity > 0'
+condition = 'ship.accessDevice("wing1", "wing1-engine").intensity > 0'
 
 [[Image]]
 
@@ -23,7 +23,7 @@ width = 15
 x = -26
 y = 20
 
-condition = 'ship.accessDevice(0, 1).intensity > 0'
+condition = 'ship.accessDevice("wing2", "wing2-engine").intensity > 0'
 
 [[Shape]]
 

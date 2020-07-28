@@ -1,4 +1,18 @@
 
+[Scenario]
+
+name = 'Objective.list.loop'
+debug = true
+
 [Inheritance]
 
 parent = '..basic/simple_race'
+
+[[Ship]]
+
+name = 'main'
+model = '..halfmoon'
+controller = '.halfmoon_loop.py'
+
+y = 350
+x = -300
