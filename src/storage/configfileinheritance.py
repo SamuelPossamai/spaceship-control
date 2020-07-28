@@ -1,6 +1,8 @@
 
 import itertools
 
+from ..utils.dictutils import writeEverywhere
+
 def resolvePrefix(name, prefixes):
 
     for dot_count, char in enumerate(name):
@@ -17,11 +19,13 @@ def resolvePrefix(name, prefixes):
     if parent_returns > len(prefixes):
         ValueError(f'Could\'nt resolve path \'{name}\'')
 
+    name_without_dots = name[dot_count:]
+
     new_prefix = tuple(prefixes[: len(prefixes) - parent_returns])
 
-    resolved_name = '/'.join(itertools.chain(new_prefix, (name[dot_count:],))) # pylint: disable=undefined-loop-variable
+    resolved_name = '/'.join(itertools.chain(new_prefix, (name_without_dots,))) # pylint: disable=undefined-loop-variable
 
-    new_prefix += tuple(name.split('/')[: -1])
+    new_prefix += tuple(name_without_dots.split('/')[: -1])
 
     return resolved_name, new_prefix
 
@@ -139,5 +143,7 @@ def mergeInheritedFiles(file_content, get_parent_func, prefixes=()):
 
     parent_content = mergeInheritedFiles(parent_content, get_parent_func,
                                          prefixes=parent_prefixes)
+
+    writeEverywhere(parent_content, {'__parentpath__': parent_prefixes})
 
     return mergeContent(file_content, parent_content)

@@ -78,6 +78,8 @@ def __resolveShipModelPrefix(model, prefixes):
 
 def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
 
+    prefixes = ship_content.get('__parentpath__', prefixes)
+
     model = ship_content.get('model')
     if model is not None:
         if isinstance(model, list):
@@ -112,6 +114,8 @@ def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
     return ShipInfo(**ship_info_kwargs)
 
 def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
+
+    prefixes = obj_content.get('__parentpath__', prefixes)
 
     model = obj_content.get('model')
     if model is not None:

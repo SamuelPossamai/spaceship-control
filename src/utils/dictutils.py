@@ -127,3 +127,18 @@ def mergeMatch(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
 
     for match_val in reversed(matches):
         merge_function(match_val, keys, target)
+
+def writeEverywhere(obj: 'Union[Dict[str, Any], List[Dict[str, Any]]]',
+                    values: 'Dict[str, Any]') -> None:
+
+    if isinstance(obj, list):
+        elements = obj
+    elif isinstance(obj, dict):
+        elements = obj.values()
+        obj.update(values)
+    else:
+        return
+
+    for element in elements:
+        writeEverywhere(element, values)
+
