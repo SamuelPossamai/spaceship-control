@@ -136,6 +136,7 @@ class Sensor(Device):
 Device._DEVICE_TYPE_MAP['position-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['angle-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['speed-sensor'] = Sensor
+Device._DEVICE_TYPE_MAP['line-dist-sensor'] = Sensor
 
 SensorInfo = collections.namedtuple('SensorInfo', (
     'reading_time', 'max_error', 'max_offset', 'estimated_offset'))
@@ -213,6 +214,12 @@ class Ship:
             return self.__engine_devices
 
         return self.__engine_devices.get(engine_type, ())
+
+    def listSensors(self, sensor_type=None):
+        if sensor_type is None:
+            return self.__sensor_devices
+
+        return self.__sensor_devices.get(sensor_type, ())
 
     @property
     def console_printer(self):

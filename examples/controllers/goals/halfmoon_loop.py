@@ -12,16 +12,24 @@ debug(ship.device)
 
 debug(sys.argv[1:])
 
-print('\n   Spaceship Control')
-print('\n\n This is just an example controller')
-
 engines = ship.listEngines('linear-engine')
+dist_sensors = ship.listSensors('line-dist-sensor')
+speed_sensor = ship.listSensors('speed-sensor')[0]
 
 while True:
     try:
+        speed = speed_sensor.read()
 
-        engines[0].intensity = 4
-        engines[1].intensity = 4
+        dist_values = tuple(sensor.read() for sensor in dist_sensors)
+
+        debug(int(speed), tuple(int(val) for val in dist_values))
+
+        if dist_values[2] < 800:
+            engines[0].intensity = 1
+            engines[1].intensity = 0
+        else:
+            engines[0].intensity = 4
+            engines[1].intensity = 4
 
     except BrokenPipeError:
         break

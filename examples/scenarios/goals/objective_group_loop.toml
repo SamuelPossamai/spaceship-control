@@ -1,4 +1,8 @@
 
+[PhysicsEngine]
+
+damping = 0.75
+
 [Scenario]
 
 name = 'Objective.list.loop'
