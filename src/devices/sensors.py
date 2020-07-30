@@ -50,6 +50,14 @@ class SpeedSensor(Sensor):
         angle = self.__off_angle + self.structural_part.angle
         return vel[0]*cos(angle) + vel[1]*sin(angle)
 
+class AngularSpeedSensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='ang-speed-sensor', **kwargs)
+
+    def read(self):
+        return 180*self.structural_part.structure.body.angular_velocity/pi
+
 class LineDetectSensor(Sensor):
 
     def __init__(self, *args: 'Any', distance=None, angle=None,

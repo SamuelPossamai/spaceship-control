@@ -92,6 +92,15 @@ reading_time = 0.5
 
 part = 'center'
 
+name = 'angular-speed-sensor'
+type = 'angular-speed'
+
+reading_time = 0.5
+
+[[Sensor]]
+
+part = 'center'
+
 type = 'detect'
 model = 'linear-distance'
 

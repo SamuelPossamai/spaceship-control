@@ -15,14 +15,17 @@ debug(sys.argv[1:])
 engines = ship.listEngines('linear-engine')
 dist_sensors = ship.listSensors('line-dist-sensor')
 speed_sensor = ship.listSensors('speed-sensor')[0]
+angular_speed_sensor = ship.listSensors('ang-speed-sensor')[0]
 
 while True:
     try:
         speed = speed_sensor.read()
+        angular_speed = angular_speed_sensor.read()
 
         dist_values = tuple(sensor.read() for sensor in dist_sensors)
 
-        debug(int(speed), tuple(int(val) for val in dist_values))
+        debug(int(speed), int(angular_speed),
+              tuple(int(val) for val in dist_values))
 
         if dist_values[2] < 800:
             engines[0].intensity = 1

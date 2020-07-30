@@ -136,6 +136,7 @@ class Sensor(Device):
 Device._DEVICE_TYPE_MAP['position-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['angle-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['speed-sensor'] = Sensor
+Device._DEVICE_TYPE_MAP['ang-speed-sensor'] = Sensor
 Device._DEVICE_TYPE_MAP['line-dist-sensor'] = Sensor
 
 SensorInfo = collections.namedtuple('SensorInfo', (

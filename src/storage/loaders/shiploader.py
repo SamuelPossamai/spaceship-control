@@ -7,7 +7,8 @@ from ...utils.errorgenerator import ErrorGenerator
 
 from ...devices.structure import Structure, StructuralPart
 from ...devices.sensors import (
-    PositionSensor, AngleSensor, SpeedSensor, LineDetectSensor
+    PositionSensor, AngleSensor, SpeedSensor, LineDetectSensor,
+    AngularSpeedSensor
 )
 from ...devices.engine import LinearEngine
 from ...devices.interfacedevice import (
@@ -91,6 +92,13 @@ def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
                        read_error_max=info.get('error_max', 0),
                        read_offset_max=info.get('offset_max', 0),
                        angle=info.get('angle', 0)), ()
+
+def __createAngularSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
+    -> 'Tuple[AngleSensor, Sequence[QWidget]]':
+
+    return AngularSpeedSensor(part, info['reading_time'],
+                              read_error_max=info.get('error_max', 0),
+                              read_offset_max=info.get('offset_max', 0)), ()
 
 def __createObstacleDistanceSensor(info: 'Dict[str, Any]',
                                    part: StructuralPart) \
@@ -195,6 +203,7 @@ __DEVICE_CREATE_FUNCTIONS = {
     ('Sensor', 'position', None): __createPositionSensor,
     ('Sensor', 'angle', None): __createAngleSensor,
     ('Sensor', 'speed', None): __createSpeedSensor,
+    ('Sensor', 'angular-speed', None): __createAngularSpeedSensor,
     ('Sensor', 'detect', 'linear-distance'): __createObstacleDistanceSensor,
     ('InterfaceDevice', 'text-display', None): __createTextDisplay,
     ('InterfaceDevice', 'text-display', 'line'): __createTextDisplay,
