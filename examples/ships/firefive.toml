@@ -135,10 +135,28 @@ y = 50
 
 part = 'center'
 
+name = 'position-sensor'
+type = 'position'
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+name = 'angle-sensor'
+type = 'angle'
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
 name = 'speed-sensor'
 type = 'speed'
 
-reading_time = 0.5
+reading_time = 0.1
 
 [[Sensor]]
 
@@ -146,66 +164,6 @@ part = 'center'
 
 name = 'angular-speed-sensor'
 type = 'angular-speed'
-
-reading_time = 0.5
-
-[[Sensor]]
-
-part = 'center'
-
-type = 'detect'
-model = 'linear-distance'
-
-angle = -90
-distance = 3000
-
-reading_time = 0.1
-
-[[Sensor]]
-
-part = 'center'
-
-type = 'detect'
-model = 'linear-distance'
-
-angle = -45
-distance = 3000
-
-reading_time = 0.1
-
-[[Sensor]]
-
-part = 'center'
-
-type = 'detect'
-model = 'linear-distance'
-
-angle = 0
-distance = 3000
-
-reading_time = 0.1
-
-[[Sensor]]
-
-part = 'center'
-
-type = 'detect'
-model = 'linear-distance'
-
-angle = 45
-distance = 3000
-
-reading_time = 0.1
-
-[[Sensor]]
-
-part = 'center'
-
-type = 'detect'
-model = 'linear-distance'
-
-angle = 90
-distance = 3000
 
 reading_time = 0.1
 

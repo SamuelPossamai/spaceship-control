@@ -285,6 +285,20 @@ class Ship:
         return device.read()
 
     @property
+    def angular_speed(self):
+        if not self.__sensor_devices:
+            return None
+
+        position_devices = self.__sensor_devices.get('ang-speed-sensor')
+
+        if not position_devices:
+            return None
+
+        device = position_devices[0]
+
+        return device.read()
+
+    @property
     def device(self):
         return self.__device
 

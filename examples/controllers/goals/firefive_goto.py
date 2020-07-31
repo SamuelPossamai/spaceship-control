@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import random
+import json
 
 sys.path.append(str(Path(__file__).parents[1]))
 
@@ -12,11 +13,15 @@ from lib.spctrl_base_controller import ship, send, debug
 
 debug(ship.device)
 
-debug(sys.argv[1:])
+args_info = json.loads(sys.argv[1])
+
+goto_objectives = [objective_info.get('info') for objective_info in
+                   args_info.get('objectives', ())
+                   if objective_info.get('type') == 'GoToObjective']
+
+debug(goto_objectives)
 
 engines = ship.listEngines('linear-engine')
-speed_sensor = ship.listSensors('speed-sensor')[0]
-angular_speed_sensor = ship.listSensors('ang-speed-sensor')[0]
 
 for engine in engines:
     engine.intensity = 4
@@ -25,10 +30,12 @@ current_engine = 0
 
 while True:
     try:
-        speed = speed_sensor.read()
-        angular_speed = angular_speed_sensor.read()
+        position = ship.position
+        angle = ship.angle
+        speed = ship.speed
+        angular_speed = ship.angular_speed
 
-        debug(int(speed), int(angular_speed))
+        debug(int(speed), int(angular_speed), position, angle)
 
         engines[current_engine].intensity = 4*random.random()
 
