@@ -1,0 +1,44 @@
+
+[PhysicsEngine]
+
+damping = 0.75
+
+[Scenario]
+
+name = 'Objective.goto'
+debug = true
+
+[[Ship]]
+
+name = 'FireFive'
+model = '..firefive'
+controller = '..goals/firefive_goto.py'
+
+x = 0
+y = 0
+angle = 0
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 0
+y = 0
+
+width = 20
+
+[[Image]]
+
+path = '..basic/checkpoint.png'
+x = 100
+y = 0
+
+width = 20
+
+[[Objective]]
+
+type = 'goto'
+
+x = 100
+y = 0
+
+distance = 10

@@ -1,0 +1,290 @@
+
+[[Image]]
+
+path = '.ships/firefive.png'
+width = 40
+height = 120
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 8
+
+x = '-14.8 - 2*ship.accessDevice("left-wing", "left-wing-engine").intensity'
+y = -50
+
+z_value = -1
+
+condition = 'ship.accessDevice("left-wing", "left-wing-engine").intensity > 0'
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 8
+
+x = '-14.8 - 2*ship.accessDevice("left-middle", "left-middle-engine").intensity'
+y = -25
+
+z_value = -1
+
+condition = 'ship.accessDevice("left-middle", "left-middle-engine").intensity > 0'
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 15
+
+x = '-14 - 3*ship.accessDevice("center", "center-engine").intensity'
+y = 0
+
+z_value = -1
+
+condition = 'ship.accessDevice("center", "center-engine").intensity > 0'
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 8
+
+x = '-14.8 - 2*ship.accessDevice("right-middle", "right-middle-engine").intensity'
+y = 25
+
+z_value = -1
+
+condition = 'ship.accessDevice("right-middle", "right-middle-engine").intensity > 0'
+
+[[Image]]
+
+path = '.engine_on.png'
+width = 8
+
+x = '-14.8 - 2*ship.accessDevice("right-wing", "right-wing-engine").intensity'
+y = 50
+
+z_value = -1
+
+condition = 'ship.accessDevice("right-wing", "right-wing-engine").intensity > 0'
+
+[[Shape]]
+
+id = 'poly-shape'
+type = 'polygon'
+mass = 3
+
+    [[Shape.Point]]
+
+    id = 'p1'
+    x = -20
+    y = -30
+
+    [[Shape.Point]]
+
+    id = 'p2'
+    x = -20
+    y = 30
+
+    [[Shape.Point]]
+
+    id = 'p3'
+    x = 15
+    y = 30
+
+    [[Shape.Point]]
+
+    id = 'p4'
+    x = 20
+    y = 0
+
+    [[Shape.Point]]
+
+    id = 'p5'
+    x = 15
+    y = -30
+
+[[Part]]
+
+name = 'center'
+x = 0
+y = 0
+
+[[Part]]
+
+name = 'left-middle'
+x = 0
+y = -25
+
+[[Part]]
+
+name = 'left-wing'
+x = 0
+y = -50
+
+[[Part]]
+
+name = 'right-middle'
+x = 0
+y = 25
+
+[[Part]]
+
+name = 'right-wing'
+x = 0
+y = 50
+
+[[Sensor]]
+
+part = 'center'
+
+name = 'speed-sensor'
+type = 'speed'
+
+reading_time = 0.5
+
+[[Sensor]]
+
+part = 'center'
+
+name = 'angular-speed-sensor'
+type = 'angular-speed'
+
+reading_time = 0.5
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = -90
+distance = 3000
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = -45
+distance = 3000
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 0
+distance = 3000
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 45
+distance = 3000
+
+reading_time = 0.1
+
+[[Sensor]]
+
+part = 'center'
+
+type = 'detect'
+model = 'linear-distance'
+
+angle = 90
+distance = 3000
+
+reading_time = 0.1
+
+[[Actuator]]
+
+part = 'left-wing'
+
+name = 'left-wing-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 2
+
+[[Actuator]]
+
+part = 'left-middle'
+
+name = 'left-middle-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 2
+
+[[Actuator]]
+
+part = 'center'
+
+name = 'center-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 10
+
+[[Actuator]]
+
+part = 'right-middle'
+
+name = 'right-middle-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 2
+
+[[Actuator]]
+
+part = 'right-wing'
+
+name = 'right-wing-engine'
+type = 'engine'
+model = 'linear'
+
+min_intensity = 0
+max_intensity = 4
+
+min_angle = 0
+max_angle = 0
+
+intensity_mult = 2
