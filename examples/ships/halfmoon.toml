@@ -10,8 +10,10 @@ height = 60
 path = '.engine_on.png'
 width = 15
 
-x = -26
+x = '-18 - 2*ship.accessDevice("wing2", "wing2-engine").intensity'
 y = -20
+
+z_value = -1
 
 condition = 'ship.accessDevice("wing2", "wing2-engine").intensity > 0'
 
@@ -20,8 +22,10 @@ condition = 'ship.accessDevice("wing2", "wing2-engine").intensity > 0'
 path = '.engine_on.png'
 width = 15
 
-x = -26
+x = '-18 - 2*ship.accessDevice("wing1", "wing1-engine").intensity'
 y = 20
+
+z_value = -1
 
 condition = 'ship.accessDevice("wing1", "wing1-engine").intensity > 0'
 

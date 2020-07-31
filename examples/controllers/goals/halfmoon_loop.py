@@ -31,8 +31,10 @@ while True:
             engines[0].intensity = 1
             engines[1].intensity = 0
         else:
-            engines[0].intensity = 4
-            engines[1].intensity = 4
+            intensity = 4/(1 + speed/100)
+
+            engines[0].intensity = intensity
+            engines[1].intensity = intensity
 
     except BrokenPipeError:
         break
