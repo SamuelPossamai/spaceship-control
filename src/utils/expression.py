@@ -8,6 +8,10 @@ class Expression:
         self.__evaluator = ExpressionEvaluator()
         self.__default_value = default_value
 
+    @property
+    def context(self):
+        return self.__evaluator.names
+
     def evaluate(self, **kwargs: 'Any') -> 'Any':
 
         self.__evaluator.names = kwargs

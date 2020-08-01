@@ -8,6 +8,8 @@ from .objectgraphicsitem import ObjectGraphicsItem
 
 from ..storage.fileinfo import FileInfo
 
+from ..utils.expression import Expression
+
 def __getSizeScale(cur_width, cur_height, after_width, after_height):
 
     width_scale = height_scale = 1
@@ -37,6 +39,18 @@ def __loadGraphicItemImagePart(image, condition_variables,
 
     if not image_angle_is_expr:
         pixmap = pixmap.transformed(QTransform().rotate(image.angle))
+
+    setup_script = image.setup_script
+    if setup_script is not None:
+        expression = Expression(setup_script)
+
+        if condition_variables:
+            expression.evaluate(**condition_variables)
+        else:
+            expression.evaluate()
+
+        if expression.context:
+            condition_variables = expression.context
 
     if image_angle_is_expr or image_x_is_expr or image_y_is_expr or \
         image.condition:

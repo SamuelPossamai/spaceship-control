@@ -14,7 +14,7 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
         self.__condition = Condition(condition) if condition else None
         self.__is_visible = True
         self.__condition_met = False
-        self.__names = {} if names is None else names
+        self.__names = {} if names is None else names.copy()
         self.__x_offset_func = None
         self.__y_offset_func = None
         self.__x_offset_func_mul = 1

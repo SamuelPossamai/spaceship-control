@@ -10,60 +10,70 @@ height = 120
 path = '.engine_on.png'
 width = 8
 
-x = '-14.8 - 2*ship.accessDevice("left-wing", "left-wing-engine").intensity'
+setup_script = 'engine = ship.accessDevice("left-wing", "left-wing-engine")'
+
+x = '-14.8 - 2*engine.intensity'
 y = -50
 
 z_value = -1
 
-condition = 'ship.accessDevice("left-wing", "left-wing-engine").intensity > 0'
+condition = 'engine.intensity > 0'
 
 [[Image]]
 
 path = '.engine_on.png'
 width = 8
 
-x = '-14.8 - 2*ship.accessDevice("left-middle", "left-middle-engine").intensity'
+setup_script = 'engine = ship.accessDevice("left-middle", "left-middle-engine")'
+
+x = '-14.8 - 2*engine.intensity'
 y = -25
 
 z_value = -1
 
-condition = 'ship.accessDevice("left-middle", "left-middle-engine").intensity > 0'
+condition = 'engine.intensity > 0'
 
 [[Image]]
 
 path = '.engine_on.png'
 width = 15
 
-x = '-14 - 3*ship.accessDevice("center", "center-engine").intensity'
+setup_script = 'engine = ship.accessDevice("center", "center-engine")'
+
+x = '-14 - 3*engine.intensity'
 y = 0
 
 z_value = -1
 
-condition = 'ship.accessDevice("center", "center-engine").intensity > 0'
+condition = 'engine.intensity > 0'
 
 [[Image]]
 
 path = '.engine_on.png'
 width = 8
 
-x = '-14.8 - 2*ship.accessDevice("right-middle", "right-middle-engine").intensity'
+setup_script = 'engine = ship.accessDevice("right-middle", "right-middle-engine")'
+
+x = '-14.8 - 2*engine.intensity'
 y = 25
 
 z_value = -1
 
-condition = 'ship.accessDevice("right-middle", "right-middle-engine").intensity > 0'
+condition = 'engine.intensity > 0'
 
 [[Image]]
 
 path = '.engine_on.png'
 width = 8
 
-x = '-14.8 - 2*ship.accessDevice("right-wing", "right-wing-engine").intensity'
+setup_script = 'engine = ship.accessDevice("right-wing", "right-wing-engine")'
+
+x = '-14.8 - 2*engine.intensity'
 y = 50
 
 z_value = -1
 
-condition = 'ship.accessDevice("right-wing", "right-wing-engine").intensity > 0'
+condition = 'engine.intensity > 0'
 
 [[Shape]]
 
