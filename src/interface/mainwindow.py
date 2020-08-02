@@ -3,6 +3,7 @@ import sys
 import time
 from math import pi
 from threading import Lock
+import traceback
 from pathlib import Path
 from queue import Empty as EmptyQueueException
 
@@ -291,6 +292,7 @@ class MainWindow(QMainWindow):
             try:
                 ship = self.__loadShip(ship_info, arg_scenario_info.copy())
             except Exception as err:
+                traceback.print_exc()
                 self.clear()
                 QMessageBox.warning(self, 'Error', (
                     f'An error occurred loading a ship({ship_info.model}): \n'

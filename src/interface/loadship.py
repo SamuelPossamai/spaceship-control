@@ -1,5 +1,6 @@
 
 import json
+import math
 
 try:
     from queue import SimpleQueue
@@ -19,6 +20,7 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
     fileinfo = FileInfo()
 
     arg_scenario_info['starting-position'] = ship_info.position
+    arg_scenario_info['starting-angle'] = 180*ship_info.angle/math.pi
 
     json_info = json.dumps(arg_scenario_info)
 
