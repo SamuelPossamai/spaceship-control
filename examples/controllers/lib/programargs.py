@@ -2,7 +2,7 @@
 import sys
 import json
 
-from .goals import Goal
+from .goals import GoalList
 
 class ProgramArgsInfo:
 
@@ -11,8 +11,11 @@ class ProgramArgsInfo:
         self.__json_content = json.loads(sys.argv[1])
         self.__starting_position = self.__json_content.get('starting-position')
         self.__starting_angle = self.__json_content.get('starting-angle')
-        self.__goals = tuple(Goal.load(goal) for goal in
-                             self.__json_content.get('objectives', ()))
+        self.__goals = GoalList('GoalList', {
+            'info': {
+                'objectives': self.__json_content.get('objectives', ())
+            }
+        })
 
     @property
     def starting_position(self):
@@ -33,5 +36,6 @@ class ProgramArgsInfo:
 
 try:
     program_args_info = ProgramArgsInfo()
-except Exception:
+except Exception as err:
+    print('programargs.py: An error occured:', err, file=sys.stderr)
     program_args_info = None

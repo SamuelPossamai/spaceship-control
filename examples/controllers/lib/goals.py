@@ -3,16 +3,19 @@ class Goal:
 
     _GOAL_TYPE_MAP = {}
 
-    def __init__(self, goal_info):
+    def __init__(self, type_, goal_info):
 
         self.__goal_info = goal_info
-        self.__type = goal_info.get('type')
+        self.__type = type_
         self.__name = goal_info.get('name')
         self.__description = goal_info.get('description')
         self.__info = goal_info.get('info')
 
     def load(goal_info):
-        return Goal(goal_info)
+
+        type_ = goal_info.get('type')
+
+        return Goal._GOAL_TYPE_MAP.get(type_, Goal)(type_, goal_info)
 
     @property
     def type_(self):
@@ -33,14 +36,48 @@ class Goal:
     def __repr__(self):
         return f'Goal: {self.__name}'
 
+class GoalList(Goal):
+
+    def __init__(self, type_, goal_info):
+        super().__init__(type_, goal_info)
+
+        self.__goals = tuple(Goal.load(goal_info) for goal_info in
+                             self.info.get('objectives', ()))
+
+    def goals(self):
+        return self.__goals
+
+    def __getitem__(self, val):
+        return self.__goals[val]
+
+    def __iter__(self):
+        return iter(self.__goals)
+
+    def __contains__(self, value):
+        return value in self.__goals
+
+    def __len__(self):
+        return len(self.__goals)
+
+    def __format__(self, format_spec):
+        return format(self.__goals, format_spec)
+
+    def __str__(self):
+        return str(self.__goals)
+
+    def __repr__(self):
+        return repr(self.__goals)
+
+Goal._GOAL_TYPE_MAP['ObjectiveGroup'] = GoalList
+
 class GoToGoal(Goal):
 
-    def __init__(self, goal_info):
-        super().__init__(goal_info)
+    def __init__(self, type_, goal_info):
+        super().__init__(type_, goal_info)
 
         info = self.info
 
-        self.__pos = info.get('x-position'), info.get('y-position')
+        self.__pos = info.get('target-x'), info.get('target-y')
         self.__distance = info.get('distance')
 
     @property
@@ -50,5 +87,6 @@ class GoToGoal(Goal):
     @property
     def distance(self):
         return self.__distance
+
 
 Goal._GOAL_TYPE_MAP['GoToObjective'] = GoToGoal

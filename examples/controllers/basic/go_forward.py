@@ -4,13 +4,16 @@ import sys
 
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath('lib')))
+sys.path.append(str(Path(__file__).parents[1]))
 
-from spctrl_base_controller import ship, send, debug
+from lib.programargs import program_args_info
+from lib.spctrl_base_controller import ship, send, debug
 
 sys.__stderr__.flush()
 
-debug(send('0:0: set-property intensity 1'))
+debug(program_args_info)
+
+send('0:0: set-property intensity 1')
 while True:
     try:
         debug(ship.position)
