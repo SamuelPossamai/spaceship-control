@@ -135,7 +135,10 @@ class Objective(ABC):
             'type': self.__class__.__name__,
             'name': self.name,
             'description': self.description,
-            'info': self.info
+            'info': self.info,
+            'negation': self.__neg,
+            'required': self.__required,
+            'ships': self.__valid_ships
         }
 
     @abstractproperty

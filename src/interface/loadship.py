@@ -19,6 +19,7 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
 
     fileinfo = FileInfo()
 
+    arg_scenario_info['ship-name'] = ship_info.name
     arg_scenario_info['starting-position'] = ship_info.position
     arg_scenario_info['starting-angle'] = 180*ship_info.angle/math.pi
 

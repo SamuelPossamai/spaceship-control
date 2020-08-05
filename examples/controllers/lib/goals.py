@@ -3,19 +3,28 @@ class Goal:
 
     _GOAL_TYPE_MAP = {}
 
-    def __init__(self, type_, goal_info):
+    def __init__(self, type_, goal_info, ship_name=None):
 
         self.__goal_info = goal_info
         self.__type = type_
         self.__name = goal_info.get('name')
         self.__description = goal_info.get('description')
         self.__info = goal_info.get('info')
+        self.__negation = goal_info.get('negation', False)
+        self.__required = goal_info.get('required', True)
+        self.__valid_ships = goal_info.get('ships')
 
-    def load(goal_info):
+        if ship_name is None or self.__valid_ships is None:
+            self.__valid = True
+        else:
+            self.__valid = ship_name in self.__valid_ships
+
+    def load(goal_info, ship_name=None):
 
         type_ = goal_info.get('type')
 
-        return Goal._GOAL_TYPE_MAP.get(type_, Goal)(type_, goal_info)
+        return Goal._GOAL_TYPE_MAP.get(type_, Goal)(
+            type_, goal_info, ship_name=ship_name)
 
     @property
     def type_(self):
@@ -33,16 +42,28 @@ class Goal:
     def info(self):
         return self.__info
 
+    @property
+    def negation(self):
+        return self.__negation
+
+    @property
+    def required(self):
+        return self.__required
+
+    @property
+    def valid(self):
+        return self.__valid
+
     def __repr__(self):
         return f'Goal: {self.__name}'
 
 class GoalList(Goal):
 
-    def __init__(self, type_, goal_info):
-        super().__init__(type_, goal_info)
+    def __init__(self, type_, goal_info, ship_name=None):
+        super().__init__(type_, goal_info, ship_name=ship_name)
 
-        self.__goals = tuple(Goal.load(goal_info) for goal_info in
-                             self.info.get('objectives', ()))
+        self.__goals = tuple(Goal.load(goal_info, ship_name=ship_name)
+                             for goal_info in self.info.get('objectives', ()))
 
     def goals(self):
         return self.__goals
@@ -72,8 +93,8 @@ Goal._GOAL_TYPE_MAP['ObjectiveGroup'] = GoalList
 
 class GoToGoal(Goal):
 
-    def __init__(self, type_, goal_info):
-        super().__init__(type_, goal_info)
+    def __init__(self, type_, goal_info, ship_name=None):
+        super().__init__(type_, goal_info, ship_name=ship_name)
 
         info = self.info
 

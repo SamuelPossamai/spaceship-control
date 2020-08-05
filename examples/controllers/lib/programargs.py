@@ -11,11 +11,16 @@ class ProgramArgsInfo:
         self.__json_content = json.loads(sys.argv[1])
         self.__starting_position = self.__json_content.get('starting-position')
         self.__starting_angle = self.__json_content.get('starting-angle')
+        self.__ship_name = self.__json_content.get('ship-name')
         self.__goals = GoalList('GoalList', {
             'info': {
                 'objectives': self.__json_content.get('objectives', ())
             }
-        })
+        }, ship_name=self.__ship_name)
+
+    @property
+    def ship_name(self):
+        return self.__ship_name
 
     @property
     def starting_position(self):
