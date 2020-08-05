@@ -32,7 +32,8 @@ def __loadError(info: 'Dict[str, Any]') -> ErrorGenerator:
 def __loadErrorDict(
         errors: 'Dict[str, Dict[str, Any]]') -> 'Dict[str, ErrorGenerator]':
 
-    return {name: __loadError(info) for name, info in errors.items()}
+    return {name: __loadError(info) for name, info in errors.items()
+            if not name.startswith('__')}
 
 def __getErrorKwargs(content: 'Dict[str, Dict[str, Any]]',
                      errors: 'Dict[str, str]') -> 'Dict[str, ErrorGenerator]':
