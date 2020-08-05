@@ -232,6 +232,9 @@ class MainWindow(QMainWindow):
             controller_options_dialog=self.__chooseControllerDialog,
             communication_engine=self.__comm_engine)
 
+        if loaded_ship_info is None:
+            return None
+
         ship = loaded_ship_info[0]
         ship_gitem = loaded_ship_info[1]
         thread = loaded_ship_info[3]
