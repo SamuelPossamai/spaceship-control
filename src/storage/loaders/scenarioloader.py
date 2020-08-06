@@ -78,7 +78,9 @@ def __resolveShipModelPrefix(model, prefixes):
 
 def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
 
-    prefixes = ship_content.get('__parentpath__', prefixes)
+    model_metadata = ship_content.get('__model_attr_meta__')
+    if model_metadata is not None:
+        prefixes = model_metadata.get('parentpath', prefixes)
 
     model = ship_content.get('model')
     if model is not None:
@@ -115,7 +117,9 @@ def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
 
 def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
 
-    prefixes = obj_content.get('__parentpath__', prefixes)
+    model_metadata = obj_content.get('__model_attr_meta__')
+    if model_metadata is not None:
+        prefixes = model_metadata.get('parentpath', prefixes)
 
     model = obj_content.get('model')
     if model is not None:

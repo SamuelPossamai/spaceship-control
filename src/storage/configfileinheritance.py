@@ -141,9 +141,11 @@ def mergeInheritedFiles(file_content, get_parent_func, prefixes=()):
 
     parent_content = get_parent_func(parent_name)
 
+    writeEverywhere(parent_content, {'parentpath': parent_prefixes},
+                    dict_key='__meta__', key_format='__{}_attr_meta__')
+
     parent_content = mergeInheritedFiles(parent_content, get_parent_func,
                                          prefixes=parent_prefixes)
 
-    writeEverywhere(parent_content, {'__parentpath__': parent_prefixes})
 
     return mergeContent(file_content, parent_content)

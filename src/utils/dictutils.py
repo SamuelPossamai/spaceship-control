@@ -129,16 +129,23 @@ def mergeMatch(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
         merge_function(match_val, keys, target)
 
 def writeEverywhere(obj: 'Union[Dict[str, Any], List[Dict[str, Any]]]',
-                    values: 'Dict[str, Any]') -> None:
+                    value: 'Any]', dict_key: str = None,
+                    key_format: str = None) -> None:
 
     if isinstance(obj, list):
         elements = obj
     elif isinstance(obj, dict):
-        elements = obj.values()
-        obj.update(values)
+        elements = tuple(obj.values())
+
+        if key_format is not None:
+            obj.update([(key_format.format(key), value) for key in obj])
+
+        if dict_key is not None:
+            obj[dict_key] = value
     else:
         return
 
     for element in elements:
-        writeEverywhere(element, values)
+        writeEverywhere(element, value, dict_key=dict_key,
+                        key_format=key_format)
 
