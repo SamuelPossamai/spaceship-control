@@ -79,9 +79,34 @@ class LineDetectSensor(Sensor):
         collisions = space.segment_query(pos, pos + segment_end, 10,
                                          ShapeFilter())
 
-        collisions = [col for col in collisions if col.shape.body is not body]
+        first_collision = next((col for col in collisions
+                                if col.shape.body is not body), None)
 
-        if not collisions:
+        if first_collision is None:
             return self.__max_dist
 
-        return collisions[0].point.get_distance(pos)
+        return first_collision.point.get_distance(pos)
+
+class DetectCloserSensor(Sensor):
+
+    def __init__(self, *args: 'Any', distance=None, **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='dist-sensor', **kwargs)
+
+        self.__max_dist = 1000 if distance is None else distance
+
+    def read(self):
+        structure = self.structural_part.structure
+        space = structure.space
+        body = structure.body
+
+        pos = self.structural_part.position
+
+        collisions = space.point_query(pos, self.__max_dist, ShapeFilter())
+
+        first_collision = next((col for col in collisions
+                                if col.shape.body is not body), None)
+
+        if first_collision is None:
+            return self.__max_dist
+
+        return first_collision.distance
