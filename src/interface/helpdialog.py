@@ -1,6 +1,7 @@
 
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
@@ -14,6 +15,9 @@ from ..storage.fileinfo import FileInfo
 sys.path.insert(0, str(Path(__file__).parent))
 UiHelpWidget, _ = FileInfo().loadUi('helpwindow.ui') # pylint: disable=invalid-name
 sys.path.pop(0)
+
+if TYPE_CHECKING:
+    from PyQt5.QtWidgets import QWidget
 
 class HelpDialog(QDialog):
 

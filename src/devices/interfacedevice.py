@@ -1,5 +1,6 @@
 
 import html
+from typing import TYPE_CHECKING
 
 from PyQt5.QtGui import QFontMetricsF, QFont
 from PyQt5.QtWidgets import QLabel, QTextEdit
@@ -11,6 +12,9 @@ from ..utils.actionqueue import ActionQueue, Action
 
 from ..interface.panelpushbutton import PanelPushButton
 from ..interface.keyboardbutton import KeyboardButton
+
+if TYPE_CHECKING:
+    from typing import Any, List
 
 class InterfaceDevice(DefaultDevice):
 

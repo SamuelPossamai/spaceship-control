@@ -1,5 +1,10 @@
 
-MERGE_FUNCTION_TYPE = 'Callable[[Dict[str, Any], Sequence[str], str], None]'
+from typing import TYPE_CHECKING, cast as typingcast
+
+if TYPE_CHECKING:
+    from typing import Callable, Dict, Any, Sequence, List
+    from mypy_extensions import VarArg
+    MergeFunctionType = 'Callable[[Dict[str, Any], Sequence[str], str], None]'
 
 def getMapOp(operation: 'Callable', dict_obj: 'Dict[str, Any]',
              initial_value: 'Any', *args: str) -> 'Any':
@@ -15,17 +20,17 @@ def getMapOp(operation: 'Callable', dict_obj: 'Dict[str, Any]',
 def getMapConcat(dict_obj: 'Dict[str, Dict[str, Any]]',
                  *args: str) -> 'Dict[str, Any]':
 
-    return getMapOp(lambda first, second: first.update(second), dict_obj, {},
-                    *args)
+    return typingcast('Dict[str, Any]', getMapOp(
+        lambda first, second: first.update(second), dict_obj, {}, *args))
 
 def getListConcat(dict_obj: 'Dict[str, List[Any]]', *args: str) -> 'List[Any]':
 
-    return getMapOp(lambda first, second: first.extend(second), dict_obj, [],
-                    *args)
+    return typingcast('List[Any]', getMapOp(
+        lambda first, second: first.extend(second), dict_obj, [], *args))
 
 def mergeBase(
         dict_obj: 'Dict[str, Any]', keys: 'Sequence[str]', target: str,
-        function: 'Callable[[Dict[str, Any], List[str]], Dict[str, Any]]') \
+        function: 'Callable[[Dict[str, Any], VarArg[str]], Dict[str, Any]]') \
             -> None:
 
     result = function(dict_obj, *keys)
@@ -114,7 +119,7 @@ def pathMatch(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
 
 def mergeMatch(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
                keys: 'Sequence[str]', target: str,
-               merge_function: MERGE_FUNCTION_TYPE = merge, **kwargs) -> None:
+               merge_function: 'MergeFunctionType' = merge, **kwargs) -> None:
 
     if 'has_keys' not in kwargs:
         kwargs['has_keys'] = tuple(key for key in keys if key != target)

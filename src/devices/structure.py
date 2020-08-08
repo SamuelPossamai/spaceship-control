@@ -1,12 +1,15 @@
 
 from abc import abstractmethod
-
 import time
 import math
+from typing import TYPE_CHECKING
 
 from .device import DeviceGroup, DefaultDevice
 
 from ..utils.errorgenerator import ErrorGenerator
+
+if TYPE_CHECKING:
+    from typing import Any, Union, Dict, Type
 
 class Structure(DeviceGroup):
 

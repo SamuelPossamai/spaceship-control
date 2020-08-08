@@ -7,6 +7,7 @@ import subprocess
 from enum import Enum, Flag, auto as flagAuto
 from typing import NamedTuple
 from fnmatch import fnmatch
+from typing import TYPE_CHECKING
 
 import json
 import toml
@@ -29,6 +30,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent.joinpath('interface')))
 from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-import-position, import-error
 sys.path.pop(0)
 
+if TYPE_CHECKING:
+    from typing import Sequence, Optional
+
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
     FILE_INTERNAL = flagAuto()
@@ -50,7 +54,7 @@ class FileInfo:
     class __DataTypeInfoType(NamedTuple):
         path: str
         use_dist_path: bool = False
-        suffix_list: 'Sequence[str]' = ()
+        suffix_list: 'Optional[Sequence[str]]' = None
         list_remove_suffix: bool = False
         list_blacklist: 'Sequence[str]' = ()
         package_glob_list: 'Sequence[str]' = None

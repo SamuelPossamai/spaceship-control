@@ -5,6 +5,7 @@ from math import pi
 from threading import Lock
 import traceback
 from pathlib import Path
+from typing import TYPE_CHECKING
 from queue import Empty as EmptyQueueException
 
 from PyQt5.QtWidgets import (

@@ -1,6 +1,7 @@
 
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 
@@ -14,6 +15,11 @@ from ..storage.fileinfo import FileInfo
 sys.path.insert(0, str(Path(__file__).parent))
 UiChooseFromTree, _ = FileInfo().loadUi('choosefromtree.ui') # pylint: disable=invalid-name
 sys.path.pop(0)
+
+if TYPE_CHECKING:
+    import anytree
+    from typing import Sequence
+    from PyQt5.QtWidgets import QWidget
 
 class ChooseFromTreeDialog(QDialog):
 

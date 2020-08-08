@@ -6,8 +6,13 @@ sensor, an actuator or another device.
 """
 
 import shlex
-
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import (
+        Any, Dict, Optional, Callable, Callable, Callable, Iterable
+    )
 
 class Device(ABC):
     """Base class for all devices.
