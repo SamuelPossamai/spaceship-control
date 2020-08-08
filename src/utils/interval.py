@@ -4,7 +4,7 @@ import bisect
 class Interval:
 
     def __init__(self, start: 'Union[int, float]',
-                    end: 'Union[int, float]' = None) -> None:
+                 end: 'Union[int, float]' = None) -> None:
         self.__start = start
         if end is None:
             self.__end = start

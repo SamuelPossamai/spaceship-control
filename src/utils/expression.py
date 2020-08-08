@@ -26,5 +26,5 @@ class Condition(Expression):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs, default_value=False)
 
-    def evaluate(self, *args, **kwargs) -> 'Any':
-        return bool(super().evaluate(*args, **kwargs))
+    def evaluate(self, **kwargs) -> 'Any':
+        return bool(super().evaluate(**kwargs))

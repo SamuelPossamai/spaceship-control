@@ -66,13 +66,12 @@ def pathMatchAbsolute(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
                       path_may_have_list: bool = True) \
                           -> 'Sequence[Dict[str, Any]]':
 
-    if start > len(path):
-        return ()
+    if start == len(path) and (has_keys is None or hasKeys(
+            dict_obj, has_keys, operation=has_keys_op)):
 
-    if start == len(path):
-        if has_keys is None or hasKeys(dict_obj, has_keys,
-                                       operation=has_keys_op):
-            return (dict_obj,)
+        return (dict_obj,)
+
+    if start >= len(path):
         return ()
 
     default_obj = object()
@@ -148,4 +147,3 @@ def writeEverywhere(obj: 'Union[Dict[str, Any], List[Dict[str, Any]]]',
     for element in elements:
         writeEverywhere(element, value, dict_key=dict_key,
                         key_format=key_format)
-
