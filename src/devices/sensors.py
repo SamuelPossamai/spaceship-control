@@ -1,9 +1,14 @@
 
+from typing import TYPE_CHECKING
+
 from pymunk import Vec2d, ShapeFilter
 
 from math import pi, cos, sin
 
 from .structure import Sensor, MultiSensor
+
+if TYPE_CHECKING:
+    from typing import Any
 
 class XPositionSensor(Sensor):
 

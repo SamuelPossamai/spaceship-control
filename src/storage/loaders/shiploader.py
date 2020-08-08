@@ -1,5 +1,6 @@
 
 from collections import namedtuple
+from typing import TYPE_CHECKING, cast as typingcast
 
 from pymunk import Body
 
@@ -20,6 +21,21 @@ from ...devices.communicationdevices import (
 
 from .shapeloader import loadShapes
 from .imageloader import loadImages
+
+if TYPE_CHECKING:
+    from typing import Tuple, Sequence, Any, Dict, List, Protocol
+    import pymunk
+    from PyQt5.QtWidgets import QWidget
+    from ...devices.device import Device
+    from ...devices.communicationdevices import CommunicationEngine
+    from ...devices.interfacedevice import InterfaceDevice
+
+    class CreateDeviceCallable(Protocol):
+        def __call__(self, *args: 'Any',
+                     **kwargs: 'Any') -> 'Tuple[Device, List[QWidget]]': ...
+
+    DeviceKindType = 'Tuple[Optional[str], Optional[str], Optional[str]]'
+    DeviceCreateFunctionsType = 'Dict[DeviceKindType, CreateDeviceCallable]'
 
 ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 
@@ -198,7 +214,7 @@ def __createConfSender(info: 'Dict[str, Any]', part: StructuralPart,
     return (ConfigurableSender(part, engine, info['intensity'],
                                info['frequency'], **errors), ())
 
-__DEVICE_CREATE_FUNCTIONS = {
+__DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 
     ('Actuator', 'engine', 'linear'): __createLinearEngine,
     ('Sensor', 'position', None): __createPositionSensor,
@@ -224,7 +240,7 @@ def __addDevice(
     type_and_model = (device_type, info.get('type'), info.get('model'))
     create_func = __DEVICE_CREATE_FUNCTIONS.get(type_and_model)
 
-    part_name = info.get('part')
+    part_name = typingcast(str, info.get('part'))
     part = parts.get(part_name)
     if part is None:
         raise Exception(f"{device_type} has invalid part \'{part_name}\'.")
@@ -254,9 +270,9 @@ def __loadShipStructure(ship_info, name, space, body):
 
     return ship, parts
 
-def loadShip(ship_info: str, name: str, space: 'pymunk.Space',
+def loadShip(ship_info: 'Dict[str, Any]', name: str, space: 'pymunk.Space',
              prefixes: 'Sequence[str]' = (), communication_engine=None) \
-    -> 'Tuple[Structure, Sequence[QWidget]]':
+    -> 'ShipInfo':
 
     shapes = loadShapes(ship_info['Shape'])
 

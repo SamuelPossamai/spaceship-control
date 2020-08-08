@@ -1,8 +1,14 @@
 
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
 from .structure import Actuator
 from ..utils.interval import Interval, IntervalSet
+
+if TYPE_CHECKING:
+    from typing import Union, Any
+    from .device import Device
+    from .structure import StructuralPart
 
 class Engine(Actuator):
 

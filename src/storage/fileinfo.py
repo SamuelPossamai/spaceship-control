@@ -57,8 +57,8 @@ class FileInfo:
         suffix_list: 'Optional[Sequence[str]]' = None
         list_remove_suffix: bool = False
         list_blacklist: 'Sequence[str]' = ()
-        package_glob_list: 'Sequence[str]' = None
-        files_mode: int = None
+        package_glob_list: 'Optional[Sequence[str]]' = None
+        files_mode: 'Optional[int]' = None
         metadata_type: 'FileMetadataType' = _FileInfo_FileMetadataType.ABSENT
         use_root_path: bool = False
 
