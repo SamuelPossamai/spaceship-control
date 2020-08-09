@@ -1,6 +1,7 @@
 
 from math import pi
 from collections import namedtuple
+from typing import TYPE_CHECKING
 
 from .imageloader import loadImages
 
@@ -11,6 +12,9 @@ from ...objectives.gotoobjective import GoToObjective
 from ...objectives.timedobjective import TimedObjectiveGroup
 
 from ...devices.communicationdevices import CommunicationEngine
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, Optional
 
 ObjectInfo = namedtuple('ObjectInfo', (
     'model', 'position', 'angle', 'variables'))
@@ -97,6 +101,7 @@ def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
 
     variables_content = ship_content.get('Variable')
 
+    variables: 'Optional[Dict[str, Any]]'
     if variables_content:
         variables = {variable['id']: variable['value']
                      for variable in variables_content}
@@ -134,6 +139,7 @@ def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
 
     variables_content = obj_content.get('Variable')
 
+    variables: 'Optional[Dict[str, Any]]'
     if variables_content:
         variables = {variable['id']: variable['value']
                      for variable in variables_content}

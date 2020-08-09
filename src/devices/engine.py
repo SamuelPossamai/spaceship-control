@@ -6,7 +6,7 @@ from .structure import Actuator
 from ..utils.interval import Interval, IntervalSet
 
 if TYPE_CHECKING:
-    from typing import Union, Any
+    from typing import Any
     from .device import Device
     from .structure import StructuralPart
 
@@ -66,7 +66,7 @@ class Engine(Actuator):
             self.__angle = val
 
     @abstractmethod
-    def mapIntensityToThrust(self, intensity) -> 'Union[float, int]':
+    def mapIntensityToThrust(self, intensity) -> float:
         pass
 
     def actuate(self, base_thrust: float = None) -> None:
@@ -99,12 +99,12 @@ class Engine(Actuator):
 class LinearEngine(Engine):
 
     def __init__(self, part: 'StructuralPart',
-                 min_intensity: 'Union[float, int]',
-                 max_intensity: 'Union[float, int]',
-                 min_angle: 'Union[float, int]',
-                 max_angle: 'Union[float, int]',
-                 intensity_multiplier: 'Union[float, int]' = 1,
-                 intensity_offset: 'Union[float, int]' = 0,
+                 min_intensity: float,
+                 max_intensity: float,
+                 min_angle: float,
+                 max_angle: float,
+                 intensity_multiplier: float = 1,
+                 intensity_offset: float = 0,
                  device_type: str = 'linear-engine',
                  **kwargs: 'Any') -> None:
 
@@ -120,5 +120,5 @@ class LinearEngine(Engine):
                          valid_angles=valid_angles,
                          device_type=device_type, **kwargs)
 
-    def mapIntensityToThrust(self, intensity) -> 'Union[float, int]':
+    def mapIntensityToThrust(self, intensity) -> float:
         return self.__int_off + intensity*self.__int_mult

@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod, abstractproperty
+from typing import TYPE_CHECKING
 
 import random
 import math
@@ -7,6 +8,9 @@ import math
 from pymunk import Vec2d
 
 from .device import DefaultDevice
+
+if TYPE_CHECKING:
+    from typing import Any, List
 
 class CommunicationEngine:
 

@@ -2,14 +2,16 @@
 from abc import abstractmethod
 import time
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast as typingcast
 
 from .device import DeviceGroup, DefaultDevice
 
 from ..utils.errorgenerator import ErrorGenerator
 
 if TYPE_CHECKING:
-    from typing import Any, Union, Dict, Type
+    from typing import Any, Dict, Type, List, Tuple, Callable, Optional
+    import pymunk
+    from .device import Device
 
 class Structure(DeviceGroup):
 
@@ -29,8 +31,8 @@ class Structure(DeviceGroup):
     def name(self) -> str:
         return self.__name
 
-    def addDevice(self, device: 'Device', **kwargs: 'Any') -> None: # pylint: disable=arguments-differ
-        super().addDevice(device, **kwargs)
+    def addDevice(self, device: 'Device', name: str = None) -> None:
+        super().addDevice(device, name)
 
         if isinstance(device, StructuralPart):
             device.structure = self
@@ -50,7 +52,7 @@ class StructuralPart(DeviceGroup):
 
     def __init__(self,
                  structure: Structure = None,
-                 offset: 'Tuple[Union[int, float], Union[int, float]]' = (0, 0),
+                 offset: 'Tuple[float, float]' = (0, 0),
                  **kwargs: 'Any') -> None:
 
         if 'device_type' not in kwargs:
@@ -84,16 +86,18 @@ class StructuralPart(DeviceGroup):
     def angle(self) -> float:
         if self.__structure is None:
             return 0
-        return self.__structure.body.angle
+        return typingcast(float, self.__structure.body.angle)
 
     @property
     def velocity(self) -> 'Tuple[float, float]':
         if self.__structure is None:
             return self.__offset
-        return tuple(self.__structure.body.velocity)
+
+        velocity = self.__structure.body.velocity
+        return velocity.x, velocity.y
 
     @property
-    def structure(self) -> Structure:
+    def structure(self) -> 'Optional[Structure]':
         return self.__structure
 
     @structure.setter
@@ -101,38 +105,38 @@ class StructuralPart(DeviceGroup):
         self.__structure = structure
 
     @property
-    def offset(self) -> 'Tuple[Union[int, float], Union[int, float]]':
+    def offset(self) -> 'Tuple[float, float]':
         return self.__offset
 
 class Sensor(DefaultDevice):
 
     def __init__(self, st_part: StructuralPart,
-                 read_time: 'Union[float, int]',
-                 read_error_max: 'Union[float, int]' = 0,
-                 read_offset_max: 'Union[float, int]' = 0,
+                 read_time: float,
+                 read_error_max: float = 0,
+                 read_offset_max: float = 0,
                  **kwargs: 'Any') -> None:
         super().__init__(**kwargs)
 
         self.__st_part = st_part
-        self.__last_read_time = 0
-        self.__last_value = None
+        self.__last_read_time: float = 0
+        self.__last_value: float = 0
         self.__read_time = read_time
         self.__error_gen = ErrorGenerator(read_error_max, read_offset_max)
 
     @property
-    def structural_part(self) -> Structure:
+    def structural_part(self) -> StructuralPart:
         return self.__st_part
 
     @property
-    def reading_time(self) -> 'Union[float, int]':
+    def reading_time(self) -> float:
         return self.__read_time
 
     @property
-    def max_read_error(self) -> 'Union[float, int]':
+    def max_read_error(self) -> float:
         return self.__error_gen.max_error + self.__error_gen.max_offset
 
     @property
-    def max_read_offset(self) -> 'Union[float, int]':
+    def max_read_offset(self) -> float:
         return self.__error_gen.max_offset
 
     def act(self) -> None:
@@ -151,7 +155,7 @@ class Sensor(DefaultDevice):
         return self.__last_value
 
     @abstractmethod
-    def read(self) -> 'Union[int, float]':
+    def read(self) -> float:
         pass
 
     __COMMANDS = {
@@ -166,9 +170,9 @@ class MultiSensor(DeviceGroup):
 
     def __init__(self, sensors: 'Dict[str, Type[Sensor]]',
                  st_part: 'StructuralPart',
-                 read_time: 'Union[float, int]',
-                 read_error_max: 'Union[float, int]' = 0,
-                 read_offset_max: 'Union[float, int]' = 0,
+                 read_time: float,
+                 read_error_max: float = 0,
+                 read_offset_max: float = 0,
                  **kwargs: 'Any'):
         super().__init__(**kwargs)
 

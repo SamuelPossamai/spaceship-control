@@ -1,5 +1,6 @@
 
 from collections import namedtuple
+from typing import TYPE_CHECKING
 
 from pymunk import Body
 
@@ -8,7 +9,13 @@ from .imageloader import loadImages
 
 ObjectInfo = namedtuple('ObjectInfo', ('body', 'images'))
 
-def loadObject(obj_info: str, space: 'pymunk.Space',
+if TYPE_CHECKING:
+    from typing import Tuple, Sequence, Any, Dict
+    import pymunk
+    from PyQt5.QtWidgets import QWidget
+    from ...devices.structure import Structure
+
+def loadObject(obj_info: 'Dict[str, Any]', space: 'pymunk.Space',
                prefixes: 'Sequence[str]' = ()) \
     -> 'Tuple[Structure, Sequence[QWidget]]':
 

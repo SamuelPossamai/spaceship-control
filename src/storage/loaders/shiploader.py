@@ -23,19 +23,17 @@ from .shapeloader import loadShapes
 from .imageloader import loadImages
 
 if TYPE_CHECKING:
-    from typing import Tuple, Sequence, Any, Dict, List, Protocol
+    from typing import Tuple, Sequence, Any, Dict, List, Callable, Optional
     import pymunk
     from PyQt5.QtWidgets import QWidget
     from ...devices.device import Device
     from ...devices.communicationdevices import CommunicationEngine
     from ...devices.interfacedevice import InterfaceDevice
 
-    class CreateDeviceCallable(Protocol):
-        def __call__(self, *args: 'Any',
-                     **kwargs: 'Any') -> 'Tuple[Device, List[QWidget]]': ...
+    CreateDeviceCallable = Callable[..., Tuple[Device, Sequence[QWidget]]]
 
-    DeviceKindType = 'Tuple[Optional[str], Optional[str], Optional[str]]'
-    DeviceCreateFunctionsType = 'Dict[DeviceKindType, CreateDeviceCallable]'
+    DeviceKindType = Tuple[Optional[str], Optional[str], Optional[str]]
+    DeviceCreateFunctionsType = Dict[DeviceKindType, CreateDeviceCallable]
 
 ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 
@@ -75,8 +73,9 @@ def __engineErrorKwargs(
         'Position': 'position_error_gen'
     })
 
-def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[LinearEngine, Sequence[QWidget]]':
+def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart,
+                         **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LinearEngine(
         part,
@@ -88,22 +87,25 @@ def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart) \
         intensity_offset=info.get('intensity_offset', 0),
         **__engineErrorKwargs(info)), ()
 
-def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[PositionSensor, Sequence[QWidget]]':
+def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart,
+                           **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return PositionSensor(part, info['reading_time'],
                           read_error_max=info.get('error_max', 0),
                           read_offset_max=info.get('offset_max', 0)), ()
 
-def __createAngleSensor(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[AngleSensor, Sequence[QWidget]]':
+def __createAngleSensor(info: 'Dict[str, Any]', part: StructuralPart,
+                        **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return AngleSensor(part, info['reading_time'],
                        read_error_max=info.get('error_max', 0),
                        read_offset_max=info.get('offset_max', 0)), ()
 
-def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[AngleSensor, Sequence[QWidget]]':
+def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart,
+                        **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return SpeedSensor(part, info['reading_time'],
                        read_error_max=info.get('error_max', 0),
@@ -111,15 +113,15 @@ def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
                        angle=info.get('angle', 0)), ()
 
 def __createAngularSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[AngleSensor, Sequence[QWidget]]':
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return AngularSpeedSensor(part, info['reading_time'],
                               read_error_max=info.get('error_max', 0),
                               read_offset_max=info.get('offset_max', 0)), ()
 
-def __createObstacleDistanceSensor(info: 'Dict[str, Any]',
-                                   part: StructuralPart) \
-    -> 'Tuple[AngleSensor, Sequence[QWidget]]':
+def __createObstacleDistanceSensor(info: 'Dict[str, Any]', part: StructuralPart,
+                                   **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LineDetectSensor(part, info['reading_time'],
                             read_error_max=info.get('error_max', 0),
@@ -127,8 +129,9 @@ def __createObstacleDistanceSensor(info: 'Dict[str, Any]',
                             angle=info.get('angle'),
                             distance=info.get('distance')), ()
 
-def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart) \
-    -> 'Tuple[TextDisplayDevice, Sequence[QWidget]]':
+def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart,
+                        **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = TextDisplayDevice()
 
@@ -139,8 +142,9 @@ def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart) \
 
     return device, (label,)
 
-def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart) \
-    -> 'Tuple[InterfaceDevice, Sequence[QWidget]]':
+def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart,
+                    **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ConsoleDevice(info.get('columns', 20), info.get('rows', 5))
 
@@ -151,8 +155,9 @@ def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart) \
 
     return (device, (text,))
 
-def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart) \
-    -> 'Tuple[KeyboardReceiverDevice, Sequence[QWidget]]':
+def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart,
+                             **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = KeyboardReceiverDevice()
 
@@ -162,8 +167,8 @@ def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart) \
 
     return device, (button,)
 
-def __createButton(info: 'Dict[str, Any]', _part: StructuralPart) \
-    -> 'Tuple[ButtonDevice, Sequence[QWidget]]':
+def __createButton(info: 'Dict[str, Any]', _part: StructuralPart, **_kwargs) \
+    -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ButtonDevice()
 
@@ -235,7 +240,7 @@ __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 
 def __addDevice(
         info: 'Dict[str, Any]', parts: 'Dict[str, StructuralPart]',
-        device_type: str, **kwargs) -> 'List[QWidget]':
+        device_type: str, **kwargs) -> 'Sequence[QWidget]':
 
     type_and_model = (device_type, info.get('type'), info.get('model'))
     create_func = __DEVICE_CREATE_FUNCTIONS.get(type_and_model)
@@ -300,7 +305,7 @@ def loadShip(ship_info: 'Dict[str, Any]', name: str, space: 'pymunk.Space',
     for info in ship_info.get('Communication', ()):
         __addDevice(info, parts, 'Communication', engine=communication_engine)
 
-    widgets = []
+    widgets: 'List[QWidget]' = []
     for info in ship_info.get('InterfaceDevice', ()):
         widgets.extend(
             __addDevice(info, parts, 'InterfaceDevice'))

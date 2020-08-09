@@ -373,7 +373,7 @@ class DeviceGroup(DefaultDevice):
 
         self.setInfo('is-device-group', 'yes')
 
-    def addDevice(self, device: Device, name: str = None):
+    def addDevice(self, device: Device, name: str = None) -> None:
         """Method used to add devices to `DeviceGroup`.
 
         This method is used to add devices to this `DeviceGroup` object, it's

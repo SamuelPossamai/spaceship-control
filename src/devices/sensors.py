@@ -8,7 +8,7 @@ from math import pi, cos, sin
 from .structure import Sensor, MultiSensor
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Union
 
 class XPositionSensor(Sensor):
 
