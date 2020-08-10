@@ -1,7 +1,13 @@
 
 from  pymunk import Vec2d
+from typing import TYPE_CHECKING, cast as typingcast
 
 from .objective import Objective
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, Sequence
+    import pymunk
+    from ..devices.structure import Structure
 
 class GoToObjective(Objective):
 
@@ -21,11 +27,13 @@ class GoToObjective(Objective):
         self.__distance = distance
         self.__distance_sqrtd = distance**2
 
-    def _verifyShip(self, ship: 'Device') -> bool:
+    def _verifyShip(self, ship: 'Structure') -> bool:
         pos = ship.body.position
-        return pos.get_dist_sqrd(self.__position) < self.__distance_sqrtd
+        return typingcast(bool,
+            pos.get_dist_sqrd(self.__position) < self.__distance_sqrtd)
 
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def _verify(self, space: 'pymunk.Space',
+                ships: 'Sequence[Structure]') -> bool:
         del space
 
         return any(self._verifyShip(ship) for ship in ships)

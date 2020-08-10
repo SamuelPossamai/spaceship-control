@@ -14,7 +14,7 @@ from ..interface.panelpushbutton import PanelPushButton
 from ..interface.keyboardbutton import KeyboardButton
 
 if TYPE_CHECKING:
-    from typing import Any, List
+    from typing import Any, List, Callable, Dict
 
 class InterfaceDevice(DefaultDevice):
 
@@ -79,7 +79,7 @@ class ButtonDevice(InterfaceDevice):
     def command(self, command: 'List[str]', *args) -> 'Any':
         return super().command(command, ButtonDevice.__COMMANDS, *args)
 
-    def __clicked(self) -> None:
+    def __clicked(self) -> str:
         return '1' if self.__button.getPressed() else '0'
 
     __COMMANDS = {
@@ -102,7 +102,7 @@ class KeyboardReceiverDevice(InterfaceDevice):
         return super().command(command,
                                KeyboardReceiverDevice.__COMMANDS, *args)
 
-    def __get(self) -> None:
+    def __get(self) -> 'Any':
         return self.__receiver.getAll()
 
     __COMMANDS = {
@@ -160,7 +160,8 @@ class ConsoleDevice(InterfaceDevice):
     def widget(self):
         return self.__text_widget
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, ConsoleDevice.__COMMANDS, *args)
 
     def __setPos(self, column_s, row_s):

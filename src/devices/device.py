@@ -7,11 +7,11 @@ sensor, an actuator or another device.
 
 import shlex
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast as typingcast
 
 if TYPE_CHECKING:
     from typing import (
-        Any, Dict, Optional, Callable, Callable, Callable, Iterable
+        Any, Dict, Optional, Callable, Callable, Callable, Iterable, List, Tuple
     )
 
 class Device(ABC):
@@ -347,11 +347,12 @@ class DeviceGroup(DefaultDevice):
 
     class Mirror(DefaultDevice.Mirror):
 
-        def __init__(self, device: Device, *args: str) -> None:
+        def __init__(self, device: 'DeviceGroup', *args: str) -> None:
             super().__init__(device, 'deviceCount', *args)
 
         def accessDevice(self, index, *args):
-            device = self._device.accessDevice(index, *args)
+            device = typingcast(DeviceGroup, self._device).accessDevice(
+                index, *args)
             if device is None:
                 return None
 
@@ -359,7 +360,7 @@ class DeviceGroup(DefaultDevice):
 
         def __getattr__(self, name: str) -> 'Any':
 
-            device = self._device.accessDevice(name)
+            device = typingcast(DeviceGroup, self._device).accessDevice(name)
             if device is None:
                 return super().__getattr__(name)
 
@@ -408,6 +409,7 @@ class DeviceGroup(DefaultDevice):
 
     def accessDevice(self, index, *args) -> 'Optional[Device]':
 
+        device: 'Optional[Device]'
         if isinstance(index, int):
             if 0 <= index < len(self.__device_list):
                 device = self.__device_list[index]
@@ -417,7 +419,10 @@ class DeviceGroup(DefaultDevice):
             device = self.__device_dict.get(index)
 
         if args:
-            device = device.accessDevice(*args)
+            if isinstance(device, DeviceGroup):
+                device = device.accessDevice(*args)
+            else:
+                return None
 
         return device
 

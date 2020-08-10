@@ -6,8 +6,14 @@ controllers need to complete.
 
 from abc import ABC, abstractmethod, abstractproperty
 import time
+from typing import TYPE_CHECKING
 
 from anytree import Node
+
+if TYPE_CHECKING:
+    from typing import Sequence, Optional, Dict, Any, Union, Iterable, Tuple
+    import pymunk
+    from ..devices.structure import Structure
 
 class Objective(ABC):
     """Base class for all objectives.
@@ -28,7 +34,7 @@ class Objective(ABC):
         self.__failed = False
         self.__neg = negation
         self.__start = time.time()
-        self.__finish = None
+        self.__finish: 'Optional[float]' = None
         if valid_ships is None:
             self.__valid_ships = None
         else:
@@ -45,7 +51,7 @@ class Objective(ABC):
         return self.__failed
 
     @property
-    def valid_ships(self) -> 'Sequence[str]':
+    def valid_ships(self) -> 'Optional[Sequence[str]]':
         return self.__valid_ships
 
     @property
@@ -182,13 +188,13 @@ class ObjectiveGroup(Objective):
     def subobjectives(self):
         return self.__subobjectives
 
-    def objectivesStatus(self) -> 'Sequence[Objective, bool]':
+    def objectivesStatus(self) -> 'Iterable[Tuple[Objective, bool]]':
 
         return ((objective, objective.accomplished())
                 for objective in  self.__subobjectives)
 
     def __verifyInteral(self, space: 'pymunk.Space',
-                        ships: 'Sequence[Device]') -> bool:
+                        ships: 'Sequence[Structure]') -> bool:
 
         if self.__seq:
             return all(objective.verify(space, ships)
@@ -205,7 +211,8 @@ class ObjectiveGroup(Objective):
 
         return sum(acc_gen) >= self.__req_qtd
 
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def _verify(self, space: 'pymunk.Space',
+                ships: 'Sequence[Structure]') -> bool:
 
         if self.__verifyInteral(space, ships) is True:
             self.__times_left -= 1
@@ -216,7 +223,7 @@ class ObjectiveGroup(Objective):
         return False
 
     def _hasFailed(self, space: 'pymunk.Space',
-                   ships: 'Sequence[Device]') -> bool:
+                   ships: 'Sequence[Structure]') -> bool:
 
         failed_gen = (objective.failed() for objective in self.__subobjectives)
 

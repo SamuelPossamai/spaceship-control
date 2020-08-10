@@ -1,10 +1,14 @@
 
 import bisect
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Iterable
 
 class Interval:
 
-    def __init__(self, start: 'Union[int, float]',
-                 end: 'Union[int, float]' = None) -> None:
+    def __init__(self, start: float,
+                 end: float = None) -> None:
         self.__start = start
         if end is None:
             self.__end = start
@@ -12,14 +16,14 @@ class Interval:
             self.__end = end
 
     @property
-    def start(self) -> 'Union[int, float]':
+    def start(self) -> float:
         return self.__start
 
     @property
-    def end(self) -> 'Union[int, float]':
+    def end(self) -> float:
         return self.__end
 
-    def isInside(self, val: 'Union[int, float]') -> bool:
+    def isInside(self, val: float) -> bool:
         return self.__start <= val <= self.__end
 
     def isConstant(self) -> bool:

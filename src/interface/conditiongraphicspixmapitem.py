@@ -1,10 +1,14 @@
 
 from math import isclose
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QGraphicsPixmapItem
 from PyQt5.QtGui import QTransform
 
 from ..utils.expression import Condition, Expression
+
+if TYPE_CHECKING:
+    from typing import Optional
 
 class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
 
@@ -15,14 +19,14 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
         self.__is_visible = True
         self.__condition_met = False
         self.__names = {} if names is None else names.copy()
-        self.__x_offset_func = None
-        self.__y_offset_func = None
-        self.__x_offset_func_mul = 1
-        self.__y_offset_func_mul = 1
-        self.__x_offset_calc = 0
-        self.__y_offset_calc = 0
-        self.__angle_offset_func = None
-        self.__angle_offset_calc = 0
+        self.__x_offset_func: 'Optional[Expression]' = None
+        self.__y_offset_func: 'Optional[Expression]' = None
+        self.__x_offset_func_mul: float = 1
+        self.__y_offset_func_mul: float = 1
+        self.__x_offset_calc: float = 0
+        self.__y_offset_calc: float = 0
+        self.__angle_offset_func: 'Optional[Expression]' = None
+        self.__angle_offset_calc: float = 0
 
         self.__pixmap = super().pixmap()
 

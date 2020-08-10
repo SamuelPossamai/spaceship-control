@@ -1,5 +1,10 @@
 
+from typing import TYPE_CHECKING
+
 from .expressionevaluator import ExpressionEvaluator
+
+if TYPE_CHECKING:
+    from typing import Any
 
 class Expression:
 
@@ -23,8 +28,8 @@ class Expression:
 
 class Condition(Expression):
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs, default_value=False)
+    def __init__(self, expression: str, default_value=False) -> None:
+        super().__init__(expression, default_value=default_value)
 
     def evaluate(self, **kwargs) -> 'Any':
         return bool(super().evaluate(**kwargs))

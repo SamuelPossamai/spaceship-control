@@ -1,5 +1,11 @@
 
+from typing import TYPE_CHECKING, cast as typingcast
+
 from pymunk import Circle, Poly, Segment
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, Sequence, Tuple
+    import pymunk
 
 def __setGeneralProperties(shape: 'pymunk.Shape',
                            info: 'Dict[str, Any]') -> None:
@@ -9,7 +15,7 @@ def __setGeneralProperties(shape: 'pymunk.Shape',
     shape.friction = info.get('friction', 0.5)
 
 
-def __createCircleShape(info: 'Dict[str, Any]') -> 'Circle':
+def __createCircleShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
     shape = Circle(None, info['radius'],
                    (info.get('x', 0), info.get('y', 0)))
@@ -18,7 +24,7 @@ def __createCircleShape(info: 'Dict[str, Any]') -> 'Circle':
 
     return shape
 
-def __createPolyShape(info: 'Dict[str, Any]') -> 'Poly':
+def __createPolyShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
     points = tuple((point.get('x', 0), point.get('y', 0))
                    for point in info['Point'])
@@ -28,7 +34,7 @@ def __createPolyShape(info: 'Dict[str, Any]') -> 'Poly':
 
     return shape
 
-def __createRectangleShape(info: 'Dict[str, Any]') -> 'Poly':
+def __createRectangleShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
     pos_x = info.get('x')
     pos_y = info.get('y')
@@ -55,7 +61,7 @@ def __createRectangleShape(info: 'Dict[str, Any]') -> 'Poly':
 
     return shape
 
-def __createLineShape(info: 'Dict[str, Any]') -> 'Segment':
+def __createLineShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
     points = info.get('Point', ())
 
@@ -86,7 +92,7 @@ __SHAPE_CREATE_FUNCTIONS = {
     'rectangle': __createRectangleShape
 }
 
-def __createShape(info: 'Dict[str, Any]') -> 'Shape':
+def __createShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
     type_ = info.get('type')
 
@@ -97,6 +103,8 @@ def __createShape(info: 'Dict[str, Any]') -> 'Shape':
 
     return create_func(info)
 
-def loadShapes(info_list: 'Sequence[Dict[str, Any]]') -> 'Tuple[Shape, ...]':
+def loadShapes(info_list: 'Sequence[Dict[str, Any]]') \
+    -> 'Tuple[pymunk.Shape, ...]':
+
     return tuple(__createShape(shape_info)
                  for shape_info in info_list)

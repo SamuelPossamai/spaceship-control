@@ -1,6 +1,13 @@
 
+from typing import TYPE_CHECKING, cast as typingcast
+
 from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+
+if TYPE_CHECKING:
+    from typing import Sequence, List
+    import anytree
+    from PyQt5.QWidgets import QWidget
 
 class NodeValue:
 
@@ -72,17 +79,17 @@ class NodeTreeView(QTreeView):
         return self.model().itemFromIndex(self.currentIndex())
 
     def selectedIsLeaf(self) -> bool:
-        return self.selectedItem().rowCount() == 0
+        return typingcast(bool, self.selectedItem().rowCount() == 0)
 
-    def selectedItemPath(self) -> 'Tuple[QStandardItem, ...]':
+    def selectedItemPath(self) -> 'Sequence[QStandardItem]':
         current_item = self.selectedItem()
 
-        result = []
+        result: 'List[QStandardItem]' = []
         while current_item is not None:
             result.insert(0, current_item)
             current_item = current_item.parent()
 
-        return tuple(result)
+        return result
 
     @staticmethod
     def __addNode(parent_row, options: 'anytree.Node') -> None:

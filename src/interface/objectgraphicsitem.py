@@ -1,10 +1,15 @@
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtCore import QRectF, QPointF, Qt
 from PyQt5.QtGui import QPolygonF
 
 import pymunk
+
+if TYPE_CHECKING:
+    from typing import List
 
 class DrawingPart(ABC):
 
@@ -134,7 +139,7 @@ class ObjectGraphicsItem(QGraphicsItem):
     def __init__(self, shapes, color=Qt.blue) -> None:
         super().__init__()
 
-        self.__parts = []
+        self.__parts: 'List[DrawingPart]' = []
         for shape in shapes:
             if isinstance(shape, pymunk.Circle):
                 offset_pym = shape.offset

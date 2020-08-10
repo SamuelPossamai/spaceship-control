@@ -1,7 +1,14 @@
 
 import time
+from typing import TYPE_CHECKING
 
 from .objective import ObjectiveGroup
+
+if TYPE_CHECKING:
+    from typing import Union, Sequence
+    import pymunk
+    from .objective import Objective
+    from ..devices.structure import Structure
 
 class TimedObjectiveGroup(ObjectiveGroup):
 
@@ -21,7 +28,8 @@ class TimedObjectiveGroup(ObjectiveGroup):
 
         self.__time_limit = time_limit
 
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Device]') -> bool:
+    def _verify(self, space: 'pymunk.Space',
+                ships: 'Sequence[Structure]') -> bool:
 
         if time.time() > self.started_at + self.__time_limit:
             return False
@@ -29,7 +37,7 @@ class TimedObjectiveGroup(ObjectiveGroup):
         return super()._verify(space, ships)
 
     def _hasFailed(self, space: 'pymunk.Space',
-                   ships: 'Sequence[Device]') -> bool:
+                   ships: 'Sequence[Structure]') -> bool:
 
         if time.time() > self.started_at + self.__time_limit:
             return True

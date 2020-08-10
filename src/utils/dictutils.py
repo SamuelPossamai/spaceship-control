@@ -2,9 +2,13 @@
 from typing import TYPE_CHECKING, cast as typingcast
 
 if TYPE_CHECKING:
-    from typing import Callable, Dict, Any, Sequence, List
+    from typing import (
+        Callable, Dict, Any, Sequence, List, Union, Iterable, Tuple
+    )
     from mypy_extensions import VarArg
-    MergeFunctionType = 'Callable[[Dict[str, Any], Sequence[str], str], None]'
+    MergeBaseCallable = Callable[[Dict[str, Any], VarArg(str)],
+                                 Union[Dict[str, Any], List[Any]]]
+    MergeFunctionType = Callable[[Dict[str, Any], Sequence[str], str], None]
 
 def getMapOp(operation: 'Callable', dict_obj: 'Dict[str, Any]',
              initial_value: 'Any', *args: str) -> 'Any':
@@ -30,7 +34,7 @@ def getListConcat(dict_obj: 'Dict[str, List[Any]]', *args: str) -> 'List[Any]':
 
 def mergeBase(
         dict_obj: 'Dict[str, Any]', keys: 'Sequence[str]', target: str,
-        function: 'Callable[[Dict[str, Any], VarArg[str]], Dict[str, Any]]') \
+        function: 'MergeBaseCallable') \
             -> None:
 
     result = function(dict_obj, *keys)
@@ -43,12 +47,12 @@ def mergeBase(
 def mergeMap(dict_obj: 'Dict[str, Dict[str, Any]]', keys: 'Sequence[str]',
              target: str) -> None:
 
-    return mergeBase(dict_obj, keys, target, getMapConcat)
+    mergeBase(dict_obj, keys, target, getMapConcat)
 
 def mergeList(dict_obj: 'Dict[str, List[Any]]', keys: 'Sequence[str]',
               target: str) -> None:
 
-    return mergeBase(dict_obj, keys, target, getListConcat)
+    mergeBase(dict_obj, keys, target, getListConcat)
 
 def merge(dict_obj: 'Dict[str, Any]', keys: 'Sequence[str]', target: str):
 
@@ -69,7 +73,7 @@ def pathMatchAbsolute(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
                       has_keys: 'Sequence[str]' = None, start: int = 0,
                       has_keys_op: 'Callable[[Iterable[bool]], bool]' = all,
                       path_may_have_list: bool = True) \
-                          -> 'Sequence[Dict[str, Any]]':
+                          -> 'Tuple[Dict[str, Any], ...]':
 
     if start == len(path) and (has_keys is None or hasKeys(
             dict_obj, has_keys, operation=has_keys_op)):
@@ -93,7 +97,7 @@ def pathMatchAbsolute(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
 
     if path_may_have_list and isinstance(current_val, list):
 
-        result = ()
+        result: 'Tuple[Dict[str, Any], ...]' = ()
         for content in current_val:
             result += pathMatchAbsolute(
                 content, path, has_keys=has_keys, has_keys_op=has_keys_op,
@@ -133,7 +137,7 @@ def mergeMatch(dict_obj: 'Dict[str, Any]', path: 'Sequence[str]',
         merge_function(match_val, keys, target)
 
 def writeEverywhere(obj: 'Union[Dict[str, Any], List[Dict[str, Any]]]',
-                    value: 'Any]', dict_key: str = None,
+                    value: 'Any', dict_key: str = None,
                     key_format: str = None) -> None:
 
     if isinstance(obj, list):
