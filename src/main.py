@@ -12,7 +12,7 @@ ProgramArgsInfo = namedtuple('ProgramArgsInfo', (
     'scenario', 'one_shot', 'time_limit', 'follow_ship', 'start_zoom',
     'timer_interval'))
 
-def getProgramArguments():
+def getProgramArguments() -> 'ProgramArgsInfo':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--scenario', help='Scenario that will be loaded')
@@ -46,7 +46,7 @@ def getProgramArguments():
                            start_zoom=args.zoom,
                            timer_interval=args.timer_interval)
 
-def main():
+def main() -> None:
 
     program_args = getProgramArguments()
 

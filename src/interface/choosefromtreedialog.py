@@ -33,21 +33,21 @@ class ChooseFromTreeDialog(QDialog):
 
         self.__ui.treeView.addNodes(options)
 
-        self.__result = None
+        self.__result: 'Optional[Sequence[str]]' = None
 
         self.__ui.buttonBox.accepted.connect(self.__dialogAccepted)
         self.__ui.treeView.clicked.connect(self.__treeViewClicked)
 
-    def getOption(self):
+    def getOption(self) -> 'Sequence[str]':
         self.__result = None
         self.exec_()
         return self.__result
 
-    def __dialogAccepted(self):
+    def __dialogAccepted(self) -> None:
         self.__result = tuple(
             item.data() for item in self.__ui.treeView.selectedItemPath())
 
-    def __treeViewClicked(self):
+    def __treeViewClicked(self) -> None:
 
         self.__ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             self.__ui.treeView.selectedIsLeaf())

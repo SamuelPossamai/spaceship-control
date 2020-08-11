@@ -57,8 +57,9 @@ class ObjectiveNodeValue(NodeValue):
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, parent=None, one_shot=False, time_limit=None,
-                 follow_ship=None, start_zoom=None, timer_interval=100):
+    def __init__(self, parent: 'QWidget' = None, one_shot: bool = False,
+                 time_limit: float = None, follow_ship: int = None,
+                 start_zoom: float = None, timer_interval: int = 100) -> None:
 
         super().__init__(parent=parent)
 
@@ -105,7 +106,7 @@ class MainWindow(QMainWindow):
         self.__ship_to_follow = follow_ship
 
         self.__one_shot = one_shot
-        self.__start_scenario_time = None
+        self.__start_scenario_time: 'Optional[float]' = None
         self.__time_limit = time_limit
 
         self.__ui.actionSimulationAutoRestart.setChecked(bool(
@@ -141,17 +142,17 @@ class MainWindow(QMainWindow):
 
         self.setFocus()
 
-    def moveEvent(self, event): # pylint: disable=no-self-use
+    def moveEvent(self, event: 'QMoveEvent') -> None: # pylint: disable=no-self-use
         FileInfo().writeConfig(event.pos().x(), 'Window', 'x')
         FileInfo().writeConfig(event.pos().y(), 'Window', 'y')
         FileInfo().saveConfig()
 
-    def resizeEvent(self, event): # pylint: disable=no-self-use
+    def resizeEvent(self, event: 'QResizeEvent') -> None: # pylint: disable=no-self-use
         FileInfo().writeConfig(event.size().width(), 'Window', 'width')
         FileInfo().writeConfig(event.size().height(), 'Window', 'height')
         FileInfo().saveConfig()
 
-    def __updateTitle(self):
+    def __updateTitle(self) -> None:
 
         if self.__current_scenario is None:
             self.setWindowTitle(self.__title_basename)
@@ -168,11 +169,11 @@ class MainWindow(QMainWindow):
             self.setWindowTitle(
                 f'{self.__title_basename}({self.__current_scenario}){suffix}')
 
-    def closeEvent(self, _event):
+    def closeEvent(self, _event: 'QCloseEvent') -> None:
         self.clear()
         self.__ui.view.setScene(None)
 
-    def clear(self):
+    def clear(self) -> None:
 
         self.setWindowTitle(self.__title_basename)
 
@@ -203,14 +204,14 @@ class MainWindow(QMainWindow):
         self.__updateTitle()
 
     @staticmethod
-    def __getOptionDialog(title, options):
+    def __getOptionDialog(title: str, options: 'Tuple[anytree.Node]'):
 
         dialog = ChooseFromTreeDialog(options)
         dialog.setWindowTitle(title)
 
         return dialog.getOption()
 
-    def __loadScenarioAction(self):
+    def __loadScenarioAction(self) -> None:
 
         scenario = self.__getOptionDialog(
             'Choose scenario', FileInfo().listFilesTree(
@@ -219,10 +220,12 @@ class MainWindow(QMainWindow):
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
 
-    def __chooseShipDialog(self, ship_options):
+    def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]') -> None:
         return self.__getOptionDialog('Choose ship model', ship_options)
 
-    def __chooseControllerDialog(self, controller_options):
+    def __chooseControllerDialog(
+        self, controller_options: 'Tuple[anytree.Node]') -> None:
+
         return self.__getOptionDialog('Choose controller', controller_options)
 
     def __loadShip(self, ship_info, arg_scenario_info):
@@ -337,7 +340,7 @@ class MainWindow(QMainWindow):
 
         return objects
 
-    def __loadStaticImages(self, static_images):
+    def __loadStaticImages(self, static_images) -> None:
 
         if static_images:
             for image_info in static_images:
@@ -348,7 +351,7 @@ class MainWindow(QMainWindow):
 
                 self.__ui.view.scene().addItem(image_item)
 
-    def loadScenario(self, scenario):
+    def loadScenario(self, scenario: str) -> None:
 
         self.clear()
 
@@ -438,7 +441,8 @@ class MainWindow(QMainWindow):
                 self.__ui.view.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @staticmethod
-    def __updateGraphicsItem(body, gitem):
+    def __updateGraphicsItem(body: 'pymunk.Body',
+                             gitem: 'QGraphicsItem') -> None:
 
         pos = body.position
         gitem.setX(pos.x)
@@ -446,14 +450,15 @@ class MainWindow(QMainWindow):
         gitem.prepareGeometryChange()
         gitem.setRotation(180*body.angle/pi)
 
-    def __objectivesTimedOut(self):
+    def __objectivesTimedOut(self) -> bool:
 
         if self.__time_limit is None or self.__start_scenario_time is None:
             return False
 
         return time.time() - self.__start_scenario_time > self.__time_limit
 
-    def __createObjectivesRecord(self, node, current_time):
+    def __createObjectivesRecord(self, node: 'anytree.Node',
+                                 current_time: float) -> 'Dict[str, Any]':
 
         objective = node.name
 
@@ -474,7 +479,7 @@ class MainWindow(QMainWindow):
         }
 
 
-    def __saveStatistics(self):
+    def __saveStatistics(self) -> None:
 
         current_time = time.time()
         scenario_time = current_time - self.__start_scenario_time
@@ -492,7 +497,7 @@ class MainWindow(QMainWindow):
                            for child in objectives.children]
         })
 
-    def __timerTimeout(self):
+    def __timerTimeout(self) -> None:
 
         if self.__current_scenario is None:
             return
@@ -562,7 +567,8 @@ class MainWindow(QMainWindow):
         self.__updateTitle()
 
     @staticmethod
-    def __importAction(message, fileoptions, filedatatype):
+    def __importAction(message: str, fileoptions: str,
+                       filedatatype: 'FileInfo.FileDataType') -> None:
 
         fdialog = QFileDialog(None, message, '', fileoptions)
         fdialog.setFileMode(QFileDialog.ExistingFiles)
@@ -573,40 +579,40 @@ class MainWindow(QMainWindow):
         FileInfo().addFiles(filedatatype, fdialog.selectedFiles())
 
     @staticmethod
-    def __importScenarioAction():
+    def __importScenarioAction() -> None:
         MainWindow.__importAction('Scenario Import Dialog',
                                   'TOML files(*.toml) ;; JSON files(*.json) ;;'
                                   'YAML files(*.yml *.yaml)',
                                   FileInfo.FileDataType.SCENARIO)
 
     @staticmethod
-    def __importShipAction():
+    def __importShipAction() -> None:
         MainWindow.__importAction('Ship Import Dialog',
                                   'TOML files(*.toml) ;; JSON files(*.json) ;;'
                                   'YAML files(*.yml *.yaml)',
                                   FileInfo.FileDataType.SHIPMODEL)
 
     @staticmethod
-    def __importControllerAction():
+    def __importControllerAction() -> None:
         MainWindow.__importAction('Controller Import Dialog',
                                   'executable files(*)',
                                   FileInfo.FileDataType.CONTROLLER)
 
     @staticmethod
-    def __importImageAction():
+    def __importImageAction() -> None:
         MainWindow.__importAction('Image Import Dialog',
                                   'image files(*.png *.gif)',
                                   FileInfo.FileDataType.IMAGE)
 
     @staticmethod
-    def __importObjectAction():
+    def __importObjectAction() -> None:
         MainWindow.__importAction('Object Import Dialog',
                                   'TOML files(*.toml) ;; JSON files(*.json) ;;'
                                   'YAML files(*.yml *.yaml)',
                                   FileInfo.FileDataType.OBJECTMODEL)
 
     @staticmethod
-    def __importPackageAction():
+    def __importPackageAction() -> None:
 
         fdialog = QFileDialog(None, 'Controller Import Dialog')
 
@@ -618,7 +624,7 @@ class MainWindow(QMainWindow):
         for package in fdialog.selectedFiles():
             FileInfo().addPackage(package)
 
-    def __deviceInterfaceComboBoxIndexChange(self, cur_index):
+    def __deviceInterfaceComboBoxIndexChange(self, cur_index: int) -> None:
 
         if cur_index == -1 or cur_index >= len(self.__ships):
             return
@@ -632,7 +638,7 @@ class MainWindow(QMainWindow):
         self.__current_ship_widgets_index = cur_index
 
     @staticmethod
-    def __openAction(text, filedatatype):
+    def __openAction(text: str, filedatatype: 'FileInfo.FileDataType') -> None:
 
         filepath = MainWindow.__getOptionDialog(
             text, FileInfo().listFilesTree(filedatatype,
@@ -643,43 +649,43 @@ class MainWindow(QMainWindow):
             FileInfo().openFile(filedatatype, '/'.join(filepath))
 
     @staticmethod
-    def __openScenarioAction():
+    def __openScenarioAction() -> None:
         MainWindow.__openAction('Choose scenario',
                                 FileInfo.FileDataType.SCENARIO)
 
     @staticmethod
-    def __openShipAction():
+    def __openShipAction() -> None:
         MainWindow.__openAction('Choose ship model',
                                 FileInfo.FileDataType.SHIPMODEL)
 
     @staticmethod
-    def __openControllerAction():
+    def __openControllerAction() -> None:
         MainWindow.__openAction('Choose controller',
                                 FileInfo.FileDataType.CONTROLLER)
 
     @staticmethod
-    def __openImageAction():
+    def __openImageAction() -> None:
         MainWindow.__openAction('Choose image',
                                 FileInfo.FileDataType.IMAGE)
 
     @staticmethod
-    def __openObjectAction():
+    def __openObjectAction() -> None:
         MainWindow.__openAction('Choose object model',
                                 FileInfo.FileDataType.OBJECTMODEL)
 
     @staticmethod
-    def __autoRestartOptionToggled(checked):
+    def __autoRestartOptionToggled(checked: bool) -> None:
         fileinfo = FileInfo()
         fileinfo.writeConfig(checked, 'Simulation', 'auto_restart')
         fileinfo.saveConfig()
 
     @staticmethod
-    def __fitAllOnStartToggled(checked):
+    def __fitAllOnStartToggled(checked: bool) -> None:
         fileinfo = FileInfo()
         fileinfo.writeConfig(checked, 'Simulation', 'fit_all_on_start')
         fileinfo.saveConfig()
 
-    def __initConnections(self):
+    def __initConnections(self) -> None:
 
         self.__ui.actionLoadScenario.triggered.connect(
             self.__loadScenarioAction)
@@ -729,7 +735,7 @@ class MainWindow(QMainWindow):
         self.__ui.actionHelpHandbook.triggered.connect(
             self.__showHelp)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: 'QKeyEvent') -> None:
 
         key = event.key()
         modifiers = event.modifiers()
@@ -770,5 +776,5 @@ class MainWindow(QMainWindow):
                     self.__center_view_on = ship_item
 
     @staticmethod
-    def __showHelp():
+    def __showHelp() -> None:
         HelpDialog().exec_()
