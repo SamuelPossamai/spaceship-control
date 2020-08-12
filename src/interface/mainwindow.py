@@ -5,8 +5,8 @@ from math import pi
 from threading import Lock
 import traceback
 from pathlib import Path
-from typing import TYPE_CHECKING
 from queue import Empty as EmptyQueueException
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import (
     QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QTextBrowser
@@ -39,14 +39,21 @@ from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-i
 UiMainWindow, _ = FileInfo().loadUi('mainwindow.ui') # pylint: disable=invalid-name
 sys.path.pop(0)
 
+if TYPE_CHECKING:
+    from typing import Tuple, Any, Dict, Optional, List
+    from PyQt5.QtWidgets import QGraphicsItem, QWidget
+    from PyQt5.QtGui import QKeyEvent, QMoveEvent, QResizeEvent, QCloseEvent
+    from ..objectives.objective import Objective
+    from ..devices.communicationdevices import CommunicationEngine
+
 class ObjectiveNodeValue(NodeValue):
 
-    def __init__(self, objective):
+    def __init__(self, objective: 'Objective') -> None:
         super().__init__(objective.name, objective.description)
 
         self.__objective = objective
 
-    def update(self):
+    def update(self) -> None:
         if self.__objective.accomplished():
             symbol = '✓ '
         elif self.__objective.failed():
@@ -81,9 +88,9 @@ class MainWindow(QMainWindow):
 
         self.__ships = []
         self.__objects = []
-        self.__scenario_objectives = []
-        self.__objectives_result = None
-        self.__current_scenario = None
+        self.__scenario_objectives: 'List[Objective]' = []
+        self.__objectives_result: 'Optional[bool]' = None
+        self.__current_scenario: 'Optional[str]' = None
 
         self.__widgets = []
         self.__objectives_node_value = []
@@ -97,7 +104,7 @@ class MainWindow(QMainWindow):
 
         self.__current_ship_widgets_index = 0
 
-        self.__comm_engine = None
+        self.__comm_engine: 'Optional[CommunicationEngine]' = None
         self.__debug_msg_queues = {}
 
         self.__debug_messages_text_browsers = {}
@@ -106,7 +113,7 @@ class MainWindow(QMainWindow):
         self.__ship_to_follow = follow_ship
 
         self.__one_shot = one_shot
-        self.__start_scenario_time: 'Optional[float]' = None
+        self.__start_scenario_time: float = 0
         self.__time_limit = time_limit
 
         self.__ui.actionSimulationAutoRestart.setChecked(bool(
@@ -181,7 +188,7 @@ class MainWindow(QMainWindow):
         self.__ui.deviceInterfaceComponents.show()
         self.__ui.treeView.show()
 
-        self.__start_scenario_time = None
+        self.__start_scenario_time = 0
         self.__center_view_on = None
 
         with self.__lock:
@@ -220,11 +227,11 @@ class MainWindow(QMainWindow):
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
 
-    def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]') -> None:
+    def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]'):
         return self.__getOptionDialog('Choose ship model', ship_options)
 
     def __chooseControllerDialog(
-        self, controller_options: 'Tuple[anytree.Node]') -> None:
+        self, controller_options: 'Tuple[anytree.Node]'):
 
         return self.__getOptionDialog('Choose controller', controller_options)
 
@@ -515,7 +522,8 @@ class MainWindow(QMainWindow):
             for obj_body, gitem in self.__objects:
                 self.__updateGraphicsItem(obj_body, gitem)
 
-            self.__comm_engine.step()
+            if self.__comm_engine is not None:
+                self.__comm_engine.step()
 
             objectives_complete = all(
                 tuple(objective.verify(self.__space, ships)

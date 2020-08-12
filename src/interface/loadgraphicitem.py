@@ -1,4 +1,6 @@
 
+from typing import TYPE_CHECKING
+
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsItemGroup
 from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtCore import Qt
@@ -10,7 +12,14 @@ from ..storage.fileinfo import FileInfo
 
 from ..utils.expression import Expression
 
-def __getSizeScale(cur_width, cur_height, after_width, after_height):
+if TYPE_CHECKING:
+    from typing import Tuple
+
+def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
+                   after_height: float) -> 'Tuple[float, float]':
+
+    width_scale: float
+    height_scale: float
 
     width_scale = height_scale = 1
     if after_height is None:

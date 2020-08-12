@@ -31,7 +31,7 @@ from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-i
 sys.path.pop(0)
 
 if TYPE_CHECKING:
-    from typing import Sequence, Optional
+    from typing import Sequence, Optional, Union, List
 
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
@@ -59,7 +59,8 @@ class FileInfo:
         list_blacklist: 'Sequence[str]' = ()
         package_glob_list: 'Optional[Sequence[str]]' = None
         files_mode: 'Optional[int]' = None
-        metadata_type: 'FileMetadataType' = _FileInfo_FileMetadataType.ABSENT
+        metadata_type: '_FileInfo_FileMetadataType' \
+            = _FileInfo_FileMetadataType.ABSENT
         use_root_path: bool = False
 
     __CONF_FILE_SUFFIX_LIST = ('.toml', '.json', '.yaml', '.yml')
@@ -98,7 +99,7 @@ class FileInfo:
             use_root_path=True),
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         if self.__already_initialized: # pylint: disable=access-member-before-definition
             return
@@ -492,7 +493,7 @@ class FileInfo:
             self.getPath(self.FileDataType.CONTROLLER, controller_name),
             ship, json_info, debug_queue, lock)
 
-    def openFile(self, filedatatype, filename):
+    def openFile(self, filedatatype: 'FileDataType', filename: str) -> None:
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
@@ -507,22 +508,22 @@ class FileInfo:
             self.__openFile(path)
 
     @staticmethod
-    def __openFile(path):
+    def __openFile(path: str) -> None:
         subprocess.call(['xdg-open', path])
 
     @staticmethod
-    def __addFiles(path, files, mode=0o644):
+    def __addFiles(path: 'Union[str, Path]', files: 'List[str]',
+                   mode: int = 0o644) -> None:
         path_str = str(path)
         for file in files:
             new_file = shutil.copy(file, path_str)
             os.chmod(new_file, mode)
 
-    def getPath(self, filedatatype, name=None, to_string=True):
+    def getPath(self, filedatatype: 'FileDataType',
+                name: str = None) -> 'Optional[str]':
 
         if filedatatype is None:
-            if to_string:
-                return str(self.__path)
-            return self.__path
+            return str(self.__path)
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
@@ -543,12 +544,11 @@ class FileInfo:
         if not(filepath.exists() and filepath.is_file()):
             return None
 
-        if to_string:
-            return str(filepath)
-        return filepath
+        return str(filepath)
 
     @staticmethod
-    def __getFileDataTypeInfo(filedatatype):
+    def __getFileDataTypeInfo(
+        filedatatype: 'FileDataType') -> '__DataTypeInfoType':
 
         info = FileInfo.__DATA_TYPE_INFO.get(filedatatype)
 

@@ -1,11 +1,15 @@
 
 import ast
+from typing import TYPE_CHECKING, cast as typingcast
 
 from simpleeval import SimpleEval, FeatureNotAvailable
 
+if TYPE_CHECKING:
+    from typing import Any, Union
+
 class ExpressionEvaluator(SimpleEval):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, **kwargs)
 
         self.nodes[ast.Assign] = self._evalAssign
@@ -13,28 +17,29 @@ class ExpressionEvaluator(SimpleEval):
         self.nodes[ast.Expr] = lambda expr: self._eval(expr.value)
 
     @staticmethod
-    def parse(expr):
+    def parse(expr: str) -> 'ast.Module':
         return ast.parse(expr.strip())
 
-    def eval(self, expr, parsed_expr=False, parsed_expr_original=None):
+    def eval(self, expr: 'Union[str, ast.Module]', parsed_expr: bool=False,
+             parsed_expr_original: str = None) -> 'Any':
 
         if parsed_expr is False:
-            expr = self.parse(expr).body
             self.expr = expr
+            expr = self.parse(typingcast(str, expr))
         else:
             if parsed_expr_original is None:
                 self.expr = '<<Parsed expression>>'
             else:
                 self.expr = parsed_expr_original
 
-        expressions = expr.body
+        expressions = typingcast('ast.Module', expr).body
 
         for i in range(len(expressions) - 1):
             self.names['_'] = self._eval(expressions[i])
 
         return self._eval(expressions[-1])
 
-    def _evalAssign(self, node):
+    def _evalAssign(self, node: 'ast.Assign') -> 'Any':
 
         value = self._eval(node.value)
         for target in node.targets:
@@ -45,7 +50,7 @@ class ExpressionEvaluator(SimpleEval):
 
         return value
 
-    def _evalAugAssign(self, node):
+    def _evalAugAssign(self, node: 'ast.AugAssign') -> 'Any':
 
         value = self._eval(node.value)
         target = node.target
