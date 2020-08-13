@@ -7,7 +7,7 @@ import subprocess
 from enum import Enum, Flag, auto as flagAuto
 from typing import NamedTuple
 from fnmatch import fnmatch
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast as typingcast
 
 import json
 import toml
@@ -31,7 +31,7 @@ from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-i
 sys.path.pop(0)
 
 if TYPE_CHECKING:
-    from typing import Sequence, Optional, Union, List
+    from typing import Sequence, Optional, Union, List, Any, Callable, Dict
 
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
@@ -43,7 +43,7 @@ class _FileInfo_FileMetadataType(Flag):
 
 class FileInfo:
 
-    __instance = None
+    __instance: 'Optional[FileInfo]' = None
 
     FileDataType = Enum('FileDataType', ('CONTROLLER', 'SHIPMODEL', 'SCENARIO',
                                          'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
@@ -101,6 +101,7 @@ class FileInfo:
 
     def __init__(self) -> None:
 
+        self.__already_initialized: bool
         if self.__already_initialized: # pylint: disable=access-member-before-definition
             return
 
@@ -142,7 +143,7 @@ class FileInfo:
             os.symlink(dist_data_examples_path.joinpath(dirname),
                        example_dir_path)
 
-    def __new__(cls):
+    def __new__(cls) -> 'FileInfo':
 
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
@@ -150,11 +151,12 @@ class FileInfo:
 
         return cls.__instance
 
-    def readConfig(self, *args, default=None, value_type=None):
+    def readConfig(self, *args: 'Any', default: 'Any' = None,
+                   value_type: 'Callable' = None) -> 'Any':
         current = self.__config_content
         for arg in args:
             if isinstance(current, dict):
-                current = current.get(arg)
+                current = typingcast('Dict[str, Any]', current.get(arg))
                 if current is None:
                     return default
             else:
@@ -168,7 +170,7 @@ class FileInfo:
 
         return current
 
-    def writeConfig(self, value, *args):
+    def writeConfig(self, value: 'Any', *args: 'Any') -> None:
 
         if not args:
             raise Exception('FileInfo.writeConfig: Path must be specified')
@@ -184,19 +186,22 @@ class FileInfo:
             previous = current
             current = new_current
 
-        previous[args[-1]] = value
+        if previous is not None:
+            previous[args[-1]] = value
 
-    def saveConfig(self):
+    def saveConfig(self) -> None:
 
         with open(self.__config_file_path, 'w') as file:
             toml.dump(self.__config_content, file)
 
-    def listFilesTree(self, filedatatype, use_metadata=True,
-                      show_meta_files=False, show_hidden_files=False):
+    def listFilesTree(self, filedatatype: 'FileDataType',
+                      use_metadata: bool = True,
+                      show_meta_files: bool = False,
+                      show_hidden_files: bool = False) -> 'Node':
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
-        blacklist = []
+        blacklist: 'Sequence[str]' = []
         if use_metadata:
             metadata_type = filedatatype_info.metadata_type
 
@@ -285,8 +290,10 @@ class FileInfo:
 
         return None
 
-    def __listTree(self, base_path, current_node, blacklist=(),
-                   remove_suffix=True, metadata_type=None, can_hide_files=True):
+    def __listTree(self, base_path: 'Path', current_node: 'Node',
+                   blacklist: 'Sequence[str]' = (), remove_suffix: bool = True,
+                   metadata_type: '_FileInfo_FileMetadataType' = None,
+                   can_hide_files: bool = True) -> 'Node':
 
         for path in sorted(base_path.iterdir()):
             is_directory = path.is_dir()
@@ -520,10 +527,10 @@ class FileInfo:
             os.chmod(new_file, mode)
 
     def getPath(self, filedatatype: 'FileDataType',
-                name: str = None) -> 'Optional[str]':
+                name: str = None) -> 'Optional[Path]':
 
         if filedatatype is None:
-            return str(self.__path)
+            return self.__path
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
@@ -544,7 +551,7 @@ class FileInfo:
         if not(filepath.exists() and filepath.is_file()):
             return None
 
-        return str(filepath)
+        return filepath
 
     @staticmethod
     def __getFileDataTypeInfo(

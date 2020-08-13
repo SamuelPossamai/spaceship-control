@@ -36,8 +36,8 @@ def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
 def __loadGraphicItemImagePart(image, condition_variables,
                                condition_graphic_items):
 
-    pixmap = QPixmap(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
-                                        image.name))
+    pixmap = QPixmap(str(
+        FileInfo().getPath(FileInfo.FileDataType.IMAGE, image.name)))
 
     image_x_is_expr = isinstance(image.x, str)
     image_y_is_expr = isinstance(image.y, str)
