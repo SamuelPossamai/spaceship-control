@@ -31,7 +31,9 @@ from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-i
 sys.path.pop(0)
 
 if TYPE_CHECKING:
-    from typing import Sequence, Optional, Union, List, Any, Callable, Dict
+    from typing import (
+        Sequence, Optional, Union, List, Any, Callable, Dict, MutableMapping
+    )
 
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
@@ -107,7 +109,7 @@ class FileInfo:
 
         self.__already_initialized = True
 
-        self.__statistics_file = None
+        self.__statistics_file: 'Optional[Union[str, Path]]' = None
 
         self.__path = \
             Path.home().joinpath('.local/share/spaceshipcontrol').resolve()
@@ -197,30 +199,37 @@ class FileInfo:
     def listFilesTree(self, filedatatype: 'FileDataType',
                       use_metadata: bool = True,
                       show_meta_files: bool = False,
-                      show_hidden_files: bool = False) -> 'Node':
+                      show_hidden_files: bool = False) -> 'Optional[Node]':
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
-        blacklist: 'Sequence[str]' = []
+        blacklist_tmp: 'List[str]' = []
         if use_metadata:
             metadata_type = filedatatype_info.metadata_type
 
             if show_meta_files is False:
                 if metadata_type & self.FileMetadataType.DIRECTORY:
-                    blacklist.append('__metadata__.*')
+                    blacklist_tmp.append('__metadata__.*')
 
                 if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
-                    blacklist.append('*.__metadata__.*')
+                    blacklist_tmp.append('*.__metadata__.*')
         else:
             metadata_type = self.FileMetadataType.ABSENT
 
-        if blacklist:
-            blacklist.extend(filedatatype_info.list_blacklist)
+        blacklist: 'Sequence[str]'
+        if blacklist_tmp:
+            blacklist_tmp.extend(filedatatype_info.list_blacklist)
+            blacklist = blacklist_tmp
         else:
             blacklist = filedatatype_info.list_blacklist
 
+        path = self.getPath(filedatatype)
+
+        if path is None:
+            return None
+
         return self.__listTree(
-            self.getPath(filedatatype),
+            path,
             Node(filedatatype_info.path),
             remove_suffix=filedatatype_info.list_remove_suffix,
             blacklist=blacklist,
@@ -228,14 +237,16 @@ class FileInfo:
             can_hide_files=not show_hidden_files)
 
     @property
-    def statistics_filepath(self):
+    def statistics_filepath(self) -> 'Optional[Union[str, Path]]':
         return self.__statistics_file
 
     @statistics_filepath.setter
-    def statistics_filepath(self, filepath):
+    def statistics_filepath(
+        self, filepath: 'Optional[Union[str, Path]]') -> None:
+
         self.__statistics_file = filepath
 
-    def saveStatistics(self, statistics):
+    def saveStatistics(self, statistics: 'Dict[str, Any]') -> None:
 
         if self.__statistics_file is None:
             return
@@ -243,9 +254,13 @@ class FileInfo:
         with open(self.__statistics_file, 'w') as file:
             yaml.dump(statistics, file)
 
-    def getHandbookText(self, section):
+    def getHandbookText(self, section: str) -> str:
 
         content = self.__getContent(section, self.FileDataType.HANDBOOK)
+
+        if content is None:
+            return ''
+
         paragraphs = content.get('Paragraph', ())
 
         if paragraphs:
@@ -254,7 +269,9 @@ class FileInfo:
 
         return ''
 
-    def __readMetadata(self, path, metadata_type, is_directory):
+    def __readMetadata(self, path: 'Path',
+                       metadata_type: '_FileInfo_FileMetadataType',
+                       is_directory: bool) -> 'Optional[Any]':
 
         if is_directory:
             if metadata_type & self.FileMetadataType.DIRECTORY:
@@ -332,17 +349,24 @@ class FileInfo:
 
         return current_node
 
-    def addFiles(self, filedatatype, files):
+    def addFiles(self, filedatatype: 'FileDataType',
+                 files: 'List[str]') -> bool:
 
         filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
 
         if filedatatype_info.files_mode is None:
             raise ValueError('Can\'t add files to this FileDataType')
 
-        return self.__addFiles(self.getPath(filedatatype), files,
-                               mode=filedatatype_info.files_mode)
+        path = self.getPath(filedatatype)
 
-    def addPackage(self, package_pathname):
+        if path is None:
+            return False
+
+        self.__addFiles(path, files,
+                        mode=filedatatype_info.files_mode)
+        return True
+
+    def addPackage(self, package_pathname: str) -> None:
 
         package_path = Path(package_pathname)
 
@@ -380,8 +404,10 @@ class FileInfo:
 
         return None, None
 
-    def __getContent(self, basename, filedatatype, inexistent_message=None,
-                     suffix_specified=False):
+    def __getContent(self, basename: str, filedatatype: 'FileDataType',
+                     inexistent_message: 'Optional[str]' = None,
+                     suffix_specified: bool = False) \
+                         -> 'Optional[MutableMapping[str, Any]]':
 
         if suffix_specified:
             filepath = self.getPath(filedatatype, basename)
@@ -405,10 +431,14 @@ class FileInfo:
 
         return toml.load(filepath)
 
-    def __getScenarioContent(self, scenario_name):
+    def __getScenarioContent(self, scenario_name: str) \
+        -> 'Optional[MutableMapping[str, Any]]':
 
         content = self.__getContent(scenario_name, self.FileDataType.SCENARIO,
                                     'Inexistent scenario named \'{name}\'')
+
+        if content is None:
+            return None
 
         dictutils.mergeMatch(content, (), ('Ship', 'ships'), 'Ship',
                              absolute=True)
@@ -419,10 +449,15 @@ class FileInfo:
 
         return content
 
-    def __getShipContent(self, ship_model, variables=None):
+    def __getShipContent(self, ship_model: str,
+                         variables: 'Dict[str, Any]' = None) \
+                             -> 'Optional[MutableMapping[str, Any]]':
 
         content = self.__getContent(ship_model, self.FileDataType.SHIPMODEL,
                                     'Inexistent ship model named \'{name}\'')
+
+        if content is None:
+            return None
 
         dictutils.mergeMatch(content, (), ('Shape', 'shapes'), 'Shape',
                              absolute=True)
@@ -441,10 +476,15 @@ class FileInfo:
 
         return content
 
-    def __getObjectContent(self, object_model, variables=None):
+    def __getObjectContent(self, object_model: str,
+                           variables: 'Dict[str, Any]' = None) \
+                               -> 'Optional[MutableMapping[str, Any]]':
 
         content = self.__getContent(object_model, self.FileDataType.OBJECTMODEL,
                                     'Inexistent object model named \'{name}\'')
+
+        if content is None:
+            return None
 
         dictutils.mergeMatch(content, (), ('Shape', 'shapes'), 'Shape',
                              absolute=True)
@@ -455,15 +495,18 @@ class FileInfo:
 
         return content
 
-    def loadUi(self, filename):
+    def loadUi(self, filename: str):
         return uic.loadUiType(
             self.getPath(self.FileDataType.UIDESIGN, filename))
 
-    def loadScenario(self, scenario_name):
+    def loadScenario(self, scenario_name: str):
 
         prefixes = scenario_name.split('/')[:-1]
 
         scenario_content = self.__getScenarioContent(scenario_name)
+
+        if scenario_content is None:
+            return None
 
         scenario_content = configfileinheritance.mergeInheritedFiles(
             scenario_content, self.__getScenarioContent, prefixes=prefixes)
@@ -512,18 +555,19 @@ class FileInfo:
             path, _ = self.__findSuffix(filename, filedatatype, valid_suffixes)
 
         if path is not None:
-            self.__openFile(path)
+            self.__openFile(str(path))
 
     @staticmethod
     def __openFile(path: str) -> None:
         subprocess.call(['xdg-open', path])
 
     @staticmethod
-    def __addFiles(path: 'Union[str, Path]', files: 'List[str]',
+    def __addFiles(path: 'Union[str, Path]',
+                   files: 'Sequence[Union[str, Path]]',
                    mode: int = 0o644) -> None:
         path_str = str(path)
-        for file in files:
-            new_file = shutil.copy(file, path_str)
+        for filepath in files:
+            new_file = shutil.copy(str(filepath), path_str)
             os.chmod(new_file, mode)
 
     def getPath(self, filedatatype: 'FileDataType',
