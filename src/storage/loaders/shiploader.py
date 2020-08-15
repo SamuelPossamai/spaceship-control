@@ -39,9 +39,31 @@ ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 
 def __loadError(info: 'Dict[str, Any]') -> ErrorGenerator:
 
-    return ErrorGenerator(error_max=info.get('error_max'),
-                          offset_max=info.get('offset_max'),
-                          error_max_minfac=info.get('error_max_minfac', 1))
+    error_max = info.get('error_max', 0)
+
+    if not isinstance(error_max, (int, float)):
+        raise TypeError(
+            f'error_max must be a number and not {type(error_max)}')
+
+    offset_max = info.get('offset_max', 0)
+
+    if not isinstance(offset_max, (int, float)):
+        raise TypeError(
+            f'offset_max must be a number and not {type(offset_max)}')
+
+    error_max_minfac = info.get('error_max_minfac', 1)
+
+    if not isinstance(error_max_minfac, (int, float)):
+        raise TypeError(
+            f'error_max_minfac must be a number and not {type(error_max_minfac)}')
+
+    if error_max_minfac < 0 or error_max_minfac > 1:
+        raise ValueError('error_max_minfac must be a value between 0 and 1'
+                         f', {error_max_minfac} is not a valid value')
+
+    return ErrorGenerator(error_max=error_max,
+                          offset_max=offset_max,
+                          error_max_minfac=error_max_minfac)
 
 def __loadErrorDict(
         errors: 'Dict[str, Dict[str, Any]]') -> 'Dict[str, ErrorGenerator]':
@@ -74,7 +96,7 @@ def __engineErrorKwargs(
     })
 
 def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart,
-                         **_kwargs) \
+                         **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LinearEngine(
@@ -88,7 +110,7 @@ def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart,
         **__engineErrorKwargs(info)), ()
 
 def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart,
-                           **_kwargs) \
+                           **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return PositionSensor(part, info['reading_time'],
@@ -96,7 +118,7 @@ def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart,
                           read_offset_max=info.get('offset_max', 0)), ()
 
 def __createAngleSensor(info: 'Dict[str, Any]', part: StructuralPart,
-                        **_kwargs) \
+                        **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return AngleSensor(part, info['reading_time'],
@@ -104,7 +126,7 @@ def __createAngleSensor(info: 'Dict[str, Any]', part: StructuralPart,
                        read_offset_max=info.get('offset_max', 0)), ()
 
 def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart,
-                        **_kwargs) \
+                        **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return SpeedSensor(part, info['reading_time'],
@@ -120,7 +142,7 @@ def __createAngularSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
                               read_offset_max=info.get('offset_max', 0)), ()
 
 def __createObstacleDistanceSensor(info: 'Dict[str, Any]', part: StructuralPart,
-                                   **_kwargs) \
+                                   **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LineDetectSensor(part, info['reading_time'],
@@ -130,7 +152,7 @@ def __createObstacleDistanceSensor(info: 'Dict[str, Any]', part: StructuralPart,
                             distance=info.get('distance')), ()
 
 def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart,
-                        **_kwargs) \
+                        **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = TextDisplayDevice()
@@ -143,7 +165,7 @@ def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart,
     return device, (label,)
 
 def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart,
-                    **_kwargs) \
+                    **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ConsoleDevice(info.get('columns', 20), info.get('rows', 5))
@@ -156,7 +178,7 @@ def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart,
     return (device, (text,))
 
 def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart,
-                             **_kwargs) \
+                             **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = KeyboardReceiverDevice()
@@ -167,7 +189,8 @@ def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart,
 
     return device, (button,)
 
-def __createButton(info: 'Dict[str, Any]', _part: StructuralPart, **_kwargs) \
+def __createButton(info: 'Dict[str, Any]', _part: StructuralPart,
+                   **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ButtonDevice()
@@ -180,7 +203,8 @@ def __createButton(info: 'Dict[str, Any]', _part: StructuralPart, **_kwargs) \
     return device, (button,)
 
 def __createBasicReceiver(info: 'Dict[str, Any]', part: StructuralPart,
-                          engine: 'CommunicationEngine' = None, **_kwargs) \
+                          engine: 'CommunicationEngine' = None,
+                          **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return BasicReceiver(part, info.get('minimum_intensity', 0),
@@ -188,7 +212,8 @@ def __createBasicReceiver(info: 'Dict[str, Any]', part: StructuralPart,
                          engine=engine), ()
 
 def __createBasicSender(info: 'Dict[str, Any]', part: StructuralPart,
-                        engine: 'CommunicationEngine' = None, **_kwargs) \
+                        engine: 'CommunicationEngine' = None,
+                        **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     errors = __getErrorKwargs(info, {
@@ -200,7 +225,8 @@ def __createBasicSender(info: 'Dict[str, Any]', part: StructuralPart,
                         **errors), ())
 
 def __createConfReceiver(info: 'Dict[str, Any]', part: StructuralPart,
-                         engine: 'CommunicationEngine' = None, **_kwargs) \
+                         engine: 'CommunicationEngine' = None,
+                         **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     return ConfigurableReceiver(part, info.get('minimum_intensity', 0),
@@ -208,7 +234,8 @@ def __createConfReceiver(info: 'Dict[str, Any]', part: StructuralPart,
                                 engine=engine), ()
 
 def __createConfSender(info: 'Dict[str, Any]', part: StructuralPart,
-                       engine: 'CommunicationEngine' = None, **_kwargs) \
+                       engine: 'CommunicationEngine' = None,
+                       **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
     errors = __getErrorKwargs(info, {
@@ -240,7 +267,7 @@ __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 
 def __addDevice(
         info: 'Dict[str, Any]', parts: 'Dict[str, StructuralPart]',
-        device_type: str, **kwargs) -> 'Sequence[QWidget]':
+        device_type: str, **kwargs: 'Any') -> 'Sequence[QWidget]':
 
     type_and_model = (device_type, info.get('type'), info.get('model'))
     create_func = __DEVICE_CREATE_FUNCTIONS.get(type_and_model)
@@ -261,13 +288,15 @@ def __addDevice(
 
     return widgets
 
-def __loadShipStructure(ship_info, name, space, body):
+def __loadShipStructure(ship_info: 'Dict[str, Any]', name: str,
+                        space: 'pymunk.Space', body: 'pymunk.Body') \
+                            -> 'Tuple[Structure, Dict[str, StructuralPart]]':
 
     ship = Structure(name, space, body, device_type='ship')
 
     parts = {}
     for part_info in ship_info.get('Part', ()):
-        part_name = part_info['name']
+        part_name = str(part_info.get('name', 'unnamed'))
         part = StructuralPart(offset=(part_info['x'], part_info['y']))
 
         ship.addDevice(part, name=part_name)
@@ -276,7 +305,8 @@ def __loadShipStructure(ship_info, name, space, body):
     return ship, parts
 
 def loadShip(ship_info: 'Dict[str, Any]', name: str, space: 'pymunk.Space',
-             prefixes: 'Sequence[str]' = (), communication_engine=None) \
+             prefixes: 'Sequence[str]' = (),
+             communication_engine: 'Optional[CommunicationEngine]' = None) \
     -> 'ShipInfo':
 
     shapes = loadShapes(ship_info['Shape'])

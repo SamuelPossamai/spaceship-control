@@ -18,7 +18,7 @@ sys.path.pop(0)
 
 if TYPE_CHECKING:
     import anytree
-    from typing import Sequence
+    from typing import Sequence, Optional
     from PyQt5.QtWidgets import QWidget
 
 class ChooseFromTreeDialog(QDialog):
