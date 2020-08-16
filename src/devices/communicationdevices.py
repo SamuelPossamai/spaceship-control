@@ -10,37 +10,39 @@ from pymunk import Vec2d
 from .device import DefaultDevice
 
 if TYPE_CHECKING:
-    from typing import Any, List
+    from typing import Any, List, Tuple
+    from .structure import StructuralPart
 
 class CommunicationEngine:
 
     class Receiver(ABC):
 
         @abstractmethod
-        def signalReceived(self, intensity, frequency):
+        def signalReceived(self, intensity: float, frequency: float) -> None:
             pass
 
         @abstractproperty
-        def position(self):
+        def position(self) -> 'Tuple[float, float]':
             pass
 
     class _Signal:
 
-        def __init__(self, start_point, initial_intensity, frequency, engine):
+        def __init__(self, start_point: 'Vec2d', initial_intensity: float,
+                     frequency: float, engine: 'CommunicationEngine') -> None:
 
             self.__start = start_point
             self.__inital_intensity = initial_intensity
             self.__engine = engine
-            self.__cur_distance = 0
-            self.__sqrd_min_distance = 0
-            self.__sqrd_max_distance = 0
+            self.__cur_distance: float = 0
+            self.__sqrd_min_distance: float = 0
+            self.__sqrd_max_distance: float = 0
             self.__cur_intensity = initial_intensity
             self.__frequency = frequency
             self.__valid = True
 
             self.__calcDist()
 
-        def __calcDist(self):
+        def __calcDist(self) -> None:
 
             half_speed = self.__engine._speed/2 # pylint: disable=protected-access
 
@@ -48,11 +50,11 @@ class CommunicationEngine:
                 max(0, self.__cur_distance - half_speed))**2
             self.__sqrd_max_distance = (self.__cur_distance + half_speed)**2
 
-        def step(self):
+        def step(self) -> None:
             self.__cur_distance += self.__engine._speed # pylint: disable=protected-access
             self.__calcDist()
 
-        def sendTo(self, receiver):
+        def sendTo(self, receiver: 'CommunicationEngine.Receiver') -> None:
             dist = Vec2d(receiver.position).get_dist_sqrd(self.__start)
 
             if self.__sqrd_min_distance < dist < self.__sqrd_max_distance:
@@ -66,18 +68,19 @@ class CommunicationEngine:
                     receiver.signalReceived(abs(intensity + noise),
                                             self.__frequency)
 
-        def isValid(self):
+        def isValid(self) -> bool:
             return self.__valid
 
-    def __init__(self, max_noise, speed, negligible_intensity):
+    def __init__(self, max_noise: float, speed: float,
+                 negligible_intensity: float) -> None:
         self._noise_max = max_noise
         self._ignore_lesser = negligible_intensity
         self._speed = speed
 
-        self.__signals = []
-        self.__receivers = []
+        self.__signals: 'List[CommunicationEngine._Signal]' = []
+        self.__receivers: 'List[CommunicationEngine.Receiver]' = []
 
-    def step(self):
+    def step(self) -> None:
 
         invalid_signals_indexes = []
         signals = self.__signals
@@ -95,21 +98,24 @@ class CommunicationEngine:
 
             del signals[-len(invalid_signals_indexes):]
 
-    def newSignal(self, start_point, initial_intensity, frequency):
+    def newSignal(self, start_point: 'Vec2d', initial_intensity: float,
+                  frequency: float) -> None:
         self.__signals.append(CommunicationEngine._Signal(
             start_point, initial_intensity, frequency, self))
 
-    def addReceiver(self, receiver):
+    def addReceiver(self, receiver: 'CommunicationEngine.Receiver') -> None:
         self.__receivers.append(receiver)
 
-    def clear(self):
+    def clear(self) -> None:
         self.__receivers.clear()
         self.__signals.clear()
 
 class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
 
-    def __init__(self, part, sensibility, frequency, frequency_tolerance=0.1,
-                 engine=None, device_type='basic-receiver'):
+    def __init__(self, part: 'StructuralPart', sensibility: float,
+                 frequency: float, frequency_tolerance: float = 0.1,
+                 engine: 'CommunicationEngine' = None,
+                 device_type: str = 'basic-receiver') -> None:
         DefaultDevice.__init__(self, device_type=device_type)
         CommunicationEngine.Receiver.__init__(self)
 
@@ -118,19 +124,19 @@ class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
         self._frequency = frequency
         self._frequency_tol = frequency_tolerance
 
-        self.__received_signals = []
+        self.__received_signals: 'List[float]' = []
 
         if engine is not None:
             engine.addReceiver(self)
 
-    def act(self):
+    def act(self) -> None:
         pass
 
     @property
-    def position(self):
+    def position(self) -> 'Tuple[float, float]':
         return self.__part.position
 
-    def signalReceived(self, intensity, frequency):
+    def signalReceived(self, intensity: float, frequency: float) -> None:
 
         frequency_diff = abs(frequency - self._frequency)
 
@@ -150,7 +156,7 @@ class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
         return DefaultDevice.command(self, command,
                                      BasicReceiver.__COMMANDS, *args)
 
-    def __getReceived(self):
+    def __getReceived(self) -> str:
         signals = ','.join(str(signal) for signal in self.__received_signals)
         self.__received_signals.clear()
         return signals
@@ -162,8 +168,8 @@ class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
 
 class ConfigurableReceiver(BasicReceiver):
 
-    def __init__(self, *args, min_frequency=0, max_frequency=math.inf,
-                 **kwargs):
+    def __init__(self, *args: 'Any', min_frequency: float = 0,
+                 max_frequency: float =math.inf, **kwargs: 'Any') -> None:
         super().__init__(*args, **kwargs, device_type='receiver')
 
         self.__min_freq = min_frequency
@@ -173,11 +179,11 @@ class ConfigurableReceiver(BasicReceiver):
         return super().command(command, ConfigurableReceiver.__COMMANDS, *args)
 
     @property
-    def frequency(self):
+    def frequency(self) -> float:
         return self._frequency
 
     @frequency.setter
-    def frequency(self, value):
+    def frequency(self, value: 'float') -> None:
         if self.__min_freq <= self._frequency <= self.__max_freq:
             self._frequency = value
 
@@ -190,9 +196,10 @@ class ConfigurableReceiver(BasicReceiver):
 
 class BasicSender(DefaultDevice):
 
-    def __init__(self, part, engine, intensity, frequency,
-                 frequency_err_gen=None, intensity_err_gen=None,
-                 device_type='basic-sender'):
+    def __init__(self, part: 'StructuralPart', engine: 'CommunicationEngine',
+                 intensity: float, frequency: float, frequency_err_gen=None,
+                 intensity_err_gen=None, device_type: str = 'basic-sender') \
+                     -> None:
         super().__init__(device_type=device_type)
 
         self.__part = part
@@ -202,10 +209,10 @@ class BasicSender(DefaultDevice):
         self._frequency = frequency
         self._intensity = intensity
 
-    def act(self):
+    def act(self) -> None:
         pass
 
-    def send(self):
+    def send(self) -> None:
 
         if self.__freq_err_gen is None:
             frequency = self._frequency
@@ -230,8 +237,9 @@ class BasicSender(DefaultDevice):
 
 class ConfigurableSender(BasicSender):
 
-    def __init__(self, *args, min_frequency=0, max_frequency=math.inf,
-                 min_intensity=0, max_intensity=math.inf, **kwargs):
+    def __init__(self, *args: 'Any', min_frequency: float = 0,
+                 max_frequency: float = math.inf, min_intensity: float = 0,
+                 max_intensity: float = math.inf, **kwargs: 'Any'):
         super().__init__(*args, **kwargs, device_type='sender')
 
         self.__min_freq = min_frequency
@@ -243,20 +251,20 @@ class ConfigurableSender(BasicSender):
         return super().command(command, ConfigurableSender.__COMMANDS, *args)
 
     @property
-    def frequency(self):
+    def frequency(self) -> float:
         return self._frequency
 
     @frequency.setter
-    def frequency(self, value):
+    def frequency(self, value: float) -> None:
         if self.__min_freq <= self._frequency <= self.__max_freq:
             self._frequency = value
 
     @property
-    def intensity(self):
+    def intensity(self) -> float:
         return self._intensity
 
     @intensity.setter
-    def intensity(self, value):
+    def intensity(self, value: float) -> None:
         if self.__min_int <= self._intensity <= self.__max_int:
             self._intensity = value
 

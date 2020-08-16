@@ -6,7 +6,7 @@ from .structure import Actuator
 from ..utils.interval import Interval, IntervalSet
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Union
     from .device import Device
     from .structure import StructuralPart
 
@@ -18,7 +18,7 @@ class Engine(Actuator):
             super().__init__(device, 'intensity', 'angle', *args)
 
     def __init__(self, part: 'StructuralPart', device_type: str ='engine',
-                 **kwargs):
+                 **kwargs: 'Any') -> None:
         super().__init__(part, device_type=device_type,
                          properties={
                              'intensity': Engine.intensity,
@@ -35,11 +35,11 @@ class Engine(Actuator):
         self.__valid_angles = kwargs.get('valid_angles')
 
     @property
-    def intensity(self):
+    def intensity(self) -> float:
         return self.__intensity
 
     @intensity.setter
-    def intensity(self, val):
+    def intensity(self, val: 'Union[str, float]') -> None:
 
         if isinstance(val, str):
             val = float(val)
@@ -51,11 +51,11 @@ class Engine(Actuator):
             self.__thrust = self.mapIntensityToThrust(self.__intensity)
 
     @property
-    def angle(self):
+    def angle(self) -> float:
         return self.__angle
 
     @angle.setter
-    def angle(self, val):
+    def angle(self, val: 'Union[str, float]') -> None:
 
         if isinstance(val, str):
             val = float(val)
@@ -66,7 +66,7 @@ class Engine(Actuator):
             self.__angle = val
 
     @abstractmethod
-    def mapIntensityToThrust(self, intensity) -> float:
+    def mapIntensityToThrust(self, intensity: float) -> float:
         pass
 
     def actuate(self, base_thrust: float = None) -> None:
@@ -120,5 +120,5 @@ class LinearEngine(Engine):
                          valid_angles=valid_angles,
                          device_type=device_type, **kwargs)
 
-    def mapIntensityToThrust(self, intensity) -> float:
+    def mapIntensityToThrust(self, intensity: float) -> float:
         return self.__int_off + intensity*self.__int_mult

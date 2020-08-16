@@ -220,9 +220,13 @@ class MainWindow(QMainWindow):
 
     def __loadScenarioAction(self) -> None:
 
+        tree = FileInfo().listFilesTree(FileInfo.FileDataType.SCENARIO)
+
+        if tree is None:
+            return
+
         scenario = self.__getOptionDialog(
-            'Choose scenario', FileInfo().listFilesTree(
-                FileInfo.FileDataType.SCENARIO).children)
+            'Choose scenario', tree.children)
 
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
