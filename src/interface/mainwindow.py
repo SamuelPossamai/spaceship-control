@@ -17,8 +17,6 @@ import pymunk
 
 import anytree
 
-# pylint: disable=relative-beyond-top-level
-
 from .choosefromtreedialog import ChooseFromTreeDialog
 from .helpdialog import HelpDialog
 from .loadgraphicitem import loadGraphicItem
@@ -27,8 +25,6 @@ from .loadship import loadShip
 from ..storage.fileinfo import FileInfo
 
 from ..objectives.objective import createObjectiveTree
-
-# pylint: enable=relative-beyond-top-level
 
 # sys.path manipulation used to import nodetreeview.py from ui
 sys.path.insert(0, str(Path(__file__).parent))
@@ -195,8 +191,8 @@ class MainWindow(QMainWindow):
             self.__space.remove(*self.__space.bodies, *self.__space.shapes)
 
             scene = self.__ui.view.scene()
-            for _, _, widgets, _ in self.__ships:
-                for widget in widgets:
+            for ship_info in self.__ships:
+                for widget in ship_info.widgets:
                     widget.setParent(None)
 
             for item in scene.items():
@@ -235,7 +231,7 @@ class MainWindow(QMainWindow):
         return self.__getOptionDialog('Choose ship model', ship_options)
 
     def __chooseControllerDialog(
-        self, controller_options: 'Tuple[anytree.Node]'):
+            self, controller_options: 'Tuple[anytree.Node]'):
 
         return self.__getOptionDialog('Choose controller', controller_options)
 
@@ -250,27 +246,23 @@ class MainWindow(QMainWindow):
         if loaded_ship_info is None:
             return None
 
-        ship = loaded_ship_info[0]
-        ship_gitem = loaded_ship_info[1]
-        thread = loaded_ship_info[3]
-
-        self.__widgets = loaded_ship_info[2]
+        self.__widgets = loaded_ship_info.widgets
 
         for widget in self.__widgets:
             widget.setParent(self.__ui.deviceInterfaceComponents)
 
-        self.__debug_msg_queues[ship.name] = loaded_ship_info[4]
+        self.__debug_msg_queues[loaded_ship_info.device.name] = loaded_ship_info.msg_queue
 
-        self.__condition_graphic_items.extend(loaded_ship_info[5])
+        self.__condition_graphic_items.extend(loaded_ship_info.condition_graphic_items)
 
-        self.__ui.view.scene().addItem(ship_gitem)
+        self.__ui.view.scene().addItem(loaded_ship_info.gitem)
 
         self.__ui.deviceInterfaceComboBox.addItem(
             f'{ship_info.name} ({ship_info.model})')
 
-        thread.start()
+        loaded_ship_info.thread.start()
 
-        return ship, ship_gitem, self.__widgets, thread
+        return loaded_ship_info
 
     def __loadObject(self, obj_info, fileinfo):
 
@@ -325,7 +317,7 @@ class MainWindow(QMainWindow):
 
         if self.__ship_to_follow is not None:
             try:
-                _, ship_item, _, _ = ships[self.__ship_to_follow]
+                ship_item = ships[self.__ship_to_follow].gitem
             except IndexError:
                 pass
             else:
@@ -415,7 +407,7 @@ class MainWindow(QMainWindow):
         self.__space.reindex_static()
 
         if self.__ships:
-            for widget in self.__ships[0][2]:
+            for widget in self.__ships[0].widgets:
                 widget.show()
 
         self.__objectives_node_value = []
@@ -441,7 +433,9 @@ class MainWindow(QMainWindow):
 
         self.__ui.debugMessagesTabWidget.clear()
         self.__debug_messages_text_browsers.clear()
-        for ship, _, _, _ in ships:
+        for ship_info in ships:
+            ship = ship_info.device
+
             tbrowser = QTextBrowser()
             self.__debug_messages_text_browsers[ship.name] = tbrowser
             self.__ui.debugMessagesTabWidget.addTab(tbrowser, ship.name)
@@ -516,12 +510,13 @@ class MainWindow(QMainWindow):
         if self.__center_view_on is not None:
             self.__ui.view.centerOn(self.__center_view_on)
 
-        ships = tuple(ship for ship, _, _, _ in self.__ships)
+        ships = tuple(ship.device for ship in self.__ships)
         with self.__lock:
             self.__space.step(0.02)
-            for ship, gitem, _, _ in self.__ships:
+            for ship_info in self.__ships:
+                ship = ship_info.device
                 ship.act()
-                self.__updateGraphicsItem(ship.body, gitem)
+                self.__updateGraphicsItem(ship.body, ship_info.gitem)
 
             for obj_body, gitem in self.__objects:
                 self.__updateGraphicsItem(obj_body, gitem)
@@ -641,10 +636,10 @@ class MainWindow(QMainWindow):
         if cur_index == -1 or cur_index >= len(self.__ships):
             return
 
-        for widget in self.__ships[self.__current_ship_widgets_index][2]:
+        for widget in self.__ships[self.__current_ship_widgets_index].widgets:
             widget.hide()
 
-        for widget in self.__ships[cur_index][2]:
+        for widget in self.__ships[cur_index].widgets:
             widget.show()
 
         self.__current_ship_widgets_index = cur_index
@@ -779,7 +774,7 @@ class MainWindow(QMainWindow):
 
             value = 9 if key == Qt.Key_0 else key - Qt.Key_1
             try:
-                _, ship_item, _, _ = self.__ships[value]
+                ship_item = self.__ships[value].gitem
             except IndexError:
                 pass
             else:

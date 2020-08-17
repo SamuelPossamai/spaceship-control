@@ -1,4 +1,5 @@
 
+from collections import namedtuple
 import json
 import math
 
@@ -12,6 +13,10 @@ import anytree
 from .loadgraphicitem import loadGraphicItem
 
 from ..storage.fileinfo import FileInfo
+
+ShipInterfaceInfo = namedtuple('ShipInfo', (
+    'device', 'gitem', 'widgets', 'thread',
+    'msg_queue', 'condition_graphic_items'))
 
 def loadShip(space, ship_info, arg_scenario_info, lock,
              ship_options_dialog=None, controller_options_dialog=None,
@@ -78,4 +83,5 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
         ship.body.shapes, loaded_ship.images,
         condition_variables={'ship': ship.mirror})
 
-    return ship, ship_gitem, widgets, thread, msg_queue, condition_graphic_items
+    return ShipInterfaceInfo(ship, ship_gitem, widgets, thread, msg_queue,
+                             condition_graphic_items)
