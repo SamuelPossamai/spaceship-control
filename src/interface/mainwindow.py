@@ -6,7 +6,7 @@ from threading import Lock
 import traceback
 from pathlib import Path
 from queue import Empty as EmptyQueueException
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast as typingcast
 
 from PyQt5.QtWidgets import (
     QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QTextBrowser
@@ -36,11 +36,15 @@ UiMainWindow, _ = FileInfo().loadUi('mainwindow.ui') # pylint: disable=invalid-n
 sys.path.pop(0)
 
 if TYPE_CHECKING:
-    from typing import Tuple, Any, Dict, Optional, List
+    from typing import Tuple, Any, Dict, Optional, List, Sequence
     from PyQt5.QtWidgets import QGraphicsItem, QWidget
     from PyQt5.QtGui import QKeyEvent, QMoveEvent, QResizeEvent, QCloseEvent
+    from .loadship import ShipInterfaceInfo, SimpleQueue
+    from .conditiongraphicspixmapitem import ConditionGraphicsPixmapItem
     from ..objectives.objective import Objective
     from ..devices.communicationdevices import CommunicationEngine
+    from ..storage.loaders.scenarioloader import ShipInfo, ObjectInfo
+    from ..storage.loaders.imageloader import ImageInfo
 
 class ObjectiveNodeValue(NodeValue):
 
@@ -82,14 +86,14 @@ class MainWindow(QMainWindow):
         self.__space = pymunk.Space()
         self.__space.gravity = (0, 0)
 
-        self.__ships = []
-        self.__objects = []
+        self.__ships: 'List[ShipInterfaceInfo]' = []
+        self.__objects: 'List[Tuple[pymunk.Body, QGraphicsItem]]' = []
         self.__scenario_objectives: 'List[Objective]' = []
         self.__objectives_result: 'Optional[bool]' = None
         self.__current_scenario: 'Optional[str]' = None
 
-        self.__widgets = []
-        self.__objectives_node_value = []
+        self.__widgets: 'List[QWidget]' = []
+        self.__objectives_node_value: 'List[ObjectiveNodeValue]' = []
 
         self.__title_basename = 'Spaceship Control'
 
@@ -101,10 +105,10 @@ class MainWindow(QMainWindow):
         self.__current_ship_widgets_index = 0
 
         self.__comm_engine: 'Optional[CommunicationEngine]' = None
-        self.__debug_msg_queues = {}
+        self.__debug_msg_queues: 'Dict[str, SimpleQueue]' = {}
 
-        self.__debug_messages_text_browsers = {}
-        self.__condition_graphic_items = []
+        self.__debug_messages_text_browsers: 'Dict[str, QTextBrowser]' = {}
+        self.__condition_graphic_items: 'List[ConditionGraphicsPixmapItem]' = []
 
         self.__ship_to_follow = follow_ship
 
@@ -207,7 +211,8 @@ class MainWindow(QMainWindow):
         self.__updateTitle()
 
     @staticmethod
-    def __getOptionDialog(title: str, options: 'Tuple[anytree.Node]'):
+    def __getOptionDialog(title: str, options: 'Tuple[anytree.Node]') \
+            -> 'Sequence[str]':
 
         dialog = ChooseFromTreeDialog(options)
         dialog.setWindowTitle(title)
@@ -227,15 +232,18 @@ class MainWindow(QMainWindow):
         if scenario is not None:
             self.loadScenario('/'.join(scenario))
 
-    def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]'):
+    def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]') \
+            -> 'Sequence[str]':
         return self.__getOptionDialog('Choose ship model', ship_options)
 
     def __chooseControllerDialog(
-            self, controller_options: 'Tuple[anytree.Node]'):
+            self, controller_options: 'Tuple[anytree.Node]') -> 'Sequence[str]':
 
         return self.__getOptionDialog('Choose controller', controller_options)
 
-    def __loadShip(self, ship_info, arg_scenario_info):
+    def __loadShip(self, ship_info: 'ShipInfo',
+                   arg_scenario_info: 'Dict[str, Any]') \
+                       -> 'Optional[ShipInterfaceInfo]':
 
         loaded_ship_info = loadShip(
             self.__space, ship_info, arg_scenario_info, self.__lock,
@@ -251,9 +259,11 @@ class MainWindow(QMainWindow):
         for widget in self.__widgets:
             widget.setParent(self.__ui.deviceInterfaceComponents)
 
-        self.__debug_msg_queues[loaded_ship_info.device.name] = loaded_ship_info.msg_queue
+        self.__debug_msg_queues[loaded_ship_info.device.name] = \
+            loaded_ship_info.msg_queue
 
-        self.__condition_graphic_items.extend(loaded_ship_info.condition_graphic_items)
+        self.__condition_graphic_items.extend(
+            loaded_ship_info.condition_graphic_items)
 
         self.__ui.view.scene().addItem(loaded_ship_info.gitem)
 
@@ -264,14 +274,18 @@ class MainWindow(QMainWindow):
 
         return loaded_ship_info
 
-    def __loadObject(self, obj_info, fileinfo):
+    def __loadObject(self, obj_info: 'ObjectInfo', fileinfo: 'FileInfo') \
+            -> 'Optional[Tuple[pymunk.Body, QGraphicsItem]]':
 
         obj_model = obj_info.model
         if obj_model is None:
-            options = fileinfo.listFilesTree(
-                FileInfo.FileDataType.OBJECTMODEL).children
+            obj_tree = fileinfo.listFilesTree(FileInfo.FileDataType.OBJECTMODEL)
+
+            if obj_tree is None:
+                return None
+
             obj_model = self.__getOptionDialog('Choose object model',
-                                               options)
+                                               obj_tree.children)
 
             if obj_model is None:
                 return None
@@ -295,9 +309,11 @@ class MainWindow(QMainWindow):
 
         return body, object_gitem
 
-    def __loadScenarioShips(self, ships_info, arg_scenario_info):
+    def __loadScenarioShips(self, ships_info: 'List[ShipInfo]',
+                            arg_scenario_info: 'Dict[str, Any]') \
+                                -> 'Optional[List[ShipInterfaceInfo]]':
 
-        ships = [None]*len(ships_info)
+        ships: 'List[Optional[ShipInterfaceInfo]]' = [None]*len(ships_info)
         for i, ship_info in enumerate(ships_info):
             try:
                 ship = self.__loadShip(ship_info, arg_scenario_info.copy())
@@ -315,20 +331,25 @@ class MainWindow(QMainWindow):
 
             ships[i] = ship
 
+        ships_after = typingcast('List[ShipInterfaceInfo]', ships)
+
         if self.__ship_to_follow is not None:
             try:
-                ship_item = ships[self.__ship_to_follow].gitem
+                ship_item = ships_after[self.__ship_to_follow].gitem
             except IndexError:
                 pass
             else:
                 self.__ui.view.centerOn(ship_item.pos())
                 self.__center_view_on = ship_item
 
-        return ships
+        return ships_after
 
-    def __loadScenarioObjects(self, objects_info):
+    def __loadScenarioObjects(self, objects_info: 'List[ObjectInfo]') \
+            -> 'Optional[List[Tuple[pymunk.Body, QGraphicsItem]]]':
 
-        objects = [None]*len(objects_info)
+        objects: 'List[Optional[Tuple[pymunk.Body, QGraphicsItem]]]' = \
+            [None]*len(objects_info)
+
         for i, obj_info in enumerate(objects_info):
             try:
                 obj = self.__loadObject(obj_info, FileInfo())
@@ -341,9 +362,9 @@ class MainWindow(QMainWindow):
 
             objects[i] = obj
 
-        return objects
+        return typingcast('List[Tuple[pymunk.Body, QGraphicsItem]]', objects)
 
-    def __loadStaticImages(self, static_images) -> None:
+    def __loadStaticImages(self, static_images: 'List[ImageInfo]') -> None:
 
         if static_images:
             for image_info in static_images:
@@ -647,10 +668,13 @@ class MainWindow(QMainWindow):
     @staticmethod
     def __openAction(text: str, filedatatype: 'FileInfo.FileDataType') -> None:
 
-        filepath = MainWindow.__getOptionDialog(
-            text, FileInfo().listFilesTree(filedatatype,
-                                           show_meta_files=True,
-                                           show_hidden_files=True).children)
+        tree = FileInfo().listFilesTree(filedatatype, show_meta_files=True,
+                                        show_hidden_files=True)
+
+        if tree is None:
+            return
+
+        filepath = MainWindow.__getOptionDialog(text, tree.children)
 
         if filepath is not None:
             FileInfo().openFile(filedatatype, '/'.join(filepath))

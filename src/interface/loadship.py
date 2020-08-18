@@ -20,7 +20,7 @@ ShipInterfaceInfo = namedtuple('ShipInfo', (
 
 def loadShip(space, ship_info, arg_scenario_info, lock,
              ship_options_dialog=None, controller_options_dialog=None,
-             communication_engine=None):
+             communication_engine=None) -> ShipInterfaceInfo:
 
     fileinfo = FileInfo()
 
