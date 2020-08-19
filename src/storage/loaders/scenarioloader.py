@@ -14,7 +14,8 @@ from ...objectives.timedobjective import TimedObjectiveGroup
 from ...devices.communicationdevices import CommunicationEngine
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Optional
+    from typing import Any, Dict, Optional, Sequence
+    from ...objectives.objective import Objective
 
 ObjectInfo = namedtuple('ObjectInfo', (
     'model', 'position', 'angle', 'variables'))
@@ -32,7 +33,8 @@ ScenarioInfo = namedtuple('ScenarioInfo', (
     'physics_engine'
 ))
 
-def __createGoToObjective(objective_content) -> 'GoToObjective':
+def __createGoToObjective(objective_content: 'Dict[str, Any]') \
+        -> 'GoToObjective':
 
     position = (objective_content['x'], objective_content['y'])
     distance = objective_content['distance']
@@ -42,7 +44,8 @@ def __createGoToObjective(objective_content) -> 'GoToObjective':
 
     return GoToObjective(position, distance, **kwargs)
 
-def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
+def __createObjectiveGroup(objective_content: 'Dict[str, Any]') \
+        -> 'ObjectiveGroup':
 
     valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
                     'negation', 'valid_ships')
@@ -53,7 +56,8 @@ def __createObjectiveGroup(objective_content) -> 'ObjectiveGroup':
     return ObjectiveGroup(loadObjectives(objective_content['Objective']),
                           **kwargs)
 
-def __createTimedObjectiveGroup(objective_content) -> 'TimedObjectiveGroup':
+def __createTimedObjectiveGroup(objective_content: 'Dict[str, Any]') \
+        -> 'TimedObjectiveGroup':
 
     valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
                     'time_limit', 'negation', 'valid_ships')
@@ -71,7 +75,7 @@ __OBJECTIVE_CREATE_FUNCTIONS = {
     'timed-list': __createTimedObjectiveGroup
 }
 
-def __resolveShipModelPrefix(model, prefixes):
+def __resolveShipModelPrefix(model: str, prefixes: 'Sequence[str]') -> str:
 
     model_after, _ = resolvePrefix(model, prefixes)
 
@@ -80,7 +84,8 @@ def __resolveShipModelPrefix(model, prefixes):
 
     return model_after
 
-def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
+def __readShipInfo(ship_content: 'Dict[str, Any]',
+                   prefixes: 'Sequence[str]') -> 'ShipInfo':
 
     model_metadata = ship_content.get('__model_attr_meta__')
     if model_metadata is not None:
@@ -120,7 +125,8 @@ def __readShipInfo(ship_content, prefixes) -> 'ShipInfo':
 
     return ShipInfo(**ship_info_kwargs)
 
-def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
+def __readObjectInfo(obj_content: 'Dict[str, Any]',
+                     prefixes: 'Sequence[str]') -> 'ObjectInfo':
 
     model_metadata = obj_content.get('__model_attr_meta__')
     if model_metadata is not None:
@@ -149,7 +155,7 @@ def __readObjectInfo(obj_content, prefixes) -> 'ObjectInfo':
     return ObjectInfo(model=model, position=position, angle=angle,
                       variables=variables)
 
-def loadPhysicsEngine(engine_info: 'Dict[str, Any]'):
+def loadPhysicsEngine(engine_info: 'Dict[str, Any]') -> 'PhysicsEngineInfo':
 
     gravity_dict = engine_info.get('Gravity')
     if gravity_dict is not None:
@@ -163,18 +169,20 @@ def loadPhysicsEngine(engine_info: 'Dict[str, Any]'):
                              engine_info.get('collision_persistence', 3),
                              engine_info.get('iterations', 10))
 
-def loadCommunicationEngine(engine_info: 'Dict[str, Any]'):
+def loadCommunicationEngine(engine_info: 'Dict[str, Any]') \
+        -> 'CommunicationEngine':
 
     return CommunicationEngine(engine_info.get('max_noise', 10),
                                engine_info.get('speed', 10000),
                                engine_info.get('negligible_intensity', 10000))
 
-def loadObjectives(objectives):
+def loadObjectives(objectives: 'Sequence[Dict[str, Any]]') \
+        -> 'Sequence[Objective]':
     return tuple(__OBJECTIVE_CREATE_FUNCTIONS[objective['type']](objective)
                  for objective in objectives)
 
 def loadScenario(scenario_info: 'Dict[str, Any]',
-                 prefixes=()) -> 'ScenarioInfo':
+                 prefixes: 'Sequence[str]' = ()) -> 'ScenarioInfo':
 
     scenario_content = scenario_info.get('Scenario', {})
 

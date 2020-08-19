@@ -28,12 +28,14 @@ class HelpDialog(QDialog):
         self.__ui = UiHelpWidget()
         self.__ui.setupUi(self)
 
-        self.__ui.treeView.addNodes(FileInfo().listFilesTree(
-            FileInfo.FileDataType.HANDBOOK).children)
+        tree = FileInfo().listFilesTree(FileInfo.FileDataType.HANDBOOK)
+
+        if tree is not None:
+            self.__ui.treeView.addNodes(tree.children)
 
         self.__ui.treeView.clicked.connect(self.__treeViewClicked)
 
-    def __treeViewClicked(self):
+    def __treeViewClicked(self) -> None:
 
         if self.__ui.treeView.selectedIsLeaf():
             section = '/'.join(item.data() for item in

@@ -6,7 +6,7 @@ import math
 try:
     from queue import SimpleQueue
 except ImportError:
-    from queue import Queue as SimpleQueue
+    from queue import Queue as SimpleQueue # type: ignore
 
 import anytree
 

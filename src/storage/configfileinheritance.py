@@ -1,9 +1,16 @@
 
 import itertools
+from typing import TYPE_CHECKING
 
 from ..utils.dictutils import writeEverywhere
 
-def resolvePrefix(name, prefixes):
+if TYPE_CHECKING:
+    from typing import (
+        Tuple, Sequence, Dict, Any, List, Collection, Optional, Union, Callable
+    )
+
+def resolvePrefix(name: str, prefixes: 'Sequence[str]') \
+        -> 'Tuple[str, Sequence[str]]':
 
     for dot_count, char in enumerate(name):
         if char != '.':
@@ -29,7 +36,8 @@ def resolvePrefix(name, prefixes):
 
     return resolved_name, new_prefix
 
-def __mergeContentList(child_content, parent_content):
+def __mergeContentList(child_content: 'List[Any]',
+                       parent_content: 'List[Any]') -> 'List[Any]':
 
     named_elements = {}
     unnamed_elements = []
@@ -63,8 +71,9 @@ def __mergeContentList(child_content, parent_content):
 
     return final_value
 
-def __mergeContentDictWriteParent(child_content, parent_content,
-                                  delete_elements):
+def __mergeContentDictWriteParent(child_content: 'Dict[str, Any]',
+                                  parent_content: 'Dict[str, Any]',
+                                  delete_elements: 'Collection[str]') -> None:
 
     for key, parent_value in parent_content.items():
 
@@ -82,7 +91,9 @@ def __mergeContentDictWriteParent(child_content, parent_content,
         else:
             child_content[key] = final_value
 
-def __mergeContentDict(child_content, parent_content):
+def __mergeContentDict(child_content: 'Dict[str, Any]',
+                       parent_content: 'Dict[str, Any]') \
+                           -> 'Optional[Dict[str, Any]]':
 
     parent_inheritance_props = parent_content.get('Inheritance')
 
@@ -93,7 +104,7 @@ def __mergeContentDict(child_content, parent_content):
 
     inheritance_properties = child_content.get('Inheritance')
 
-    delete_elements = ()
+    delete_elements: 'Collection[str]' = ()
     if inheritance_properties is not None:
         inheritance_mode = inheritance_properties.get('mode')
 
@@ -117,7 +128,9 @@ def __mergeContentDict(child_content, parent_content):
 
     return child_content
 
-def mergeContent(child_content, parent_content):
+def mergeContent(child_content: 'Union[Dict[str, Any], List[Any]]',
+                 parent_content: 'Union[Dict[str, Any], List[Any]]') \
+                     -> 'Optional[Union[Dict[str, Any], List[Any]]]':
 
     if isinstance(child_content, dict) and isinstance(parent_content, dict):
         return __mergeContentDict(child_content, parent_content)
@@ -127,7 +140,9 @@ def mergeContent(child_content, parent_content):
 
     return child_content
 
-def mergeInheritedFiles(file_content, get_parent_func, prefixes=()):
+def mergeInheritedFiles(file_content: 'Dict[str, Any]',
+                        get_parent_func: 'Callable[[str], Dict[str, Any]]',
+                        prefixes: 'Sequence[str]' = ()) -> 'Dict[str, Any]':
 
     config_content = file_content.get('Inheritance')
 
@@ -148,4 +163,9 @@ def mergeInheritedFiles(file_content, get_parent_func, prefixes=()):
                                          prefixes=parent_prefixes)
 
 
-    return mergeContent(file_content, parent_content)
+    merged_content = __mergeContentDict(file_content, parent_content)
+
+    if merged_content is None:
+        return file_content
+
+    return merged_content
