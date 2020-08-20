@@ -8,11 +8,14 @@ from PyQt5.QtGui import QTransform
 from ..utils.expression import Condition, Expression
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Optional, Any, Dict
+    from PyQt5.QtGui import QPixmap
 
 class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
 
-    def __init__(self, condition, *args, names=None, **kwargs) -> None:
+    def __init__(self, condition: 'Optional[str]', *args: 'Any',
+                 names: 'Optional[Dict[str, Any]]' = None,
+                 **kwargs: 'Any') -> None:
         super().__init__(*args, **kwargs)
 
         self.__condition = Condition(condition) if condition else None
@@ -45,12 +48,12 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
     def isVisible(self) -> bool:
         return self.__is_visible
 
-    def setPixmap(self, pixmap) -> None:
+    def setPixmap(self, pixmap: 'QPixmap') -> None:
         super().setPixmap(pixmap)
 
         self.__pixmap = pixmap
 
-    def setOffset(self, *args) -> None:
+    def setOffset(self, *args: 'Any') -> None:
         super().setOffset(*args)
 
         if self.__x_offset_calc != 0 or self.__y_offset_calc != 0:
@@ -61,7 +64,7 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
                               offset.y() + self.__y_offset_calc)
 
     def setXOffsetExpression(self, expression: 'Optional[str]',
-                             multiplier=1) -> None:
+                             multiplier: float = 1) -> None:
 
         if expression is None:
             self.__x_offset_func = None
@@ -72,7 +75,7 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
         self.evaluate()
 
     def setYOffsetExpression(self, expression: 'Optional[str]',
-                             multiplier=1) -> None:
+                             multiplier: float = 1) -> None:
 
         if expression is None:
             self.__y_offset_func = None
@@ -91,7 +94,7 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
 
         self.evaluate()
 
-    def __updateOffset(self, new_calc_x, new_calc_y):
+    def __updateOffset(self, new_calc_x: float, new_calc_y: float) -> None:
 
         offset = super().offset()
 
@@ -102,7 +105,7 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
         self.__x_offset_calc = new_calc_x
         self.__y_offset_calc = new_calc_y
 
-    def evaluate(self, **kwargs):
+    def evaluate(self, **kwargs: 'Any') -> None:
 
         self.__condition_met = self.__condition.evaluate(
             **self.__names, **kwargs) if self.__condition is not None else True

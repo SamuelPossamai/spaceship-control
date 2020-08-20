@@ -5,36 +5,37 @@ from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 if TYPE_CHECKING:
-    from typing import Sequence, List
+    from typing import Sequence, List, Optional
     import anytree
     from PyQt5.QWidgets import QWidget
 
 class NodeValue:
 
-    def __init__(self, name, description, label=None):
+    def __init__(self, name: str, description: 'Optional[str]',
+                 label: str = None) -> None:
         self.__name = name
         self.__desc = description
         self.__item = None
         self.__label = label
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__name
 
     @name.setter
-    def name(self, new_val):
+    def name(self, new_val: str) -> None:
         self.__name = new_val
         if self.__label is None and self.__item is not None:
             self.__item.setText(new_val)
 
     @property
-    def label(self):
+    def label(self) -> 'Optional[str]':
         if self.__label is None:
             return self.__name
         return self.__label
 
     @label.setter
-    def label(self, new_val):
+    def label(self, new_val: 'Optional[str]') -> None:
         self.__label = new_val
         if self.__item is not None:
             if self.__label is None:
@@ -43,16 +44,16 @@ class NodeValue:
                 self.__item.setText(self.__label)
 
     @property
-    def description(self):
+    def description(self) -> 'Optional[str]':
         return self.__desc
 
     @description.setter
-    def description(self, new_val):
+    def description(self, new_val: 'Optional[str]') -> None:
         self.__desc = new_val
         if self.__item is not None:
             self.__item.setToolTip(new_val)
 
-    def __setItem(self, new_val):
+    def __setItem(self, new_val: 'QStandardItem') -> None:
         self.__item = new_val
 
     item = property(None, __setItem)
@@ -67,7 +68,7 @@ class NodeTreeView(QTreeView):
         self.setUniformRowHeights(True)
         self.setHeaderHidden(True)
 
-    def clear(self):
+    def clear(self) -> None:
         self.model().clear()
 
     def addNodes(self, nodes: 'Sequence[anytree.Node]') -> None:
@@ -75,7 +76,7 @@ class NodeTreeView(QTreeView):
         for node in nodes:
             NodeTreeView.__addNode(self.model(), node)
 
-    def selectedItem(self) -> QStandardItem:
+    def selectedItem(self) -> 'QStandardItem':
         return self.model().itemFromIndex(self.currentIndex())
 
     def selectedIsLeaf(self) -> bool:
@@ -92,7 +93,8 @@ class NodeTreeView(QTreeView):
         return result
 
     @staticmethod
-    def __addNode(parent_row, options: 'anytree.Node') -> None:
+    def __addNode(parent_row: 'QStandardItem',
+                  options: 'anytree.Node') -> None:
 
         node_value = options.name
         set_item = False
