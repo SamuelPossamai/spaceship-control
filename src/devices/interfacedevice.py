@@ -15,6 +15,7 @@ from ..interface.keyboardbutton import KeyboardButton
 
 if TYPE_CHECKING:
     from typing import Any, List, Callable, Dict
+    from PyQt5.QtWidgets import QWidget
 
 class InterfaceDevice(DefaultDevice):
 
@@ -47,10 +48,11 @@ class TextDisplayDevice(InterfaceDevice):
         ''')
 
     @property
-    def widget(self):
+    def widget(self) -> 'QWidget':
         return self.__label
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable[..., Any]]') -> 'Any':
         return super().command(command, TextDisplayDevice.__COMMANDS, *args)
 
     def setText(self, text: str) -> None:
@@ -73,10 +75,11 @@ class ButtonDevice(InterfaceDevice):
         self.__button.setStyleSheet('background-color: red;')
 
     @property
-    def widget(self):
+    def widget(self) -> 'QWidget':
         return self.__button
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable[..., Any]]') -> 'Any':
         return super().command(command, ButtonDevice.__COMMANDS, *args)
 
     def __clicked(self) -> str:
@@ -95,10 +98,11 @@ class KeyboardReceiverDevice(InterfaceDevice):
         self.__receiver = KeyboardButton()
 
     @property
-    def widget(self):
+    def widget(self) -> 'QWidget':
         return self.__receiver
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable[..., Any]]') -> 'Any':
         return super().command(command,
                                KeyboardReceiverDevice.__COMMANDS, *args)
 
@@ -157,14 +161,14 @@ class ConsoleDevice(InterfaceDevice):
         text.setFixedWidth(width)
 
     @property
-    def widget(self):
+    def widget(self) -> 'QWidget':
         return self.__text_widget
 
     def command(self, command: 'List[str]',
                 *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, ConsoleDevice.__COMMANDS, *args)
 
-    def __setPos(self, column_s, row_s):
+    def __setPos(self, column_s: str, row_s: str) -> str:
 
         column = int(column_s)
         row = int(row_s)
@@ -180,10 +184,10 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __getPos(self):
+    def __getPos(self) -> str:
         return f'{self.__col}-{self.__row}'
 
-    def __newline(self):
+    def __newline(self) -> str:
 
         if self.__row >= self.__total_rows:
             return '<<err>>'
@@ -193,7 +197,7 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __columndec(self):
+    def __columndec(self) -> str:
         if self.__col == 0:
             return '<<err>>'
 
@@ -201,12 +205,12 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __columnstart(self):
+    def __columnstart(self) -> str:
         self.__col = 0
 
         return '<<ok>>'
 
-    def __write(self, text):
+    def __write(self, text: str) -> str:
         pos = self.__row*self.__total_cols + self.__col
         self.__text = self.__text[: pos] + text + self.__text[pos + len(text):]
 
@@ -220,19 +224,19 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __update(self):
+    def __update(self) -> str:
 
         text = html.escape(self.__text).replace(' ', '&nbsp;')
         self.addAction(Action(QTextEdit.setHtml, self.__text_widget, text))
 
         return '<<ok>>'
 
-    def __clear(self):
+    def __clear(self) -> str:
         self.__text = ' '*(self.__total_cols*self.__total_rows)
 
         return '<<ok>>'
 
-    __COMMANDS = {
+    __COMMANDS: 'Dict[str, Callable[..., Any]]' = {
 
         'write': __write,
         'set-cursor-pos': __setPos,

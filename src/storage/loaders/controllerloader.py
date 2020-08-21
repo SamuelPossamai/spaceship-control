@@ -1,11 +1,19 @@
 
 import time
+from typing import TYPE_CHECKING
 
 import signal
 from subprocess import Popen, PIPE
 from threading import Thread
 
-def __controllerThreadWatcher(process, device, lock):
+if TYPE_CHECKING:
+    from typing import BinaryIO
+    from queue import SimpleQueue
+    from threading import Lock
+    from ...devices.structure import Structure
+
+def __controllerThreadWatcher(process: 'Popen', device: 'Structure',
+                              lock: 'Lock') -> None:
 
     while True:
         with lock:
@@ -15,7 +23,8 @@ def __controllerThreadWatcher(process, device, lock):
 
     process.send_signal(signal.SIGHUP)
 
-def __controllerThreadDebugMessages(pstderr, debug_queue):
+def __controllerThreadDebugMessages(pstderr: 'BinaryIO',
+                                    debug_queue: 'SimpleQueue') -> None:
 
     try:
         while True:
@@ -27,7 +36,8 @@ def __controllerThreadDebugMessages(pstderr, debug_queue):
     except BrokenPipeError:
         pass
 
-def __controllerThread(pstdout, pstdin, device, lock):
+def __controllerThread(pstdout: 'BinaryIO', pstdin: 'BinaryIO',
+                       device: 'Structure', lock: 'Lock') -> None:
 
     try:
         while True:
@@ -46,7 +56,8 @@ def __controllerThread(pstdout, pstdin, device, lock):
     except BrokenPipeError:
         pass
 
-def loadController(program_path, ship, json_info, debug_queue, lock):
+def loadController(program_path: str, ship: 'Structure', json_info: str,
+                   debug_queue: 'SimpleQueue', lock: 'Lock') -> 'Thread':
 
     process = Popen([program_path, json_info], stdin=PIPE, stdout=PIPE,
                     stderr=PIPE)
