@@ -1,6 +1,7 @@
 
-from  pymunk import Vec2d
 from typing import TYPE_CHECKING, cast as typingcast
+
+from  pymunk import Vec2d
 
 from .objective import Objective
 
@@ -29,7 +30,8 @@ class GoToObjective(Objective):
 
     def _verifyShip(self, ship: 'Structure') -> bool:
         pos = ship.body.position
-        return typingcast(bool,
+        return typingcast(
+            bool,
             pos.get_dist_sqrd(self.__position) < self.__distance_sqrtd)
 
     def _verify(self, space: 'pymunk.Space',

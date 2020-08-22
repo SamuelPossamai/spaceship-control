@@ -104,7 +104,8 @@ class Objective(ABC):
         """
         return self.__name
 
-    def verify(self, space: 'pymunk.Space', ships: 'Sequence[Structure]') -> bool:
+    def verify(self, space: 'pymunk.Space',
+               ships: 'Sequence[Structure]') -> bool:
         """Verify if the objective is complete or if it was failed.
 
         Returns:
@@ -126,7 +127,8 @@ class Objective(ABC):
         return self.accomplished()
 
     @abstractmethod
-    def _verify(self, space: 'pymunk.Space', ships: 'Sequence[Structure]') -> bool:
+    def _verify(self, space: 'pymunk.Space',
+                ships: 'Sequence[Structure]') -> bool:
         pass
 
     @staticmethod

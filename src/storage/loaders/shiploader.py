@@ -54,8 +54,8 @@ def __loadError(info: 'Dict[str, Any]') -> ErrorGenerator:
     error_max_minfac = info.get('error_max_minfac', 1)
 
     if not isinstance(error_max_minfac, (int, float)):
-        raise TypeError(
-            f'error_max_minfac must be a number and not {type(error_max_minfac)}')
+        raise TypeError('error_max_minfac must be a '
+                        f'number and not {type(error_max_minfac)}')
 
     if error_max_minfac < 0 or error_max_minfac > 1:
         raise ValueError('error_max_minfac must be a value between 0 and 1'

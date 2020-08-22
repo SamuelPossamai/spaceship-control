@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 def resolvePrefix(name: str, prefixes: 'Sequence[str]') \
         -> 'Tuple[str, Sequence[str]]':
 
+    dot_count = 0
     for dot_count, char in enumerate(name):
         if char != '.':
             break

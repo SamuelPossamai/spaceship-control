@@ -142,8 +142,8 @@ def mergeMatch(dict_obj: 'MutableMapping[str, Any]', path: 'Sequence[str]',
         merge_function(match_val, keys, target)
 
 def writeEverywhere(
-    obj: 'Union[MutableMapping[str, Any], List[MutableMapping[str, Any]]]',
-    value: 'Any', dict_key: str = None, key_format: str = None) -> None:
+        obj: 'Union[MutableMapping[str, Any], List[MutableMapping[str, Any]]]',
+        value: 'Any', dict_key: str = None, key_format: str = None) -> None:
 
     if isinstance(obj, list):
         elements = obj

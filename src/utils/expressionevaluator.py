@@ -20,7 +20,7 @@ class ExpressionEvaluator(SimpleEval):
     def parse(expr: str) -> 'ast.Module':
         return ast.parse(expr.strip())
 
-    def eval(self, expr: 'Union[str, ast.Module]', parsed_expr: bool=False,
+    def eval(self, expr: 'Union[str, ast.Module]', parsed_expr: bool = False,
              parsed_expr_original: str = None) -> 'Any':
 
         if parsed_expr is False:

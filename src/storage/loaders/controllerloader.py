@@ -7,10 +7,12 @@ from subprocess import Popen, PIPE
 from threading import Thread
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import BinaryIO
     from queue import SimpleQueue
     from threading import Lock
     from ...devices.structure import Structure
+    # pylint: enable=ungrouped-imports
 
 def __controllerThreadWatcher(process: 'Popen', device: 'Structure',
                               lock: 'Lock') -> None:

@@ -1,5 +1,5 @@
 
-from typing import TYPE_CHECKING, cast as typingcast
+from typing import TYPE_CHECKING
 
 from pymunk import Circle, Poly, Segment
 
@@ -49,9 +49,6 @@ def __createRectangleShape(info: 'Dict[str, Any]') -> 'pymunk.Shape':
     if width is None or height is None:
         raise ValueError('Both \'width\' and \'height\' of a rectangle '
                          'shape must be provided')
-
-    points = ((pos_x, pos_y), (pos_x + width, pos_y),
-              (pos_x + width, pos_y + height), (pos_x, pos_y + height))
 
     shape = Poly(None, (
         (pos_x, pos_y), (pos_x + width, pos_y),

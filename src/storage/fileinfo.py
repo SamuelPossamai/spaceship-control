@@ -5,9 +5,8 @@ import shutil
 from pathlib import Path
 import subprocess
 from enum import Enum, Flag, auto as flagAuto
-from typing import NamedTuple
 from fnmatch import fnmatch
-from typing import TYPE_CHECKING, cast as typingcast
+from typing import NamedTuple, TYPE_CHECKING, cast as typingcast
 
 import json
 import toml
@@ -31,9 +30,11 @@ from nodetreeview import NodeValue # pylint: disable=wrong-import-order, wrong-i
 sys.path.pop(0)
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import (
         Sequence, Optional, Union, List, Any, Callable, Dict, MutableMapping
     )
+    # pylint: enable=ungrouped-imports
 
 class _FileInfo_FileMetadataType(Flag):
     ABSENT = 0
@@ -242,7 +243,7 @@ class FileInfo:
 
     @statistics_filepath.setter
     def statistics_filepath(
-        self, filepath: 'Optional[Union[str, Path]]') -> None:
+            self, filepath: 'Optional[Union[str, Path]]') -> None:
 
         self.__statistics_file = filepath
 
@@ -269,6 +270,36 @@ class FileInfo:
 
         return ''
 
+    def __readFileMetadata(self, path: 'Path',
+                           metadata_type: '_FileInfo_FileMetadataType') \
+                               -> 'Optional[Any]':
+
+        if metadata_type & self.FileMetadataType.FILE_INTERNAL:
+            try:
+                content = self.__getContent(
+                    str(path), self.FileDataType.METADATA,
+                    suffix_specified=True)
+            except Exception:
+                pass
+            else:
+                if content is not None and 'Metadata' in content:
+                    return content['Metadata']
+
+        if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
+
+            external_file_path = path.with_suffix(
+                ''.join(path.suffixes) + '.__metadata__')
+            try:
+                content = self.__getContent(
+                    str(external_file_path), self.FileDataType.METADATA)
+            except Exception:
+                pass
+            else:
+                if content is not None:
+                    return content
+
+        return None
+
     def __readMetadata(self, path: 'Path',
                        metadata_type: '_FileInfo_FileMetadataType',
                        is_directory: bool) -> 'Optional[Any]':
@@ -280,32 +311,10 @@ class FileInfo:
                                              self.FileDataType.METADATA)
                 except Exception:
                     pass
-        else:
-            if metadata_type & self.FileMetadataType.FILE_INTERNAL:
-                try:
-                    content = self.__getContent(
-                        str(path), self.FileDataType.METADATA,
-                        suffix_specified=True)
-                except Exception:
-                    pass
-                else:
-                    if content is not None and 'Metadata' in content:
-                        return content['Metadata']
 
-            if metadata_type & self.FileMetadataType.FILE_EXTERNAL:
+            return None
 
-                external_file_path = path.with_suffix(
-                    ''.join(path.suffixes) + '.__metadata__')
-                try:
-                    content = self.__getContent(
-                        str(external_file_path), self.FileDataType.METADATA)
-                except Exception:
-                    pass
-                else:
-                    if content is not None:
-                        return content
-
-        return None
+        return self.__readFileMetadata(path, metadata_type)
 
     def __listTree(self, base_path: 'Path', current_node: 'Node',
                    blacklist: 'Sequence[str]' = (), remove_suffix: bool = True,
@@ -599,7 +608,7 @@ class FileInfo:
 
     @staticmethod
     def __getFileDataTypeInfo(
-        filedatatype: 'FileDataType') -> '__DataTypeInfoType':
+            filedatatype: 'FileDataType') -> '__DataTypeInfoType':
 
         info = FileInfo.__DATA_TYPE_INFO.get(filedatatype)
 
