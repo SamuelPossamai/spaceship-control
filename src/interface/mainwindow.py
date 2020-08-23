@@ -523,6 +523,46 @@ class MainWindow(QMainWindow):
                            for child in objectives.children]
         })
 
+    def __handleDebugMessages(self) -> None:
+
+        for ship_name, queue in self.__debug_msg_queues.items():
+            tbrowser = self.__debug_messages_text_browsers.get(ship_name)
+            if tbrowser is None:
+                continue
+
+            try:
+                while not queue.empty():
+                    tbrowser.append(queue.get_nowait())
+            except EmptyQueueException:
+                pass
+
+    def __checkObjectives(self, ships: 'Sequence[Structure]') -> None:
+
+        objectives_complete = all(
+            tuple(objective.verify(self.__space, ships)
+                    for objective in self.__scenario_objectives))
+
+        if objectives_complete:
+            self.__objectives_result = True
+        else:
+
+            if self.__objectivesTimedOut() or any(
+                    tuple(objective.failed()
+                            for objective in self.__scenario_objectives)):
+
+                self.__objectives_result = False
+            else:
+                self.__objectives_result = None
+
+    def __dynamicGraphicItemsUpdate(self) -> None:
+
+        if self.__condition_graphic_items:
+            timestamp = time.time()
+            if self.__start_scenario_time is not None:
+                timestamp -= self.__start_scenario_time
+            for dyn_gitem in self.__condition_graphic_items:
+                dyn_gitem.evaluate(timestamp=timestamp)
+
     def __timerTimeout(self) -> None:
 
         if self.__current_scenario is None:
@@ -545,28 +585,8 @@ class MainWindow(QMainWindow):
             if self.__comm_engine is not None:
                 self.__comm_engine.step()
 
-            objectives_complete = all(
-                tuple(objective.verify(self.__space, ships)
-                      for objective in self.__scenario_objectives))
-
-            if objectives_complete:
-                self.__objectives_result = True
-            else:
-
-                if self.__objectivesTimedOut() or any(
-                        tuple(objective.failed()
-                              for objective in self.__scenario_objectives)):
-
-                    self.__objectives_result = False
-                else:
-                    self.__objectives_result = None
-
-            if self.__condition_graphic_items:
-                timestamp = time.time()
-                if self.__start_scenario_time is not None:
-                    timestamp -= self.__start_scenario_time
-                for dyn_gitem in self.__condition_graphic_items:
-                    dyn_gitem.evaluate(timestamp=timestamp)
+            self.__checkObjectives(ships)
+            self.__dynamicGraphicItemsUpdate()
 
         if self.__objectives_result is not None:
             if self.__one_shot is True:
@@ -581,16 +601,7 @@ class MainWindow(QMainWindow):
         for node_value in self.__objectives_node_value:
             node_value.update()
 
-        for ship_name, queue in self.__debug_msg_queues.items():
-            tbrowser = self.__debug_messages_text_browsers.get(ship_name)
-            if tbrowser is None:
-                continue
-
-            try:
-                while not queue.empty():
-                    tbrowser.append(queue.get_nowait())
-            except EmptyQueueException:
-                pass
+        self.__handleDebugMessages()
 
         self.__updateTitle()
 
