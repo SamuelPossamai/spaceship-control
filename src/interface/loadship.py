@@ -2,6 +2,7 @@
 from collections import namedtuple
 import json
 import math
+from typing import TYPE_CHECKING
 
 try:
     from queue import SimpleQueue
@@ -14,13 +15,26 @@ from .loadgraphicitem import loadGraphicItem
 
 from ..storage.fileinfo import FileInfo
 
+if TYPE_CHECKING:
+    from threading import Lock
+    from typing import Optional, Dict, Any, Callable, Sequence
+    import pymunk
+    from anytree import Node
+    from ..devices.communicationdevices import CommunicationEngine
+    from ..storage.loaders.scenarioloader import ShipInfo
+
+    DialogCallable = Callable[[Node], Sequence[str]]
+
 ShipInterfaceInfo = namedtuple('ShipInfo', (
     'device', 'gitem', 'widgets', 'thread',
     'msg_queue', 'condition_graphic_items'))
 
-def loadShip(space, ship_info, arg_scenario_info, lock,
-             ship_options_dialog=None, controller_options_dialog=None,
-             communication_engine=None) -> ShipInterfaceInfo:
+def loadShip(space: 'pymunk.Space', ship_info: 'ShipInfo',
+             arg_scenario_info: 'Dict[str, Any]', lock: 'Lock',
+             ship_options_dialog: 'DialogCallable' = None,
+             controller_options_dialog: 'DialogCallable' = None,
+             communication_engine: 'CommunicationEngine' = None) \
+                 -> 'Optional[ShipInterfaceInfo]':
 
     fileinfo = FileInfo()
 
@@ -38,8 +52,11 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
             ship_options = tuple(anytree.Node(model_option)
                                     for model_option in ship_model)
         else:
-            ship_options = fileinfo.listFilesTree(
-                FileInfo.FileDataType.SHIPMODEL).children
+            options_tree = fileinfo.listFilesTree(FileInfo.FileDataType.CONTROLLER)
+            if options_tree is None:
+                return None
+
+            ship_options = options_tree.children
 
         if ship_options_dialog is not None:
             ship_model = ship_options_dialog(ship_options)
@@ -64,8 +81,11 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
 
     if ship_controller is None:
 
-        controller_options = fileinfo.listFilesTree(
-            FileInfo.FileDataType.CONTROLLER).children
+        options_tree = fileinfo.listFilesTree(FileInfo.FileDataType.CONTROLLER)
+        if options_tree is None:
+            return None
+
+        controller_options = options_tree.children
 
         if controller_options_dialog is not None:
             ship_controller = controller_options_dialog(controller_options)
@@ -75,7 +95,7 @@ def loadShip(space, ship_info, arg_scenario_info, lock,
 
         ship_controller = '/'.join(ship_controller)
 
-    msg_queue = SimpleQueue()
+    msg_queue: 'SimpleQueue' = SimpleQueue()
     thread = fileinfo.loadController(ship_controller, ship, json_info,
                                      msg_queue, lock)
 

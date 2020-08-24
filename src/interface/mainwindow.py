@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from .loadship import ShipInterfaceInfo, SimpleQueue
     from .conditiongraphicspixmapitem import ConditionGraphicsPixmapItem
     from ..objectives.objective import Objective
+    from ..devices.structure import Structure
     from ..devices.communicationdevices import CommunicationEngine
     from ..storage.loaders.scenarioloader import ShipInfo, ObjectInfo
     from ..storage.loaders.imageloader import ImageInfo
