@@ -31,9 +31,14 @@ sys.path.pop(0)
 
 if TYPE_CHECKING:
     # pylint: disable=ungrouped-imports
+    from queue import SimpleQueue
+    from threading import Thread, Lock
     from typing import (
-        Sequence, Optional, Union, List, Any, Callable, Dict, MutableMapping
+        Sequence, Optional, Union, List, Any, Callable, Dict, MutableMapping,
+        Type, Tuple, Iterable
     )
+    from .loaders.scenarioloader import ScenarioInfo
+    from ..devices.structure import Structure
     # pylint: enable=ungrouped-imports
 
 class _FileInfo_FileMetadataType(Flag):
@@ -332,7 +337,8 @@ class FileInfo:
             if remove_suffix is True:
                 path = path.with_suffix('')
 
-            name = path.name
+            path_name = path.name
+            name: 'Union[str, NodeValue]' = path_name
 
             if metadata_type is not None:
                 metadata = self.__readMetadata(
@@ -342,10 +348,10 @@ class FileInfo:
                     if can_hide_files and metadata.get('hide', False):
                         continue
 
-                    label = str(metadata.get('name', name))
+                    label = str(metadata.get('name', path_name))
                     desc = metadata.get('description', '')
                     if desc is not None:
-                        name = NodeValue(name, str(desc), label=label)
+                        name = NodeValue(path_name, str(desc), label=label)
 
             new_node = Node(name, parent=current_node)
             if is_directory:
@@ -404,7 +410,10 @@ class FileInfo:
 
                         self.__addFiles(dest_path, (path,), mode=mode)
 
-    def __findSuffix(self, basename, filedatatype, valid_suffixes):
+    def __findSuffix(self, basename: str,
+                     filedatatype: 'FileDataType',
+                     valid_suffixes: 'Iterable[str]') \
+                         -> 'Tuple[Optional[Path], Optional[str]]':
 
         for valid_suffix in valid_suffixes:
             filepath = self.getPath(filedatatype, basename + valid_suffix)
@@ -418,6 +427,8 @@ class FileInfo:
                      suffix_specified: bool = False) \
                          -> 'Optional[MutableMapping[str, Any]]':
 
+        filepath: 'Optional[Union[str, Path]]'
+        suffix: 'Optional[str]'
         if suffix_specified:
             filepath = self.getPath(filedatatype, basename)
             suffix = Path(basename).suffix
@@ -432,11 +443,17 @@ class FileInfo:
 
         if suffix == '.json':
             with open(filepath) as file:
-                return json.load(file)
+                content = json.load(file)
+                if isinstance(content, dict):
+                    return content
+                return None
 
         if suffix in ('.yaml', '.yml'):
             with open(filepath) as file:
-                return yaml.safe_load(file)
+                content = yaml.safe_load(file)
+                if isinstance(content, dict):
+                    return content
+                return None
 
         return toml.load(filepath)
 
@@ -504,11 +521,12 @@ class FileInfo:
 
         return content
 
-    def loadUi(self, filename: str):
-        return uic.loadUiType(
-            self.getPath(self.FileDataType.UIDESIGN, filename))
+    def loadUi(self, filename: str) -> 'Tuple[Type, Type]':
+        return typingcast(
+            'Tuple[Type, Type]',
+            uic.loadUiType(self.getPath(self.FileDataType.UIDESIGN, filename)))
 
-    def loadScenario(self, scenario_name: str):
+    def loadScenario(self, scenario_name: str) -> 'Optional[ScenarioInfo]':
 
         prefixes = scenario_name.split('/')[:-1]
 
@@ -546,10 +564,11 @@ class FileInfo:
 
         return objectloader.loadObject(obj_content, space, prefixes=prefixes)
 
-    def loadController(self, controller_name, ship, json_info,
-                       debug_queue, lock):
+    def loadController(self, controller_name: str, ship: 'Structure',
+                       json_info: str, debug_queue: 'SimpleQueue',
+                       lock: 'Lock') -> 'Thread':
         return controllerloader.loadController(
-            self.getPath(self.FileDataType.CONTROLLER, controller_name),
+            str(self.getPath(self.FileDataType.CONTROLLER, controller_name)),
             ship, json_info, debug_queue, lock)
 
     def openFile(self, filedatatype: 'FileDataType', filename: str) -> None:

@@ -13,7 +13,14 @@ from ..storage.fileinfo import FileInfo
 from ..utils.expression import Expression
 
 if TYPE_CHECKING:
-    from typing import Tuple
+    from typing import Tuple, Dict, Sequence, Any, Optional, List
+    from pymunk import Shape
+    from PyQt5.QtGui import QColor
+    from PyQt5.QtWidgets import QGraphicsItem
+    from ..storage.loaders.imageloader import ImageInfo
+
+    GraphicItemInfo = Tuple[Optional[QGraphicsItem],
+                            Sequence[ConditionGraphicsPixmapItem]]
 
 def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
                    after_height: float) -> 'Tuple[float, float]':
@@ -33,8 +40,11 @@ def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
 
     return width_scale, height_scale
 
-def __loadGraphicItemImagePart(image, condition_variables,
-                               condition_graphic_items):
+def __loadGraphicItemImagePart(
+        image: 'ImageInfo',
+        condition_variables: 'Optional[Dict[str, Any]]',
+        condition_graphic_items: 'List[ConditionGraphicsPixmapItem]') \
+            -> 'QGraphicsItem':
 
     pixmap = QPixmap(str(
         FileInfo().getPath(FileInfo.FileDataType.IMAGE, image.name)))
@@ -95,8 +105,11 @@ def __loadGraphicItemImagePart(image, condition_variables,
 
     return gitem_part
 
-def loadGraphicItem(shapes, images, condition_variables=None,
-                    default_color=Qt.blue, group_z_value=0):
+def loadGraphicItem(shapes: 'Optional[Sequence[Shape]]',
+                    images: 'Sequence[ImageInfo]',
+                    condition_variables: 'Dict[str, Any]' = None,
+                    default_color: 'QColor' = Qt.blue,
+                    group_z_value: float = 0) -> 'GraphicItemInfo':
 
     if not images:
         if shapes is None:
@@ -110,7 +123,7 @@ def loadGraphicItem(shapes, images, condition_variables=None,
     gitem = QGraphicsItemGroup()
     gitem.setZValue(group_z_value)
 
-    condition_graphic_items = []
+    condition_graphic_items: 'List[ConditionGraphicsPixmapItem]' = []
     for image in images:
         gitem.addToGroup(__loadGraphicItemImagePart(
             image, condition_variables, condition_graphic_items))

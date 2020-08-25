@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from ..devices.communicationdevices import CommunicationEngine
     from ..storage.loaders.scenarioloader import ShipInfo
 
-    DialogCallable = Callable[[Node], Sequence[str]]
+    DialogCallable = Callable[[Node], Optional[Sequence[str]]]
 
 ShipInterfaceInfo = namedtuple('ShipInfo', (
     'device', 'gitem', 'widgets', 'thread',

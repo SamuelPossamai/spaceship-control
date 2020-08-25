@@ -207,6 +207,10 @@ def __createBasicReceiver(info: 'Dict[str, Any]', part: StructuralPart,
                           **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
 
+    if engine is None:
+        raise Exception('Communication module is present, but communication'
+                        ' was not enabled')
+
     return BasicReceiver(part, info.get('minimum_intensity', 0),
                          info['frequency'], info.get('tolerance', 0.5),
                          engine=engine), ()
@@ -215,6 +219,10 @@ def __createBasicSender(info: 'Dict[str, Any]', part: StructuralPart,
                         engine: 'CommunicationEngine' = None,
                         **_kwargs: 'Any') \
     -> 'Tuple[Device, Sequence[QWidget]]':
+
+    if engine is None:
+        raise Exception('Communication module is present, but communication'
+                        ' was not enabled')
 
     errors = __getErrorKwargs(info, {
         'Frequency': 'frequency_err_gen',

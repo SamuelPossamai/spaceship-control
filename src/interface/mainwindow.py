@@ -213,7 +213,7 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def __getOptionDialog(title: str, options: 'Tuple[anytree.Node]') \
-            -> 'Sequence[str]':
+            -> 'Optional[Sequence[str]]':
 
         dialog = ChooseFromTreeDialog(options)
         dialog.setWindowTitle(title)
@@ -234,11 +234,12 @@ class MainWindow(QMainWindow):
             self.loadScenario('/'.join(scenario))
 
     def __chooseShipDialog(self, ship_options: 'Tuple[anytree.Node]') \
-            -> 'Sequence[str]':
+            -> 'Optional[Sequence[str]]':
         return self.__getOptionDialog('Choose ship model', ship_options)
 
-    def __chooseControllerDialog(
-            self, controller_options: 'Tuple[anytree.Node]') -> 'Sequence[str]':
+    def __chooseControllerDialog(self,
+                                 controller_options: 'Tuple[anytree.Node]') \
+                                     -> 'Optional[Sequence[str]]':
 
         return self.__getOptionDialog('Choose controller', controller_options)
 
