@@ -63,6 +63,41 @@ class AngularSpeedSensor(Sensor):
     def read(self) -> float:
         return 180*self.structural_part.angular_velocity/pi
 
+class XAccelerationSensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='x-acceleration-sensor', **kwargs)
+        self.__last_x_speed = 0
+        self.__last_acc_val = 0
+
+    def act(self):
+        current_speed = self.structural_part.velocity.x
+        self.__last_acc_val = current_speed - self.__current_x_speed
+        self.__last_x_speed = current_speed
+
+    def read(self) -> float:
+        return self.__last_acc_val
+
+class YAccelerationSensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='y-acceleration-sensor', **kwargs)
+        self.__last_y_speed = 0
+
+    def act(self):
+        current_speed = self.structural_part.velocity.y
+        self.__last_acc_val = current_speed - self.__current_y_speed
+        self.__last_y_speed = current_speed
+
+    def read(self) -> float:
+        return self.__last_acc_val
+
+class AccelerationSensor(MultiSensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__({'x': XAccelerationSensor, 'y': YAccelerationSensor},
+                         *args, device_type='acceleration-sensor', **kwargs)
+
 class LineDetectSensor(Sensor):
 
     def __init__(self, *args: 'Any', distance: float = None,
