@@ -98,6 +98,20 @@ class AccelerationSensor(MultiSensor):
         super().__init__({'x': XAccelerationSensor, 'y': YAccelerationSensor},
                          *args, device_type='acceleration-sensor', **kwargs)
 
+class AngularAccelerationSensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='ang-acceleration-sensor', **kwargs)
+        self.__last_ang_speed = 0
+
+    def act(self):
+        current_speed = 180*self.structural_part.angular_velocity/pi
+        self.__last_acc_val = current_speed - self.__last_ang_speed
+        self.__last_ang_speed = current_speed
+
+    def read(self) -> float:
+        return self.__last_acc_val
+
 class LineDetectSensor(Sensor):
 
     def __init__(self, *args: 'Any', distance: float = None,
