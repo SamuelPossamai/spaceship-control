@@ -67,12 +67,12 @@ class XAccelerationSensor(Sensor):
 
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='x-acceleration-sensor', **kwargs)
-        self.__last_x_speed = 0
-        self.__last_acc_val = 0
+        self.__last_x_speed: float = 0
+        self.__last_acc_val: float = 0
 
-    def act(self):
-        current_speed = self.structural_part.velocity.x
-        self.__last_acc_val = current_speed - self.__current_x_speed
+    def act(self) -> None:
+        current_speed = self.structural_part.velocity[0]
+        self.__last_acc_val = current_speed - self.__last_x_speed
         self.__last_x_speed = current_speed
 
     def read(self) -> float:
@@ -82,11 +82,11 @@ class YAccelerationSensor(Sensor):
 
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='y-acceleration-sensor', **kwargs)
-        self.__last_y_speed = 0
+        self.__last_y_speed: float = 0
 
-    def act(self):
-        current_speed = self.structural_part.velocity.y
-        self.__last_acc_val = current_speed - self.__current_y_speed
+    def act(self) -> None:
+        current_speed = self.structural_part.velocity[1]
+        self.__last_acc_val = current_speed - self.__last_y_speed
         self.__last_y_speed = current_speed
 
     def read(self) -> float:
@@ -102,9 +102,9 @@ class AngularAccelerationSensor(Sensor):
 
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='ang-acceleration-sensor', **kwargs)
-        self.__last_ang_speed = 0
+        self.__last_ang_speed: float = 0
 
-    def act(self):
+    def act(self) -> None:
         current_speed = 180*self.structural_part.angular_velocity/pi
         self.__last_acc_val = current_speed - self.__last_ang_speed
         self.__last_ang_speed = current_speed

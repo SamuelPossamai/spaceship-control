@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING, cast as typingcast
 
 if TYPE_CHECKING:
     from typing import (
-        Any, Dict, Optional, Callable, Callable, Callable, Iterable, List, Tuple
+        Any, Dict, Optional, Callable, Callable, Callable, Iterable, List,
+        Tuple, Union
     )
 
 class Device(ABC):
@@ -28,7 +29,7 @@ class Device(ABC):
             self._device = device
             self.__valid_attrs = set(args)
 
-        def __getattr__(self, name) -> 'Any':
+        def __getattr__(self, name: str) -> 'Any':
             if name in self.__valid_attrs:
                 return getattr(self._device, name)
 
@@ -313,7 +314,7 @@ class DefaultDevice(Device): # pylint: disable=abstract-method
     def __showPropertiesStr(self) -> str:
         return ':'.join(f'{key}={val}' for key, val in self.properties)
 
-    __COMMANDS = {
+    __COMMANDS: 'Dict[str, Callable]' = {
 
         'device-type': deviceType,
         'device-desc': deviceDescription,
@@ -350,7 +351,8 @@ class DeviceGroup(DefaultDevice):
         def __init__(self, device: 'DeviceGroup', *args: str) -> None:
             super().__init__(device, 'deviceCount', *args)
 
-        def accessDevice(self, index, *args):
+        def accessDevice(self, index: 'Union[str, int]',
+                         *args: 'Union[str, int]') -> 'Optional[Device.Mirror]':
             device = typingcast(DeviceGroup, self._device).accessDevice(
                 index, *args)
             if device is None:
@@ -366,7 +368,8 @@ class DeviceGroup(DefaultDevice):
 
             return device.mirror
 
-    def __init__(self, device_type: str = 'device-group', **kwargs):
+    def __init__(self, device_type: str = 'device-group', **kwargs: 'Any') \
+            -> None:
         super().__init__(device_type=device_type, **kwargs)
 
         self.__device_list: 'List[Device]' = []
@@ -407,7 +410,8 @@ class DeviceGroup(DefaultDevice):
         """
         return len(self.__device_list)
 
-    def accessDevice(self, index, *args) -> 'Optional[Device]':
+    def accessDevice(self, index: 'Union[str, int]', *args: 'Union[str, int]') \
+            -> 'Optional[Device]':
 
         device: 'Optional[Device]'
         if isinstance(index, int):
@@ -458,7 +462,8 @@ class DeviceGroup(DefaultDevice):
 
         return super().communicate(input_)
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]', *args: 'Dict[str, Callable]') \
+            -> 'Any':
         return super().command(command, DeviceGroup.__COMMANDS, *args)
 
     @property

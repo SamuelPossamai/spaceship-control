@@ -526,14 +526,14 @@ class FileInfo:
             'Tuple[Type, Type]',
             uic.loadUiType(self.getPath(self.FileDataType.UIDESIGN, filename)))
 
-    def loadScenario(self, scenario_name: str) -> 'Optional[ScenarioInfo]':
+    def loadScenario(self, scenario_name: str) -> 'ScenarioInfo':
 
         prefixes = scenario_name.split('/')[:-1]
 
         scenario_content = self.__getScenarioContent(scenario_name)
 
         if scenario_content is None:
-            return None
+            raise Exception('Scenario was not found')
 
         scenario_content = configfileinheritance.mergeInheritedFiles(
             scenario_content, self.__getScenarioContent, prefixes=prefixes)
