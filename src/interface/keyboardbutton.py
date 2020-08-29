@@ -1,13 +1,17 @@
 
 from threading import Lock
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 
+if TYPE_CHECKING:
+    from PyQt5.QtGui import QKeyEvent, QFocusEvent, QColor
+
 class KeyboardButton(QPushButton):
 
-    def __init__(self, can_delete_after=100):
+    def __init__(self, can_delete_after: int = 100) -> None:
         super().__init__('kb')
 
         super().clicked.connect(self.__clicked)
@@ -24,7 +28,7 @@ class KeyboardButton(QPushButton):
 
         self.update()
 
-    def appendToQueue(self, val):
+    def appendToQueue(self, val: str) -> None:
         with self.__lock:
 
             if len(val) != self.__key_size:
@@ -36,22 +40,22 @@ class KeyboardButton(QPushButton):
 
             self.__queue.extend(val.encode('utf-8'))
 
-    def getAll(self):
+    def getAll(self) -> str:
         with self.__lock:
             content = self.__queue.decode('utf-8')
             self.__queue.clear()
 
         return content
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: 'QKeyEvent') -> None:
         self.appendToQueue('{:02x}{:08x}'.format(int(event.modifiers()) >> 24,
                                                  event.key()))
 
-    def focusOutEvent(self, _event):
+    def focusOutEvent(self, _event: 'QFocusEvent') -> None:
         self.__focus = False
         self.__setColor(Qt.red)
 
-    def __clicked(self):
+    def __clicked(self) -> None:
         if self.__focus:
             self.clearFocus()
         else:
@@ -59,7 +63,7 @@ class KeyboardButton(QPushButton):
             self.__focus = True
             self.__setColor(Qt.blue)
 
-    def __setColor(self, color):
+    def __setColor(self, color: 'QColor') -> None:
         pal = self.palette()
         pal.setColor(QPalette.Button, color)
         self.setPalette(pal)

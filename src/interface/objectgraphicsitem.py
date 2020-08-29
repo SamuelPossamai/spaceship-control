@@ -9,11 +9,15 @@ from PyQt5.QtGui import QPolygonF
 import pymunk
 
 if TYPE_CHECKING:
-    from typing import List
+    from typing import List, Sequence, Any, Optional
+    from pymunk import Shape
+    from PyQt5.QtGui import QColor, QPainter
+    from PyQt5.QtWidgets import QStyleOptionGraphicsItem, QWidget
 
 class DrawingPart(ABC):
 
-    def paint(self, painter, option, widget) -> None:
+    def paint(self, painter: 'QPainter', option: 'QStyleOptionGraphicsItem',
+              widget: 'Optional[QWidget]') -> None:
         painter.save()
         self._paint(painter, option, widget)
         painter.restore()
@@ -23,14 +27,15 @@ class DrawingPart(ABC):
         pass
 
     @abstractmethod
-    def _paint(self, painter, option, widget) -> None:
+    def _paint(self, painter: 'QPainter', option: 'QStyleOptionGraphicsItem',
+               widget: 'Optional[QWidget]') -> None:
         pass
 
 class EllipseDrawingPart(DrawingPart):
 
-    def __init__(self, height, width, color=None,
-                 border_color=None, brush_color=None,
-                 offset=QPointF(0, 0)):
+    def __init__(self, height: float, width: float, color: 'QColor' = None,
+                 border_color: 'QColor' = None, brush_color: 'QColor' = None,
+                 offset: 'QPointF' = QPointF(0, 0)) -> None:
         super().__init__()
 
         if border_color is None:
@@ -50,7 +55,9 @@ class EllipseDrawingPart(DrawingPart):
         return QRectF(-self.__b_radius, -self.__a_radius, 2*self.__a_radius,
                       2*self.__b_radius)
 
-    def _paint(self, painter, option, widget) -> None:
+    def _paint(self, painter: 'QPainter',
+               option: 'QStyleOptionGraphicsItem',
+               widget: 'Optional[QWidget]') -> None:
         if self.__b_color is not None:
             pen = painter.pen()
             pen.setColor(self.__b_color)
@@ -62,12 +69,13 @@ class EllipseDrawingPart(DrawingPart):
 
 class CircleDrawingPart(EllipseDrawingPart):
 
-    def __init__(self, radius, **kwargs) -> None:
+    def __init__(self, radius: float, **kwargs: 'Any') -> None:
         super().__init__(2*radius, 2*radius, **kwargs)
 
 class LineDrawingPart(DrawingPart):
 
-    def __init__(self, start, end, color=None, width=None) -> None:
+    def __init__(self, start: 'QPointF', end: 'QPointF', color: 'QColor' = None,
+                 width: float = None) -> None:
         super().__init__()
 
         self.__start = start
@@ -82,7 +90,9 @@ class LineDrawingPart(DrawingPart):
         end_y = self.__end.y()
         return QRectF(start_x, start_y, end_x - start_x, end_y - start_y)
 
-    def _paint(self, painter, option, widget) -> None:
+    def _paint(self, painter: 'QPainter',
+               option: 'QStyleOptionGraphicsItem',
+               widget: 'Optional[QWidget]') -> None:
         if self.__color is not None or self.__width is not None:
             pen = painter.pen()
             if self.__color is not None:
@@ -95,8 +105,10 @@ class LineDrawingPart(DrawingPart):
 
 class PolyDrawingPart(DrawingPart):
 
-    def __init__(self, points, color=None, border_color=None,
-                 brush_color=None) -> None:
+    def __init__(self, points: 'Sequence[QPointF]',
+                 color: 'QColor' = None,
+                 border_color: 'QColor' = None,
+                 brush_color: 'QColor' = None) -> None:
         super().__init__()
 
         if border_color is None:
@@ -124,7 +136,9 @@ class PolyDrawingPart(DrawingPart):
         max_y = max(self.__points, key=y_val_key).y()
         return QRectF(min_x, min_y, max_x - min_x, max_y - min_y)
 
-    def _paint(self, painter, option, widget) -> None:
+    def _paint(self, painter: 'QPainter',
+               option: 'QStyleOptionGraphicsItem',
+               widget: 'Optional[QWidget]') -> None:
         if self.__b_color is not None:
             pen = painter.pen()
             pen.setColor(self.__b_color)
@@ -136,7 +150,8 @@ class PolyDrawingPart(DrawingPart):
 
 class ObjectGraphicsItem(QGraphicsItem):
 
-    def __init__(self, shapes, color=Qt.blue) -> None:
+    def __init__(self, shapes: 'Sequence[Shape]',
+                 color: 'QColor' = Qt.blue) -> None:
         super().__init__()
 
         self.__parts: 'List[DrawingPart]' = []
@@ -177,7 +192,8 @@ class ObjectGraphicsItem(QGraphicsItem):
     def boundingRect(self) -> QRectF:
         return self.__bounding_rect
 
-    def paint(self, painter, option, widget) -> None:
+    def paint(self, painter: 'QPainter', option: 'QStyleOptionGraphicsItem',
+              widget: 'Optional[QWidget]') -> None:
 
         for part in self.__parts:
             part.paint(painter, option, widget)

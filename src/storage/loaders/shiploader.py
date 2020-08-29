@@ -23,7 +23,9 @@ from .shapeloader import loadShapes
 from .imageloader import loadImages
 
 if TYPE_CHECKING:
-    from typing import Tuple, Sequence, Any, Dict, List, Callable, Optional
+    from typing import (
+        Tuple, Sequence, Any, MutableMapping, List, Callable, Optional
+    )
     import pymunk
     from PyQt5.QtWidgets import QWidget
     from ...devices.device import Device
@@ -33,11 +35,12 @@ if TYPE_CHECKING:
     CreateDeviceCallable = Callable[..., Tuple[Device, Sequence[QWidget]]]
 
     DeviceKindType = Tuple[Optional[str], Optional[str], Optional[str]]
-    DeviceCreateFunctionsType = Dict[DeviceKindType, CreateDeviceCallable]
+    DeviceCreateFunctionsType = MutableMapping[DeviceKindType,
+                                               CreateDeviceCallable]
 
 ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 
-def __loadError(info: 'Dict[str, Any]') -> ErrorGenerator:
+def __loadError(info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
     error_max = info.get('error_max', 0)
 
@@ -65,21 +68,23 @@ def __loadError(info: 'Dict[str, Any]') -> ErrorGenerator:
                           offset_max=offset_max,
                           error_max_minfac=error_max_minfac)
 
-def __loadErrorDict(
-        errors: 'Dict[str, Dict[str, Any]]') -> 'Dict[str, ErrorGenerator]':
+def __loadErrorMutableMapping(
+        errors: 'MutableMapping[str, MutableMapping[str, Any]]') \
+            -> 'MutableMapping[str, ErrorGenerator]':
 
     return {name: __loadError(info) for name, info in errors.items()
             if not name.startswith('__')}
 
-def __getErrorKwargs(content: 'Dict[str, Dict[str, Any]]',
-                     errors: 'Dict[str, str]') -> 'Dict[str, ErrorGenerator]':
+def __getErrorKwargs(content: 'MutableMapping[str, MutableMapping[str, Any]]',
+                     errors: 'MutableMapping[str, str]') \
+                         -> 'MutableMapping[str, ErrorGenerator]':
 
     errors_content = content.get('Error')
 
     if errors_content is None:
         return {}
 
-    errors_dict = __loadErrorDict(errors_content)
+    errors_dict = __loadErrorMutableMapping(errors_content)
 
     return {key: value for key, value in
             ((error_keyword, errors_dict.get(error_tablename))
@@ -87,7 +92,8 @@ def __getErrorKwargs(content: 'Dict[str, Dict[str, Any]]',
             if value is not None}
 
 def __engineErrorKwargs(
-        content: 'Dict[str, Dict[str, Any]]') -> 'Dict[str, ErrorGenerator]':
+        content: 'MutableMapping[str, MutableMapping[str, Any]]') \
+            -> 'MutableMapping[str, ErrorGenerator]':
 
     return __getErrorKwargs(content, {
         'Thrust': 'thrust_error_gen',
@@ -95,9 +101,9 @@ def __engineErrorKwargs(
         'Position': 'position_error_gen'
     })
 
-def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart,
+def __createLinearEngine(info: 'MutableMapping[str, Any]', part: StructuralPart,
                          **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+        -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LinearEngine(
         part,
@@ -109,41 +115,43 @@ def __createLinearEngine(info: 'Dict[str, Any]', part: StructuralPart,
         intensity_offset=info.get('intensity_offset', 0),
         **__engineErrorKwargs(info)), ()
 
-def __createPositionSensor(info: 'Dict[str, Any]', part: StructuralPart,
+def __createPositionSensor(info: 'MutableMapping[str, Any]', part: StructuralPart,
                            **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+        -> 'Tuple[Device, Sequence[QWidget]]':
 
     return PositionSensor(part, info['reading_time'],
                           read_error_max=info.get('error_max', 0),
                           read_offset_max=info.get('offset_max', 0)), ()
 
-def __createAngleSensor(info: 'Dict[str, Any]', part: StructuralPart,
+def __createAngleSensor(info: 'MutableMapping[str, Any]', part: StructuralPart,
                         **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+        -> 'Tuple[Device, Sequence[QWidget]]':
 
     return AngleSensor(part, info['reading_time'],
                        read_error_max=info.get('error_max', 0),
                        read_offset_max=info.get('offset_max', 0)), ()
 
-def __createSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart,
+def __createSpeedSensor(info: 'MutableMapping[str, Any]', part: StructuralPart,
                         **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+        -> 'Tuple[Device, Sequence[QWidget]]':
 
     return SpeedSensor(part, info['reading_time'],
                        read_error_max=info.get('error_max', 0),
                        read_offset_max=info.get('offset_max', 0),
                        angle=info.get('angle', 0)), ()
 
-def __createAngularSpeedSensor(info: 'Dict[str, Any]', part: StructuralPart) \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+def __createAngularSpeedSensor(info: 'MutableMapping[str, Any]',
+                               part: StructuralPart) \
+                                   -> 'Tuple[Device, Sequence[QWidget]]':
 
     return AngularSpeedSensor(part, info['reading_time'],
                               read_error_max=info.get('error_max', 0),
                               read_offset_max=info.get('offset_max', 0)), ()
 
-def __createObstacleDistanceSensor(info: 'Dict[str, Any]', part: StructuralPart,
+def __createObstacleDistanceSensor(info: 'MutableMapping[str, Any]',
+                                   part: StructuralPart,
                                    **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                                       -> 'Tuple[Device, Sequence[QWidget]]':
 
     return LineDetectSensor(part, info['reading_time'],
                             read_error_max=info.get('error_max', 0),
@@ -151,9 +159,9 @@ def __createObstacleDistanceSensor(info: 'Dict[str, Any]', part: StructuralPart,
                             angle=info.get('angle'),
                             distance=info.get('distance')), ()
 
-def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart,
-                        **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+def __createTextDisplay(info: 'MutableMapping[str, Any]',
+                        _part: StructuralPart,
+                        **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = TextDisplayDevice()
 
@@ -164,9 +172,8 @@ def __createTextDisplay(info: 'Dict[str, Any]', _part: StructuralPart,
 
     return device, (label,)
 
-def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart,
-                    **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+def __createConsole(info: 'MutableMapping[str, Any]', _part: StructuralPart,
+                    **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ConsoleDevice(info.get('columns', 20), info.get('rows', 5))
 
@@ -177,9 +184,10 @@ def __createConsole(info: 'Dict[str, Any]', _part: StructuralPart,
 
     return (device, (text,))
 
-def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart,
+def __createKeyboardReceiver(info: 'MutableMapping[str, Any]',
+                             _part: StructuralPart,
                              **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                                 -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = KeyboardReceiverDevice()
 
@@ -189,9 +197,9 @@ def __createKeyboardReceiver(info: 'Dict[str, Any]', _part: StructuralPart,
 
     return device, (button,)
 
-def __createButton(info: 'Dict[str, Any]', _part: StructuralPart,
+def __createButton(info: 'MutableMapping[str, Any]', _part: StructuralPart,
                    **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                       -> 'Tuple[Device, Sequence[QWidget]]':
 
     device = ButtonDevice()
 
@@ -202,10 +210,10 @@ def __createButton(info: 'Dict[str, Any]', _part: StructuralPart,
 
     return device, (button,)
 
-def __createBasicReceiver(info: 'Dict[str, Any]', part: StructuralPart,
+def __createBasicReceiver(info: 'MutableMapping[str, Any]', part: StructuralPart,
                           engine: 'CommunicationEngine' = None,
                           **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                              -> 'Tuple[Device, Sequence[QWidget]]':
 
     if engine is None:
         raise Exception('Communication module is present, but communication'
@@ -215,10 +223,10 @@ def __createBasicReceiver(info: 'Dict[str, Any]', part: StructuralPart,
                          info['frequency'], info.get('tolerance', 0.5),
                          engine=engine), ()
 
-def __createBasicSender(info: 'Dict[str, Any]', part: StructuralPart,
+def __createBasicSender(info: 'MutableMapping[str, Any]', part: StructuralPart,
                         engine: 'CommunicationEngine' = None,
                         **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                            -> 'Tuple[Device, Sequence[QWidget]]':
 
     if engine is None:
         raise Exception('Communication module is present, but communication'
@@ -232,19 +240,19 @@ def __createBasicSender(info: 'Dict[str, Any]', part: StructuralPart,
     return (BasicSender(part, engine, info['intensity'], info['frequency'],
                         **errors), ())
 
-def __createConfReceiver(info: 'Dict[str, Any]', part: StructuralPart,
+def __createConfReceiver(info: 'MutableMapping[str, Any]', part: StructuralPart,
                          engine: 'CommunicationEngine' = None,
                          **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                             -> 'Tuple[Device, Sequence[QWidget]]':
 
     return ConfigurableReceiver(part, info.get('minimum_intensity', 0),
                                 info['frequency'], info.get('tolerance', 0.5),
                                 engine=engine), ()
 
-def __createConfSender(info: 'Dict[str, Any]', part: StructuralPart,
+def __createConfSender(info: 'MutableMapping[str, Any]', part: StructuralPart,
                        engine: 'CommunicationEngine' = None,
                        **_kwargs: 'Any') \
-    -> 'Tuple[Device, Sequence[QWidget]]':
+                           -> 'Tuple[Device, Sequence[QWidget]]':
 
     errors = __getErrorKwargs(info, {
         'Frequency': 'frequency_err_gen',
@@ -274,7 +282,8 @@ __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 }
 
 def __addDevice(
-        info: 'Dict[str, Any]', parts: 'Dict[str, StructuralPart]',
+        info: 'MutableMapping[str, Any]',
+        parts: 'MutableMapping[str, StructuralPart]',
         device_type: str, **kwargs: 'Any') -> 'Sequence[QWidget]':
 
     type_and_model = (device_type, info.get('type'), info.get('model'))
@@ -296,9 +305,10 @@ def __addDevice(
 
     return widgets
 
-def __loadShipStructure(ship_info: 'Dict[str, Any]', name: str,
-                        space: 'pymunk.Space', body: 'pymunk.Body') \
-                            -> 'Tuple[Structure, Dict[str, StructuralPart]]':
+def __loadShipStructure(
+        ship_info: 'MutableMapping[str, Any]', name: str,
+        space: 'pymunk.Space', body: 'pymunk.Body') \
+            -> 'Tuple[Structure, MutableMapping[str, StructuralPart]]':
 
     ship = Structure(name, space, body, device_type='ship')
 
@@ -312,10 +322,10 @@ def __loadShipStructure(ship_info: 'Dict[str, Any]', name: str,
 
     return ship, parts
 
-def loadShip(ship_info: 'Dict[str, Any]', name: str, space: 'pymunk.Space',
-             prefixes: 'Sequence[str]' = (),
+def loadShip(ship_info: 'MutableMapping[str, Any]', name: str,
+             space: 'pymunk.Space', prefixes: 'Sequence[str]' = (),
              communication_engine: 'Optional[CommunicationEngine]' = None) \
-    -> 'ShipInfo':
+        -> 'ShipInfo':
 
     shapes = loadShapes(ship_info['Shape'])
 

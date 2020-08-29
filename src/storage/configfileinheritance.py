@@ -6,8 +6,13 @@ from ..utils.dictutils import writeEverywhere
 
 if TYPE_CHECKING:
     from typing import (
-        Tuple, Sequence, Dict, Any, List, Collection, Optional, Union, Callable
+        Tuple, Sequence, Any, Collection, Optional, Union, Callable,
+        MutableSequence, MutableMapping
     )
+
+    GetParentCallableType = Callable[[str], MutableMapping[str, Any]]
+    ContentElementType = Union[MutableMapping[str, Any],
+                               Optional[MutableSequence[Any]]]
 
 def resolvePrefix(name: str, prefixes: 'Sequence[str]') \
         -> 'Tuple[str, Sequence[str]]':
@@ -37,8 +42,9 @@ def resolvePrefix(name: str, prefixes: 'Sequence[str]') \
 
     return resolved_name, new_prefix
 
-def __mergeContentList(child_content: 'List[Any]',
-                       parent_content: 'List[Any]') -> 'List[Any]':
+def __mergeContentList(child_content: 'MutableSequence[Any]',
+                       parent_content: 'MutableSequence[Any]') \
+                           -> 'MutableSequence[Any]':
 
     named_elements = {}
     unnamed_elements = []
@@ -72,8 +78,8 @@ def __mergeContentList(child_content: 'List[Any]',
 
     return final_value
 
-def __mergeContentDictWriteParent(child_content: 'Dict[str, Any]',
-                                  parent_content: 'Dict[str, Any]',
+def __mergeContentDictWriteParent(child_content: 'MutableMapping[str, Any]',
+                                  parent_content: 'MutableMapping[str, Any]',
                                   delete_elements: 'Collection[str]') -> None:
 
     for key, parent_value in parent_content.items():
@@ -92,9 +98,9 @@ def __mergeContentDictWriteParent(child_content: 'Dict[str, Any]',
         else:
             child_content[key] = final_value
 
-def __mergeContentDict(child_content: 'Dict[str, Any]',
-                       parent_content: 'Dict[str, Any]') \
-                           -> 'Optional[Dict[str, Any]]':
+def __mergeContentDict(child_content: 'MutableMapping[str, Any]',
+                       parent_content: 'MutableMapping[str, Any]') \
+                           -> 'Optional[MutableMapping[str, Any]]':
 
     parent_inheritance_props = parent_content.get('Inheritance')
 
@@ -129,9 +135,9 @@ def __mergeContentDict(child_content: 'Dict[str, Any]',
 
     return child_content
 
-def mergeContent(child_content: 'Union[Dict[str, Any], List[Any]]',
-                 parent_content: 'Union[Dict[str, Any], List[Any]]') \
-                     -> 'Optional[Union[Dict[str, Any], List[Any]]]':
+def mergeContent(child_content: 'ContentElementType',
+                 parent_content: 'ContentElementType') \
+                     -> 'Optional[ContentElementType]':
 
     if isinstance(child_content, dict) and isinstance(parent_content, dict):
         return __mergeContentDict(child_content, parent_content)
@@ -141,9 +147,10 @@ def mergeContent(child_content: 'Union[Dict[str, Any], List[Any]]',
 
     return child_content
 
-def mergeInheritedFiles(file_content: 'Dict[str, Any]',
-                        get_parent_func: 'Callable[[str], Dict[str, Any]]',
-                        prefixes: 'Sequence[str]' = ()) -> 'Dict[str, Any]':
+def mergeInheritedFiles(file_content: 'MutableMapping[str, Any]',
+                        get_parent_func: 'GetParentCallableType',
+                        prefixes: 'Sequence[str]' = ()) \
+                            -> 'MutableMapping[str, Any]':
 
     config_content = file_content.get('Inheritance')
 

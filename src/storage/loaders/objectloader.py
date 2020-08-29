@@ -10,14 +10,13 @@ from .imageloader import loadImages
 ObjectInfo = namedtuple('ObjectInfo', ('body', 'images'))
 
 if TYPE_CHECKING:
-    from typing import Tuple, Sequence, Any, Dict
+    from typing import Tuple, Sequence, Any, MutableMapping
     import pymunk
     from PyQt5.QtWidgets import QWidget
     from ...devices.structure import Structure
 
-def loadObject(obj_info: 'Dict[str, Any]', space: 'pymunk.Space',
-               prefixes: 'Sequence[str]' = ()) \
-    -> 'Tuple[Structure, Sequence[QWidget]]':
+def loadObject(obj_info: 'MutableMapping[str, Any]', space: 'pymunk.Space',
+               prefixes: 'Sequence[str]' = ()) -> 'ObjectInfo':
 
     config_content = obj_info.get('Config', {})
 

@@ -37,8 +37,13 @@ if TYPE_CHECKING:
         Sequence, Optional, Union, List, Any, Callable, Dict, MutableMapping,
         Type, Tuple, Iterable
     )
+    from pymunk import Space
+    from PyQt5.QtWidgets import QWidget
     from .loaders.scenarioloader import ScenarioInfo
+    from .loaders.shiploader import ShipInfo
+    from .loaders.objectloader import ObjectInfo
     from ..devices.structure import Structure
+    from ..devices.communicationdevices import CommunicationEngine
     # pylint: enable=ungrouped-imports
 
 class _FileInfo_FileMetadataType(Flag):
@@ -540,8 +545,9 @@ class FileInfo:
 
         return scenarioloader.loadScenario(scenario_content, prefixes=prefixes)
 
-    def loadShip(self, model, name, space, communication_engine=None,
-                 variables=None):
+    def loadShip(self, model: str, name: str, space: 'Space',
+                 communication_engine: 'CommunicationEngine' = None,
+                 variables: 'Dict[str, Any]' = None) -> 'ShipInfo':
 
         prefixes = model.split('/')[:-1]
 
@@ -553,11 +559,16 @@ class FileInfo:
         return shiploader.loadShip(ship_content, name, space, prefixes=prefixes,
                                    communication_engine=communication_engine)
 
-    def loadObject(self, model, space, variables=None):
+    def loadObject(self, model: str, space: 'Space',
+                   variables: 'Dict[str, Any]' = None) \
+                       -> 'ObjectInfo':
 
         prefixes = model.split('/')[:-1]
 
         obj_content = self.__getObjectContent(model, variables=variables)
+
+        if obj_content is None:
+            raise Exception("Object model \'{model}\' not found")
 
         obj_content = configfileinheritance.mergeInheritedFiles(
             obj_content, self.__getObjectContent, prefixes=prefixes)
