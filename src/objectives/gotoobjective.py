@@ -6,14 +6,15 @@ from  pymunk import Vec2d
 from .objective import Objective
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Sequence
+    from typing import Any, Dict, Sequence, Tuple
     import pymunk
     from ..devices.structure import Structure
 
 class GoToObjective(Objective):
 
-    def __init__(self, position, distance, name=None, description=None,
-                 **kwargs):
+    def __init__(self, position: 'Tuple[float, float]', distance: float,
+                 name: str = None, description: str = None,
+                 **kwargs: 'Any') -> None:
         if name is None:
             name = f'Go to position({position[0]}, {position[1]})'
 

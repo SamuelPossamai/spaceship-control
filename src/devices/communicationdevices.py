@@ -10,7 +10,7 @@ from pymunk import Vec2d
 from .device import DefaultDevice
 
 if TYPE_CHECKING:
-    from typing import Any, List, Tuple
+    from typing import Any, List, Tuple, Dict, Callable
     from .structure import StructuralPart
 
 class CommunicationEngine:
@@ -152,7 +152,8 @@ class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
 
         self.__received_signals.append(intensity - self._sensibility)
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable]') -> 'Any':
         return DefaultDevice.command(self, command,
                                      BasicReceiver.__COMMANDS, *args)
 
@@ -175,7 +176,8 @@ class ConfigurableReceiver(BasicReceiver):
         self.__min_freq = min_frequency
         self.__max_freq = max_frequency
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, ConfigurableReceiver.__COMMANDS, *args)
 
     @property
@@ -187,7 +189,7 @@ class ConfigurableReceiver(BasicReceiver):
         if self.__min_freq <= self._frequency <= self.__max_freq:
             self._frequency = value
 
-    __COMMANDS = {
+    __COMMANDS: 'Dict[str, Callable]' = {
         'set-frequency': lambda self, val:
                          ConfigurableReceiver.frequency.fset(self, float(val)),
         'min-frequency': lambda self: self.__min_freq, # pylint: disable=protected-access
@@ -226,10 +228,11 @@ class BasicSender(DefaultDevice):
 
         self.__engine.newSignal(self.__part.position, intensity, frequency)
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, BasicSender.__COMMANDS, *args)
 
-    __COMMANDS = {
+    __COMMANDS: 'Dict[str, Callable]' = {
         'get-frequency': lambda self: self._frequency, # pylint: disable=protected-access
         'get-intensity': lambda self: self._intensity, # pylint: disable=protected-access
         'send-signal': send
@@ -247,7 +250,8 @@ class ConfigurableSender(BasicSender):
         self.__min_int = min_intensity
         self.__max_int = max_intensity
 
-    def command(self, command: 'List[str]', *args) -> 'Any':
+    def command(self, command: 'List[str]',
+                *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, ConfigurableSender.__COMMANDS, *args)
 
     @property
@@ -268,7 +272,7 @@ class ConfigurableSender(BasicSender):
         if self.__min_int <= self._intensity <= self.__max_int:
             self._intensity = value
 
-    __COMMANDS = {
+    __COMMANDS: 'Dict[str, Callable]' = {
         'set-frequency': lambda self, val:
                          ConfigurableSender.frequency.fset(self, float(val)),
         'set-intensity': lambda self, val:

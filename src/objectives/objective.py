@@ -11,7 +11,9 @@ from typing import TYPE_CHECKING
 from anytree import Node
 
 if TYPE_CHECKING:
-    from typing import Sequence, Optional, Dict, Any, Union, Iterable, Tuple
+    from typing import (
+        Sequence, Optional, Dict, Any, Union, Iterable, Tuple, Collection
+    )
     import pymunk
     from ..devices.structure import Structure
 
@@ -25,7 +27,7 @@ class Objective(ABC):
 
     def __init__(self, name: str, description: str,
                  required: bool = None, negation: bool = False,
-                 valid_ships: 'Sequence[str]' = None) -> None:
+                 valid_ships: 'Collection[str]' = None) -> None:
         super().__init__()
 
         self.__name = name
@@ -51,7 +53,7 @@ class Objective(ABC):
         return self.__failed
 
     @property
-    def valid_ships(self) -> 'Optional[Sequence[str]]':
+    def valid_ships(self) -> 'Optional[Collection[str]]':
         return self.__valid_ships
 
     @property
@@ -167,7 +169,7 @@ class ObjectiveGroup(Objective):
                  required_quantity: int = None,
                  sequential: bool = False,
                  times: int = 1,
-                 **kwargs) -> None:
+                 **kwargs: 'Any') -> None:
 
         if sequential and required_quantity is not None:
             raise ValueError('ObjectiveGroup: It\'s not possible to specify'
@@ -187,7 +189,7 @@ class ObjectiveGroup(Objective):
         self.__times_left = times
 
     @property
-    def subobjectives(self):
+    def subobjectives(self) -> 'Sequence[Objective]':
         return self.__subobjectives
 
     def objectivesStatus(self) -> 'Iterable[Tuple[Objective, bool]]':
@@ -243,7 +245,7 @@ class ObjectiveGroup(Objective):
 
     @staticmethod
     def _getDefaultDescription(subobjectives: 'Sequence[Objective]',
-                               **kwargs) -> str:
+                               **kwargs: 'Any') -> str:
 
         required_quantity = kwargs.get('required_quantity')
         if required_quantity is not None:

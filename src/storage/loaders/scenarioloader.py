@@ -14,7 +14,7 @@ from ...objectives.timedobjective import TimedObjectiveGroup
 from ...devices.communicationdevices import CommunicationEngine
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Optional, Sequence
+    from typing import Any, MutableMapping, Optional, Sequence
     from ...objectives.objective import Objective
 
 ObjectInfo = namedtuple('ObjectInfo', (
@@ -33,7 +33,7 @@ ScenarioInfo = namedtuple('ScenarioInfo', (
     'physics_engine'
 ))
 
-def __createGoToObjective(objective_content: 'Dict[str, Any]') \
+def __createGoToObjective(objective_content: 'MutableMapping[str, Any]') \
         -> 'GoToObjective':
 
     position = (objective_content['x'], objective_content['y'])
@@ -44,7 +44,7 @@ def __createGoToObjective(objective_content: 'Dict[str, Any]') \
 
     return GoToObjective(position, distance, **kwargs)
 
-def __createObjectiveGroup(objective_content: 'Dict[str, Any]') \
+def __createObjectiveGroup(objective_content: 'MutableMapping[str, Any]') \
         -> 'ObjectiveGroup':
 
     valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
@@ -56,7 +56,7 @@ def __createObjectiveGroup(objective_content: 'Dict[str, Any]') \
     return ObjectiveGroup(loadObjectives(objective_content['Objective']),
                           **kwargs)
 
-def __createTimedObjectiveGroup(objective_content: 'Dict[str, Any]') \
+def __createTimedObjectiveGroup(objective_content: 'MutableMapping[str, Any]') \
         -> 'TimedObjectiveGroup':
 
     valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
@@ -84,7 +84,7 @@ def __resolveShipModelPrefix(model: str, prefixes: 'Sequence[str]') -> str:
 
     return model_after
 
-def __readShipInfo(ship_content: 'Dict[str, Any]',
+def __readShipInfo(ship_content: 'MutableMapping[str, Any]',
                    prefixes: 'Sequence[str]') -> 'ShipInfo':
 
     model_metadata = ship_content.get('__model_attr_meta__')
@@ -106,7 +106,7 @@ def __readShipInfo(ship_content: 'Dict[str, Any]',
 
     variables_content = ship_content.get('Variable')
 
-    variables: 'Optional[Dict[str, Any]]'
+    variables: 'Optional[MutableMapping[str, Any]]'
     if variables_content:
         variables = {variable['id']: variable['value']
                      for variable in variables_content}
@@ -125,7 +125,7 @@ def __readShipInfo(ship_content: 'Dict[str, Any]',
 
     return ShipInfo(**ship_info_kwargs)
 
-def __readObjectInfo(obj_content: 'Dict[str, Any]',
+def __readObjectInfo(obj_content: 'MutableMapping[str, Any]',
                      prefixes: 'Sequence[str]') -> 'ObjectInfo':
 
     model_metadata = obj_content.get('__model_attr_meta__')
@@ -145,7 +145,7 @@ def __readObjectInfo(obj_content: 'Dict[str, Any]',
 
     variables_content = obj_content.get('Variable')
 
-    variables: 'Optional[Dict[str, Any]]'
+    variables: 'Optional[MutableMapping[str, Any]]'
     if variables_content:
         variables = {variable['id']: variable['value']
                      for variable in variables_content}
@@ -155,7 +155,8 @@ def __readObjectInfo(obj_content: 'Dict[str, Any]',
     return ObjectInfo(model=model, position=position, angle=angle,
                       variables=variables)
 
-def loadPhysicsEngine(engine_info: 'Dict[str, Any]') -> 'PhysicsEngineInfo':
+def loadPhysicsEngine(engine_info: 'MutableMapping[str, Any]') \
+        -> 'PhysicsEngineInfo':
 
     gravity_dict = engine_info.get('Gravity')
     if gravity_dict is not None:
@@ -169,19 +170,19 @@ def loadPhysicsEngine(engine_info: 'Dict[str, Any]') -> 'PhysicsEngineInfo':
                              engine_info.get('collision_persistence', 3),
                              engine_info.get('iterations', 10))
 
-def loadCommunicationEngine(engine_info: 'Dict[str, Any]') \
+def loadCommunicationEngine(engine_info: 'MutableMapping[str, Any]') \
         -> 'CommunicationEngine':
 
     return CommunicationEngine(engine_info.get('max_noise', 10),
                                engine_info.get('speed', 10000),
                                engine_info.get('negligible_intensity', 10000))
 
-def loadObjectives(objectives: 'Sequence[Dict[str, Any]]') \
+def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
         -> 'Sequence[Objective]':
     return tuple(__OBJECTIVE_CREATE_FUNCTIONS[objective['type']](objective)
                  for objective in objectives)
 
-def loadScenario(scenario_info: 'Dict[str, Any]',
+def loadScenario(scenario_info: 'MutableMapping[str, Any]',
                  prefixes: 'Sequence[str]' = ()) -> 'ScenarioInfo':
 
     scenario_content = scenario_info.get('Scenario', {})

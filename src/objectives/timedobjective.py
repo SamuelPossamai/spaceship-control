@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from .objective import ObjectiveGroup
 
 if TYPE_CHECKING:
-    from typing import Union, Sequence
+    from typing import Sequence, Any
     import pymunk
     from .objective import Objective
     from ..devices.structure import Structure
@@ -13,10 +13,10 @@ if TYPE_CHECKING:
 class TimedObjectiveGroup(ObjectiveGroup):
 
     def __init__(self, subobjectives: 'Sequence[Objective]',
-                 time_limit: 'Union[int, float]',
+                 time_limit: float,
                  name: str = 'Timed objectives list',
                  description: str = None,
-                 **kwargs) -> None:
+                 **kwargs: 'Any') -> None:
 
         if description is None:
             description = self._getDefaultDescription(

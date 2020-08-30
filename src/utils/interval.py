@@ -45,7 +45,7 @@ class IntervalSet:
         else:
             bisect.insort(self.__sequence, interval)
 
-    def isInside(self, val) -> bool:
+    def isInside(self, val: float) -> bool:
 
         if val in self.__constants:
             return True
@@ -63,5 +63,5 @@ class IntervalSet:
     def __len__(self) -> int:
         return len(self.__sequence)
 
-    def __iter__(self):
+    def __iter__(self) -> 'Iterable':
         return iter(self.__sequence)

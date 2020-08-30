@@ -4,17 +4,17 @@ from typing import TYPE_CHECKING
 from .expressionevaluator import ExpressionEvaluator
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Dict
 
 class Expression:
 
-    def __init__(self, expression: str, default_value=None) -> None:
+    def __init__(self, expression: str, default_value: 'Any' = None) -> None:
         self.__expr = ExpressionEvaluator.parse(expression)
         self.__evaluator = ExpressionEvaluator()
         self.__default_value = default_value
 
     @property
-    def context(self):
+    def context(self) -> 'Dict[str, Any]':
         return self.__evaluator.names
 
     def evaluate(self, **kwargs: 'Any') -> 'Any':
@@ -28,8 +28,8 @@ class Expression:
 
 class Condition(Expression):
 
-    def __init__(self, expression: str, default_value=False) -> None:
+    def __init__(self, expression: str, default_value: bool = False) -> None:
         super().__init__(expression, default_value=default_value)
 
-    def evaluate(self, **kwargs) -> 'Any':
+    def evaluate(self, **kwargs: 'Any') -> 'Any':
         return bool(super().evaluate(**kwargs))
