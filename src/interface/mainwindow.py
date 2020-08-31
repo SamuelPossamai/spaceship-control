@@ -36,6 +36,7 @@ UiMainWindow, _ = FileInfo().loadUi('mainwindow.ui') # pylint: disable=invalid-n
 sys.path.pop(0)
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import Tuple, Any, Dict, Optional, List, Sequence
     from PyQt5.QtWidgets import QGraphicsItem, QWidget
     from PyQt5.QtGui import QKeyEvent, QMoveEvent, QResizeEvent, QCloseEvent
@@ -46,6 +47,7 @@ if TYPE_CHECKING:
     from ..devices.communicationdevices import CommunicationEngine
     from ..storage.loaders.scenarioloader import ShipInfo, ObjectInfo
     from ..storage.loaders.imageloader import ImageInfo
+    # pylint: enable=ungrouped-imports
 
 class ObjectiveNodeValue(NodeValue):
 
@@ -377,6 +379,26 @@ class MainWindow(QMainWindow):
 
                 self.__ui.view.scene().addItem(image_item)
 
+    def __loadDebugMessages(self, ships):
+
+        self.__ui.debugMessagesTabWidget.clear()
+        self.__debug_messages_text_browsers.clear()
+        for ship_info in ships:
+            ship = ship_info.device
+
+            tbrowser = QTextBrowser()
+            self.__debug_messages_text_browsers[ship.name] = tbrowser
+            self.__ui.debugMessagesTabWidget.addTab(tbrowser, ship.name)
+
+    def __loadSpaceProperties(self, scenario_info):
+
+        space_info = scenario_info.physics_engine
+        self.__space.damping = space_info.damping
+        self.__space.gravity = space_info.gravity
+        self.__space.collision_slop = space_info.collision_slop
+        self.__space.collision_persistence = space_info.collision_persistence
+        self.__space.iterations = space_info.iterations
+
     def loadScenario(self, scenario: str) -> None:
 
         self.clear()
@@ -392,12 +414,7 @@ class MainWindow(QMainWindow):
                 f'{type(err).__name__}: {err}'))
             return
 
-        space_info = scenario_info.physics_engine
-        self.__space.damping = space_info.damping
-        self.__space.gravity = space_info.gravity
-        self.__space.collision_slop = space_info.collision_slop
-        self.__space.collision_persistence = space_info.collision_persistence
-        self.__space.iterations = space_info.iterations
+        self.__loadSpaceProperties(scenario_info)
 
         self.__ui.deviceInterfaceWidgets.setVisible(
             scenario_info.visible_user_interface)
@@ -454,14 +471,7 @@ class MainWindow(QMainWindow):
         self.__current_scenario = scenario
         self.__ui.deviceInterfaceComboBox.setVisible(len(self.__ships) > 1)
 
-        self.__ui.debugMessagesTabWidget.clear()
-        self.__debug_messages_text_browsers.clear()
-        for ship_info in ships:
-            ship = ship_info.device
-
-            tbrowser = QTextBrowser()
-            self.__debug_messages_text_browsers[ship.name] = tbrowser
-            self.__ui.debugMessagesTabWidget.addTab(tbrowser, ship.name)
+        self.__loadDebugMessages(ships)
 
         if self.__ui.actionFitAllOnStart.isChecked():
             self.__timerTimeout()
@@ -542,7 +552,7 @@ class MainWindow(QMainWindow):
 
         objectives_complete = all(
             tuple(objective.verify(self.__space, ships)
-                    for objective in self.__scenario_objectives))
+                  for objective in self.__scenario_objectives))
 
         if objectives_complete:
             self.__objectives_result = True
@@ -550,7 +560,7 @@ class MainWindow(QMainWindow):
 
             if self.__objectivesTimedOut() or any(
                     tuple(objective.failed()
-                            for objective in self.__scenario_objectives)):
+                          for objective in self.__scenario_objectives)):
 
                 self.__objectives_result = False
             else:

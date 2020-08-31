@@ -11,8 +11,7 @@ from typing import TYPE_CHECKING, cast as typingcast
 
 if TYPE_CHECKING:
     from typing import (
-        Any, Dict, Optional, Callable, Callable, Callable, Iterable, List,
-        Tuple, Union
+        Any, Dict, Optional, Callable, Iterable, List, Tuple, Union
     )
 
 class Device(ABC):

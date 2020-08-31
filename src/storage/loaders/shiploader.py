@@ -115,7 +115,8 @@ def __createLinearEngine(info: 'MutableMapping[str, Any]', part: StructuralPart,
         intensity_offset=info.get('intensity_offset', 0),
         **__engineErrorKwargs(info)), ()
 
-def __createPositionSensor(info: 'MutableMapping[str, Any]', part: StructuralPart,
+def __createPositionSensor(info: 'MutableMapping[str, Any]',
+                           part: StructuralPart,
                            **_kwargs: 'Any') \
         -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -210,7 +211,8 @@ def __createButton(info: 'MutableMapping[str, Any]', _part: StructuralPart,
 
     return device, (button,)
 
-def __createBasicReceiver(info: 'MutableMapping[str, Any]', part: StructuralPart,
+def __createBasicReceiver(info: 'MutableMapping[str, Any]',
+                          part: StructuralPart,
                           engine: 'CommunicationEngine' = None,
                           **_kwargs: 'Any') \
                               -> 'Tuple[Device, Sequence[QWidget]]':

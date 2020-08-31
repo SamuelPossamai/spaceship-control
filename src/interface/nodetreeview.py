@@ -7,7 +7,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 if TYPE_CHECKING:
     from typing import Sequence, List, Optional
     import anytree
-    from PyQt5.QWidgets import QWidget
+    from PyQt5.QtWidgets import QWidget
 
 class NodeValue:
 

@@ -50,9 +50,10 @@ def loadShip(space: 'pymunk.Space', ship_info: 'ShipInfo',
     if ship_model_is_tuple or ship_model is None:
         if ship_model_is_tuple:
             ship_options = tuple(anytree.Node(model_option)
-                                    for model_option in ship_model)
+                                 for model_option in ship_model)
         else:
-            options_tree = fileinfo.listFilesTree(FileInfo.FileDataType.CONTROLLER)
+            options_tree = fileinfo.listFilesTree(
+                FileInfo.FileDataType.CONTROLLER)
             if options_tree is None:
                 return None
 

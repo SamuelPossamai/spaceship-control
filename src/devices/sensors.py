@@ -1,9 +1,9 @@
 
+from math import pi, cos, sin
 from typing import TYPE_CHECKING, cast as typingcast
 
 from pymunk import Vec2d, ShapeFilter
 
-from math import pi, cos, sin
 
 from .structure import Sensor, MultiSensor
 
@@ -16,8 +16,7 @@ class XPositionSensor(Sensor):
         super().__init__(*args, device_type='x-position-sensor', **kwargs)
 
     def read(self) -> float:
-        x, _ = self.structural_part.position
-        return x
+        return self.structural_part.position[0]
 
 class YPositionSensor(Sensor):
 
@@ -25,8 +24,7 @@ class YPositionSensor(Sensor):
         super().__init__(*args, device_type='y-position-sensor', **kwargs)
 
     def read(self) -> float:
-        _, y = self.structural_part.position
-        return y
+        return self.structural_part.position[1]
 
 class PositionSensor(MultiSensor):
 
@@ -83,6 +81,7 @@ class YAccelerationSensor(Sensor):
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='y-acceleration-sensor', **kwargs)
         self.__last_y_speed: float = 0
+        self.__last_acc_val: float = 0
 
     def act(self) -> None:
         current_speed = self.structural_part.velocity[1]
@@ -102,6 +101,7 @@ class AngularAccelerationSensor(Sensor):
 
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
         super().__init__(*args, device_type='ang-acceleration-sensor', **kwargs)
+        self.__last_acc_val: float = 0
         self.__last_ang_speed: float = 0
 
     def act(self) -> None:

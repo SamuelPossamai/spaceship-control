@@ -99,7 +99,7 @@ def __loadGraphicItemImagePart(
         y_offset = image.y/height_scale
 
     gitem_part.setOffset(x_offset - pixmap.width()/2,
-                            y_offset - pixmap.height()/2)
+                         y_offset - pixmap.height()/2)
 
     gitem_part.setZValue(image.z_value)
 

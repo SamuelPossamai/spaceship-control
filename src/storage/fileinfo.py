@@ -353,10 +353,9 @@ class FileInfo:
                     if can_hide_files and metadata.get('hide', False):
                         continue
 
-                    label = str(metadata.get('name', path_name))
-                    desc = metadata.get('description', '')
-                    if desc is not None:
-                        name = NodeValue(path_name, str(desc), label=label)
+                    name = NodeValue(
+                        path_name, str(metadata.get('description', '')),
+                        label=str(metadata.get('name', path_name)))
 
             new_node = Node(name, parent=current_node)
             if is_directory:
