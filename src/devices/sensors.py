@@ -61,6 +61,32 @@ class AngularSpeedSensor(Sensor):
     def read(self) -> float:
         return 180*self.structural_part.angular_velocity/pi
 
+class XVelocitySensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='x-velocity-sensor', **kwargs)
+        self.__last_x_speed: float = 0
+        self.__last_acc_val: float = 0
+
+    def read(self) -> float:
+        return self.structural_part.velocity[0]
+
+class YVelocitySensor(Sensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__(*args, device_type='y-velocity-sensor', **kwargs)
+        self.__last_y_speed: float = 0
+        self.__last_acc_val: float = 0
+
+    def read(self) -> float:
+        return self.structural_part.velocity[1]
+
+class VelocitySensor(MultiSensor):
+
+    def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
+        super().__init__({'x': XAccelerationSensor, 'y': YAccelerationSensor},
+                         *args, device_type='velocity-sensor', **kwargs)
+
 class XAccelerationSensor(Sensor):
 
     def __init__(self, *args: 'Any', **kwargs: 'Any') -> None:
