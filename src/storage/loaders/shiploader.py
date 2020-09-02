@@ -9,7 +9,8 @@ from ...utils.errorgenerator import ErrorGenerator
 from ...devices.structure import Structure, StructuralPart
 from ...devices.sensors import (
     PositionSensor, AngleSensor, SpeedSensor, LineDetectSensor,
-    AngularSpeedSensor
+    AngularSpeedSensor, VelocitySensor, AccelerationSensor,
+    AngularAccelerationSensor
 )
 from ...devices.engine import LinearEngine
 from ...devices.interfacedevice import (
@@ -141,6 +142,33 @@ def __createSpeedSensor(info: 'MutableMapping[str, Any]', part: StructuralPart,
                        read_offset_max=info.get('offset_max', 0),
                        angle=info.get('angle', 0)), ()
 
+def __createVelocitySensor(info: 'MutableMapping[str, Any]',
+                           part: StructuralPart,
+                           **_kwargs: 'Any') \
+        -> 'Tuple[Device, Sequence[QWidget]]':
+
+    return VelocitySensor(part, info['reading_time'],
+                          read_error_max=info.get('error_max', 0),
+                          read_offset_max=info.get('offset_max', 0)), ()
+
+def __createAccelerationSensor(info: 'MutableMapping[str, Any]',
+                               part: StructuralPart,
+                               **_kwargs: 'Any') \
+        -> 'Tuple[Device, Sequence[QWidget]]':
+
+    return AccelerationSensor(part, info['reading_time'],
+                              read_error_max=info.get('error_max', 0),
+                              read_offset_max=info.get('offset_max', 0)), ()
+
+def __createAngularAccelerationSensor(info: 'MutableMapping[str, Any]',
+                                      part: StructuralPart,
+                                      **_kwargs: 'Any') \
+        -> 'Tuple[Device, Sequence[QWidget]]':
+
+    return (AngularAccelerationSensor(
+        part, info['reading_time'], read_error_max=info.get('error_max', 0),
+        read_offset_max=info.get('offset_max', 0)), ())
+
 def __createAngularSpeedSensor(info: 'MutableMapping[str, Any]',
                                part: StructuralPart) \
                                    -> 'Tuple[Device, Sequence[QWidget]]':
@@ -271,6 +299,9 @@ __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
     ('Sensor', 'angle', None): __createAngleSensor,
     ('Sensor', 'speed', None): __createSpeedSensor,
     ('Sensor', 'angular-speed', None): __createAngularSpeedSensor,
+    ('Sensor', 'velocity', None): __createVelocitySensor,
+    ('Sensor', 'acceleration', None): __createAccelerationSensor,
+    ('Sensor', 'angular-acceleration', None): __createAngularAccelerationSensor,
     ('Sensor', 'detect', 'linear-distance'): __createObstacleDistanceSensor,
     ('InterfaceDevice', 'text-display', None): __createTextDisplay,
     ('InterfaceDevice', 'text-display', 'line'): __createTextDisplay,
