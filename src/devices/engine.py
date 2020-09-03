@@ -25,9 +25,9 @@ class Engine(Actuator):
                              'angle': Engine.angle
                          })
 
-        self.__intensity = kwargs.get('start_intensity', 0)
+        self.__intensity: float = kwargs.get('start_intensity', 0)
         self.__thrust = self.mapIntensityToThrust(self.__intensity)
-        self.__angle = kwargs.get('start_angle', 0)
+        self.__angle: float = kwargs.get('start_angle', 0)
         self.__thrust_error = kwargs.get('thrust_error_gen')
         self.__angle_error = kwargs.get('angle_error_gen')
         self.__pos_error = kwargs.get('position_error_gen')

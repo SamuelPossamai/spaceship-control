@@ -45,7 +45,9 @@ if TYPE_CHECKING:
     from ..objectives.objective import Objective
     from ..devices.structure import Structure
     from ..devices.communicationdevices import CommunicationEngine
-    from ..storage.loaders.scenarioloader import ShipInfo, ObjectInfo
+    from ..storage.loaders.scenarioloader import (
+        ScenarioInfo, ShipInfo, ObjectInfo
+    )
     from ..storage.loaders.imageloader import ImageInfo
     # pylint: enable=ungrouped-imports
 
@@ -379,7 +381,7 @@ class MainWindow(QMainWindow):
 
                 self.__ui.view.scene().addItem(image_item)
 
-    def __loadDebugMessages(self, ships):
+    def __loadDebugMessages(self, ships: 'List[ShipInterfaceInfo]') -> None:
 
         self.__ui.debugMessagesTabWidget.clear()
         self.__debug_messages_text_browsers.clear()
@@ -390,7 +392,7 @@ class MainWindow(QMainWindow):
             self.__debug_messages_text_browsers[ship.name] = tbrowser
             self.__ui.debugMessagesTabWidget.addTab(tbrowser, ship.name)
 
-    def __loadSpaceProperties(self, scenario_info):
+    def __loadSpaceProperties(self, scenario_info: 'ScenarioInfo') -> None:
 
         space_info = scenario_info.physics_engine
         self.__space.damping = space_info.damping

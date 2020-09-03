@@ -1,7 +1,16 @@
 
 from simpleeval import simple_eval
+from typing import TYPE_CHECKING, MutableMapping
 
-def __dictSubVariables(content, enabled, variables):
+if TYPE_CHECKING:
+    from typing import Any, Optional, Tuple
+
+    DictSubVariablesReturnType = Tuple[bool, Optional[MutableMapping[str, Any]]]
+
+def __dictSubVariables(content: 'MutableMapping[str, Any]',
+                       enabled: 'Optional[bool]',
+                       variables: 'Optional[MutableMapping[str, Any]]') \
+                           -> 'DictSubVariablesReturnType':
 
     if enabled is None:
         config = content.get('Config')
@@ -27,7 +36,7 @@ def __dictSubVariables(content, enabled, variables):
             if dont_override in variables:
                 del new_variables[dont_override]
 
-        variables = variables.copy()
+        variables = dict(**variables)
         variables.update(new_variables)
 
     for key, value in content.items():
@@ -38,27 +47,39 @@ def __dictSubVariables(content, enabled, variables):
 
     return False, None
 
-def __strSubVariables(content, variables):
+def __strSubVariables(content: str,
+                      variables: 'Optional[MutableMapping[str, Any]]') \
+                          -> 'Any':
 
     if content.startswith('#'):
         return content[1:]
     if content.startswith('raw#'):
         return content[4:]
     if content.startswith('var#'):
-        return variables[content[4:].strip()]
+        variable_name = content[4:].strip()
+        if variables is not None:
+            sentinel = object()
+            value = variables.get(content[4:].strip(), sentinel)
+            if value is not sentinel:
+                return value
+        raise Exception(f'Variable \'{variable_name}\' not found')
     if content.startswith('expr#'):
         return simple_eval(content[5:], names=variables)
     if content.startswith('format#'):
+        if variables is None:
+            return content[7:]
         return content[7:].format(**variables)
 
     return content
 
-def subVariables(content, enabled=None, variables=None):
+def subVariables(content: 'Any', enabled: bool = None,
+                 variables: 'Optional[MutableMapping[str, Any]]' = None) \
+                     -> 'Any':
 
     if enabled is False:
         return content
 
-    if isinstance(content, dict):
+    if isinstance(content, MutableMapping):
         must_return, ret_val = __dictSubVariables(content, enabled, variables)
         if must_return:
             return ret_val
