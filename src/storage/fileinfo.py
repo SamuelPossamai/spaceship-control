@@ -272,11 +272,12 @@ class FileInfo:
         if content is None:
             return ''
 
-        paragraphs = content.get('Paragraph', ())
+        elements = content.get('Block', ())
 
-        if paragraphs:
+        if elements:
             return '\n'.join(
-                paragraph.get('content', '') for paragraph in paragraphs)
+                paragraph.get('content', '') for paragraph in elements
+                if paragraph.get('type') == 'paragraph')
 
         return ''
 

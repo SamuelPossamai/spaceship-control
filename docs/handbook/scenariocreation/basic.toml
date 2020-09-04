@@ -1,0 +1,10 @@
+
+[Metadata]
+
+name = 'Basic'
+description = 'Basic instruction to understand tha base of scenario making'
+
+[[Block]]
+
+type = "paragraph"
+content = "Instruction"

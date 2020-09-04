@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QApplication
 
 # pylint: disable=relative-beyond-top-level
 
@@ -28,6 +28,8 @@ class HelpDialog(QDialog):
         self.__ui = UiHelpWidget()
         self.__ui.setupUi(self)
 
+        self.setWindowTitle('Help')
+
         tree = FileInfo().listFilesTree(FileInfo.FileDataType.HANDBOOK)
 
         if tree is not None:
@@ -42,3 +44,15 @@ class HelpDialog(QDialog):
                                self.__ui.treeView.selectedItemPath())
 
             self.__ui.textBrowser.setText(FileInfo().getHandbookText(section))
+
+def main() -> None:
+
+    app = QApplication(sys.argv)
+
+    window = HelpDialog()
+    window.show()
+
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
