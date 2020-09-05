@@ -19,7 +19,7 @@ from anytree import Node
 from . import configfileinheritance, configfilevariables
 
 from .loaders import (
-    shiploader, scenarioloader, controllerloader, objectloader
+    shiploader, scenarioloader, controllerloader, objectloader, textloader
 )
 
 from ..utils import dictutils
@@ -272,14 +272,7 @@ class FileInfo:
         if content is None:
             return ''
 
-        elements = content.get('Block', ())
-
-        if elements:
-            return '\n'.join(
-                paragraph.get('content', '') for paragraph in elements
-                if paragraph.get('type') == 'paragraph')
-
-        return ''
+        return textloader.loadTextFile(content)
 
     def __readFileMetadata(self, path: 'Path',
                            metadata_type: '_FileInfo_FileMetadataType') \
