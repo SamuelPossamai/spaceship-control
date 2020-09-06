@@ -93,6 +93,7 @@ class DefaultDevice(Device): # pylint: disable=abstract-method
             constants that may used to help the controller to know more
             information about this device.
     """
+
     class Mirror(Device.Mirror):
 
         def __init__(self, device: 'Device', *args: str) -> None:
