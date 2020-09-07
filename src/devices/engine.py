@@ -17,7 +17,7 @@ class Engine(Actuator):
         def __init__(self, device: 'Device', *args: str) -> None:
             super().__init__(device, 'intensity', 'angle', *args)
 
-    def __init__(self, part: 'StructuralPart', device_type: str ='engine',
+    def __init__(self, part: 'StructuralPart', device_type: str = 'engine',
                  **kwargs: 'Any') -> None:
         super().__init__(part, device_type=device_type,
                          properties={

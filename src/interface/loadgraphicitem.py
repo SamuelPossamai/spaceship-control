@@ -13,11 +13,13 @@ from ..storage.fileinfo import FileInfo
 from ..utils.expression import Expression
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import Tuple, Dict, Sequence, Any, Optional, List
     from pymunk import Shape
     from PyQt5.QtGui import QColor
     from PyQt5.QtWidgets import QGraphicsItem
     from ..storage.loaders.imageloader import ImageInfo
+    # pylint: enable=ungrouped-imports
 
     GraphicItemInfo = Tuple[Optional[QGraphicsItem],
                             Sequence[ConditionGraphicsPixmapItem]]
@@ -40,6 +42,17 @@ def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
 
     return width_scale, height_scale
 
+def __runExpression(expr_str, variables):
+
+    expression = Expression(expr_str)
+
+    if variables:
+        expression.evaluate(**variables)
+    else:
+        expression.evaluate()
+
+    return expression.context
+
 def __loadGraphicItemImagePart(
         image: 'ImageInfo',
         condition_variables: 'Optional[Dict[str, Any]]',
@@ -61,15 +74,9 @@ def __loadGraphicItemImagePart(
 
     setup_script = image.setup_script
     if setup_script is not None:
-        expression = Expression(setup_script)
-
-        if condition_variables:
-            expression.evaluate(**condition_variables)
-        else:
-            expression.evaluate()
-
-        if expression.context:
-            condition_variables = expression.context
+        result = __runExpression(setup_script, condition_variables)
+        if result is not None:
+            condition_variables = result
 
     if image_angle_is_expr or image_x_is_expr or image_y_is_expr or \
         image.condition:

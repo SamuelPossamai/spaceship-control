@@ -140,4 +140,3 @@ class ConditionGraphicsPixmapItem(QGraphicsPixmapItem):
                 self.__angle_offset_calc = new_angle
                 super().setPixmap(self.__pixmap.transformed(
                     QTransform().rotate(new_angle)))
-

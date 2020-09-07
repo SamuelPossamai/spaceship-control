@@ -170,7 +170,7 @@ class BasicReceiver(DefaultDevice, CommunicationEngine.Receiver):
 class ConfigurableReceiver(BasicReceiver):
 
     def __init__(self, *args: 'Any', min_frequency: float = 0,
-                 max_frequency: float =math.inf, **kwargs: 'Any') -> None:
+                 max_frequency: float = math.inf, **kwargs: 'Any') -> None:
         super().__init__(*args, **kwargs, device_type='receiver')
 
         self.__min_freq = min_frequency
