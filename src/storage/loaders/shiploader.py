@@ -13,6 +13,7 @@ from ...devices.sensors import (
     AngularAccelerationSensor
 )
 from ...devices.engine import LinearEngine
+from ...devices.forceemitter import ForceEmitter
 from ...devices.interfacedevice import (
     TextDisplayDevice, ButtonDevice, KeyboardReceiverDevice, ConsoleDevice
 )
@@ -115,6 +116,12 @@ def __createLinearEngine(info: 'MutableMapping[str, Any]', part: StructuralPart,
         intensity_multiplier=info.get('intensity_mult', 1),
         intensity_offset=info.get('intensity_offset', 0),
         **__engineErrorKwargs(info)), ()
+
+def __createForceEmitter(info: 'MutableMapping[str, Any]', part: StructuralPart,
+                         **_kwargs: 'Any') \
+        -> 'Tuple[Device, Sequence[QWidget]]':
+
+    return ForceEmitter(part), ()
 
 def __createPositionSensor(info: 'MutableMapping[str, Any]',
                            part: StructuralPart,
@@ -295,6 +302,7 @@ def __createConfSender(info: 'MutableMapping[str, Any]', part: StructuralPart,
 __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 
     ('Actuator', 'engine', 'linear'): __createLinearEngine,
+    ('Actuator', 'force-emitter', None): __createForceEmitter,
     ('Sensor', 'position', None): __createPositionSensor,
     ('Sensor', 'angle', None): __createAngleSensor,
     ('Sensor', 'speed', None): __createSpeedSensor,

@@ -10,7 +10,7 @@ class ForceEmitter(Actuator):
                  **kwargs: 'Any') -> None:
         super().__init__(part, device_type=device_type)
 
-    def act(self) -> None:
+    def actuate(self) -> None:
 
         structure = self.structural_part.structure
 
@@ -39,4 +39,4 @@ class ForceEmitter(Actuator):
         first_collision.shape.body.apply_force_at_world_point(
             force, first_collision.point)
 
-        body.apply_force_at_world_point(force, pos)
+        body.apply_force_at_world_point(-force, pos)

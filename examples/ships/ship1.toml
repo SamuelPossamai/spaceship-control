@@ -140,6 +140,15 @@ offset_max = 0
 
 [[Actuator]]
 
+part = 'part1'
+
+name = 'force-emitter'
+type = 'force-emitter'
+
+intensity_mult = 20
+
+[[Actuator]]
+
 part = 'part2'
 
 name = 'engine2'
