@@ -1,10 +1,88 @@
 
 [Metadata]
 
-name = 'Basic'
-description = 'Basic instruction to understand tha base of scenario making'
+name = 'Introduction'
+description = 'Basic instructions to understand tha base of scenario making'
 
 [[Block]]
 
 type = "paragraph"
-content = "Instruction"
+content = """
+    The scenario making is divided in four main types of files that may be used.
+    In this page you'll find a little bit about each of them.
+"""
+
+[[Block]]
+
+type = "list"
+
+    [[Block.Item]]
+
+        content = 'Scenario'
+
+    [[Block.Item]]
+
+        content = 'Ship'
+
+    [[Block.Item]]
+
+        content = 'Controller'
+
+    [[Block.Item]]
+
+        content = 'Object'
+
+[[Block]]
+
+type = "break"
+
+[[Block]]
+
+type = "paragraph"
+content = "Scenario:"
+
+[[Block]]
+
+type = "paragraph"
+content = """
+    In the scenario file you'll be specify the number of ships and their's \
+    position, controller and model as the number of objects, their's position\
+    and model. You will be able to specify here the objectives the controller\
+    need to accomplish as well.
+"""
+
+[[Block]]
+
+type = "paragraph"
+content = "Ship:"
+
+[[Block]]
+
+type = "paragraph"
+content = """
+    No description yet
+"""
+
+[[Block]]
+
+type = "paragraph"
+content = "Object:"
+
+[[Block]]
+
+type = "paragraph"
+content = """
+    No description yet
+"""
+
+[[Block]]
+
+type = "paragraph"
+content = "Controller:"
+
+[[Block]]
+
+type = "paragraph"
+content = """
+    No description yet
+"""

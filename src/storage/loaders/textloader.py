@@ -16,12 +16,17 @@ def __loadList(element_info, depth):
     return before_all + before_item + (after_item + before_item).join(
         loadTextFileBlock(item, depth=depth + 1) for item in items) + after_item
 
+def __loadBreak(element_info, _depth):
+
+    return '\n' * element_info.get('qtd', 1)
+
 __LOAD_ELEMENT_FUNCTIONS = {
 
     None: __loadTextSpan,
     'paragraph': __loadParagraph,
     'text': __loadTextSpan,
-    'list': __loadList
+    'list': __loadList,
+    'break': __loadBreak
 }
 
 def loadTextFileBlock(element, depth=0):
