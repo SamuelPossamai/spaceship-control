@@ -46,6 +46,11 @@ while True:
         else:
             engine_three_intensity = 0
 
+        if '000000005a' in commands:
+            force_emitter_thrust = 4000
+        else:
+            force_emitter_thrust = 0
+
         debug(commands)
 
         debug('Speed:', ship.speed)
@@ -56,7 +61,8 @@ while True:
         ship.displayPrint(f'<font color={colors[color_id]}>{pos[0]:.1f}, '
                           f'{pos[1]:.1f} ({angle:.1f}º)</font>')
 
-        debug(engines)
+        debug(engines,
+              send(f'0:1: set-property intensity {force_emitter_thrust}'))
 
         engines[0].intensity = engine_one_intensity
         engines[1].intensity = engine_two_intensity
