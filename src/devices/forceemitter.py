@@ -1,6 +1,8 @@
 
 from pymunk import Vec2d, ShapeFilter
 
+from ..utils.interval import Interval, IntervalSet
+
 from .structure import Actuator
 
 class ForceEmitter(Actuator):
@@ -14,8 +16,18 @@ class ForceEmitter(Actuator):
                              'angle': ForceEmitter.angle
                          })
 
-        self.__thrust = 0
-        self.__angle = 0
+        min_intensity: float = kwargs.get('min_intensity', 0)
+        max_intensity: float = kwargs.get('min_intensity', min_intensity + 1)
+
+        min_angle: float = kwargs.get('max_angle', 0)
+        max_angle: float = kwargs.get('min_angle', min_angle)
+
+        self.__thrust: float = kwargs.get('start_intensity', min_intensity)
+        self.__angle: float = kwargs.get('start_angle', min_intensity)
+
+        self.__valid_intensities = IntervalSet(
+            (Interval(min_intensity, max_intensity),))
+        self.__valid_angles = IntervalSet((Interval(min_angle, max_angle),))
 
     @property
     def intensity(self) -> float:
@@ -27,7 +39,10 @@ class ForceEmitter(Actuator):
         if isinstance(val, str):
             val = float(val)
 
-        self.__thrust = val
+        if self.__valid_intensities is None or \
+            self.__valid_intensities.isInside(val):
+
+            self.__thrust = val
 
     @property
     def angle(self) -> float:
@@ -39,7 +54,10 @@ class ForceEmitter(Actuator):
         if isinstance(val, str):
             val = float(val)
 
-        self.__angle = val
+        if self.__valid_angles is None or \
+            self.__valid_angles.isInside(val):
+
+            self.__angle = val
 
     def actuate(self) -> None:
 
