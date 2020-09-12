@@ -22,7 +22,7 @@ type = "list"
 
     [[Block.Item]]
 
-        content = 'Ship'
+        content = 'Ship Model'
 
     [[Block.Item]]
 
@@ -30,7 +30,7 @@ type = "list"
 
     [[Block.Item]]
 
-        content = 'Object'
+        content = 'Object Model'
 
 [[Block]]
 
@@ -54,25 +54,27 @@ content = """
 [[Block]]
 
 type = "paragraph"
-content = "Ship:"
+content = "Ship Model:"
 
 [[Block]]
 
 type = "paragraph"
 content = """
-    No description yet
+    The ship model file will describe the ships physical properties, it's \
+    appearance and all devices it has.
 """
 
 [[Block]]
 
 type = "paragraph"
-content = "Object:"
+content = "Object Model:"
 
 [[Block]]
 
 type = "paragraph"
 content = """
-    No description yet
+    The object model file will describe all physical properties that describe \
+    an object.
 """
 
 [[Block]]
@@ -84,5 +86,6 @@ content = "Controller:"
 
 type = "paragraph"
 content = """
-    No description yet
+    The controller file must be an executable file that will used to control a \
+    ship. It can control a ship interacting with its devices.
 """
