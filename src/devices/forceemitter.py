@@ -1,9 +1,14 @@
 
 from pymunk import Vec2d, ShapeFilter
+from typing import TYPE_CHECKING
 
 from ..utils.interval import Interval, IntervalSet
 
 from .structure import Actuator
+
+if TYPE_CHECKING:
+    from typing import Any, Union
+    from .structure import StructuralPart
 
 class ForceEmitter(Actuator):
 

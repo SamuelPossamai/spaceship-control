@@ -29,12 +29,11 @@ ShipInterfaceInfo = namedtuple('ShipInfo', (
     'device', 'gitem', 'widgets', 'thread',
     'msg_queue', 'condition_graphic_items'))
 
-def __loadShipSelectModel(ship_model: 'Optional[str]',
-                          options_dialog: 'Optional[DialogCallable]',
-                          ship_model_is_tuple: bool) \
+def __loadShipSelectModel(ship_model: 'Optional[Sequence[str]]',
+                          options_dialog: 'Optional[DialogCallable]') \
                               -> 'Optional[str]':
 
-    if ship_model_is_tuple:
+    if ship_model is not None:
         ship_options = tuple(anytree.Node(model_option)
                              for model_option in ship_model)
     else:
@@ -53,7 +52,8 @@ def __loadShipSelectModel(ship_model: 'Optional[str]',
 
     return '/'.join(ship_model)
 
-def __loadShipSelectController(options_dialog: 'Optional[DialogCallable]'):
+def __loadShipSelectController(options_dialog: 'Optional[DialogCallable]') \
+        -> 'Optional[str]':
 
     options_tree = FileInfo().listFilesTree(FileInfo.FileDataType.CONTROLLER)
     if options_tree is None:
@@ -81,11 +81,9 @@ def loadShip(space: 'pymunk.Space', ship_info: 'ShipInfo',
     arg_scenario_info['starting-angle'] = 180*ship_info.angle/math.pi
 
     ship_model = ship_info.model
-    ship_model_is_tuple = isinstance(ship_model, tuple)
 
-    if ship_model_is_tuple or ship_model is None:
-        ship_model = __loadShipSelectModel(ship_model, ship_options_dialog,
-                                           ship_model_is_tuple)
+    if isinstance(ship_model, tuple) or ship_model is None:
+        ship_model = __loadShipSelectModel(ship_model, ship_options_dialog)
         if ship_model is None:
             return None
 

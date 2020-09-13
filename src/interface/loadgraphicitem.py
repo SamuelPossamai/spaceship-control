@@ -42,7 +42,8 @@ def __getSizeScale(cur_width: float, cur_height: float, after_width: float,
 
     return width_scale, height_scale
 
-def __runExpression(expr_str, variables):
+def __runExpression(expr_str: str, variables: 'Optional[Dict[str, Any]]') \
+        -> 'Dict[str, Any]':
 
     expression = Expression(expr_str)
 

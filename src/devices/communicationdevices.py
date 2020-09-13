@@ -11,6 +11,7 @@ from .device import DefaultDevice
 
 if TYPE_CHECKING:
     from typing import Any, List, Tuple, Dict, Callable
+    from ..utils.errorgenerator import ErrorGenerator
     from .structure import StructuralPart
 
 class CommunicationEngine:
@@ -199,9 +200,10 @@ class ConfigurableReceiver(BasicReceiver):
 class BasicSender(DefaultDevice):
 
     def __init__(self, part: 'StructuralPart', engine: 'CommunicationEngine',
-                 intensity: float, frequency: float, frequency_err_gen=None,
-                 intensity_err_gen=None, device_type: str = 'basic-sender') \
-                     -> None:
+                 intensity: float, frequency: float,
+                 frequency_err_gen: 'ErrorGenerator' = None,
+                 intensity_err_gen: 'ErrorGenerator' = None,
+                 device_type: str = 'basic-sender') -> None:
         super().__init__(device_type=device_type)
 
         self.__part = part
