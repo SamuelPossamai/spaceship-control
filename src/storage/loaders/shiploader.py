@@ -121,7 +121,14 @@ def __createForceEmitter(info: 'MutableMapping[str, Any]', part: StructuralPart,
                          **_kwargs: 'Any') \
         -> 'Tuple[Device, Sequence[QWidget]]':
 
-    return ForceEmitter(part), ()
+    valid_keys = {'min_intensity', 'max_intensity', 'min_angle', 'max_angle'}
+
+    fe_kwargs = {key: val for key, val in info.items() if key in valid_keys}
+
+    return ForceEmitter(
+        part,
+        **fe_kwargs,
+        **__engineErrorKwargs(info)), ()
 
 def __createPositionSensor(info: 'MutableMapping[str, Any]',
                            part: StructuralPart,

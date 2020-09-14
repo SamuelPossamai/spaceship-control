@@ -27,6 +27,10 @@ class ForceEmitter(Actuator):
         min_angle: float = kwargs.get('max_angle', 0)
         max_angle: float = kwargs.get('min_angle', min_angle)
 
+        self.__thrust_error = kwargs.get('thrust_error_gen')
+        self.__angle_error = kwargs.get('angle_error_gen')
+        self.__pos_error = kwargs.get('position_error_gen')
+
         self.__thrust: float = kwargs.get('start_intensity', min_intensity)
         self.__angle: float = kwargs.get('start_angle', min_intensity)
 
@@ -71,10 +75,23 @@ class ForceEmitter(Actuator):
         if structure is None:
             return
 
+        if self.__angle_error is None:
+            angle = self.__angle
+        else:
+            angle = self.__angle_error(self.__angle_error)
+
+        if self.__thrust_error is None:
+            thrust = self.__thrust
+        else:
+            thrust = self.__thrust_error(self.__thrust)
+
+        pos = self.structural_part.position
+        if self.__pos_error is not None:
+            pos = Vec2d(self.__pos_error(pos.x), self.__pos_error(pos.y))
+
         space = structure.space
         body = structure.body
 
-        pos = self.structural_part.position
         segment_end = Vec2d(1000, 0)
         segment_end.angle = self.structural_part.angle + self.__angle
 
