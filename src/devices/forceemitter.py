@@ -93,7 +93,7 @@ class ForceEmitter(Actuator):
         body = structure.body
 
         segment_end = Vec2d(1000, 0)
-        segment_end.angle = self.structural_part.angle + self.__angle
+        segment_end.angle = self.structural_part.angle + angle
 
         collisions = space.segment_query(pos, pos + segment_end, 10,
                                          ShapeFilter())
@@ -104,7 +104,7 @@ class ForceEmitter(Actuator):
         if first_collision is None:
             return
 
-        force = Vec2d(-self.__thrust, 0)
+        force = Vec2d(-thrust, 0)
         force.angle = self.structural_part.angle
 
         first_collision.shape.body.apply_force_at_world_point(

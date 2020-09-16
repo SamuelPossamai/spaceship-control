@@ -14,6 +14,19 @@ if TYPE_CHECKING:
     from .device import Device
 
 class Structure(DeviceGroup):
+    """Class that represents a ship
+
+    A Structure object is used to represent the ship's devices and control
+    interface, this class is used so the controller can give commands for
+    the actuators and sensors. An object of this class is connected to the
+    physical engine so the sensors and actuators connected to it can perform
+    their functions.
+
+    Args:
+        name: Name used to identify the ship.
+        space: Representation of the space in the physical engine.
+        body: Representation of the ship static and dynamic physical properties.
+    """
 
     def __init__(self, name: str, space: 'pymunk.Space', body: 'pymunk.Body',
                  **kwargs: 'Any') -> None:
