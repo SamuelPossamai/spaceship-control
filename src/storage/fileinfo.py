@@ -59,8 +59,8 @@ class FileInfo:
     __instance: 'Optional[FileInfo]' = None
 
     FileDataType = Enum('FileDataType', ('CONTROLLER', 'SHIPMODEL', 'SCENARIO',
-                                         'OBJECTMODEL', 'IMAGE', 'UIDESIGN',
-                                         'HANDBOOK', 'METADATA'))
+                                         'OBJECTMODEL', 'OBJECTIVE', 'IMAGE',
+                                         'UIDESIGN', 'HANDBOOK', 'METADATA'))
 
     FileMetadataType = _FileInfo_FileMetadataType
 
@@ -94,6 +94,10 @@ class FileInfo:
             metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.OBJECTMODEL: __DataTypeInfoType(
             'objects', False, __CONF_FILE_SUFFIX_LIST, True, (),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
+        FileDataType.OBJECTIVE: __DataTypeInfoType(
+            'objectives', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
             metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.IMAGE: __DataTypeInfoType(
