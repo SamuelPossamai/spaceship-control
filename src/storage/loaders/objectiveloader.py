@@ -1,6 +1,8 @@
 
 from typing import TYPE_CHECKING
 
+from .. import fileinfo
+
 from ...objectives.objective import ObjectiveGroup
 from ...objectives.gotoobjective import GoToObjective
 from ...objectives.timedobjective import TimedObjectiveGroup
@@ -51,7 +53,16 @@ __OBJECTIVE_CREATE_FUNCTIONS = {
     'timed-list': __createTimedObjectiveGroup
 }
 
+def loadCustomObjectives(custom_objectives):
+
+    for objective in custom_objectives:
+        loadCustomObjectives(objective.children())
+
 def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
         -> 'Sequence[Objective]':
+
+    custom_objectives = fileinfo.FileInfo().listFilesTree(
+        fileinfo.FileInfo.FileDataType.OBJECTIVE)
+
     return tuple(__OBJECTIVE_CREATE_FUNCTIONS[objective['type']](objective)
                  for objective in objectives)

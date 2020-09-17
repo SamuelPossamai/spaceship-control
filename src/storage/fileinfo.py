@@ -144,7 +144,7 @@ class FileInfo:
             self.__config_content = {}
 
         create_n_link_example_dirs = ['controllers', 'ships', 'scenarios',
-                                      'objects', 'images']
+                                      'objects', 'objectives', 'images']
 
         dist_data_examples_path = self.__dist_data_path.joinpath('examples')
 
