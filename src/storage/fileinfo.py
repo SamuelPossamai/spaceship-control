@@ -523,6 +523,11 @@ class FileInfo:
 
         return content
 
+    def __loadCustomObjectives(self, custom_objectives):
+
+        for objective in custom_objectives:
+            loadCustomObjectives(objective.children())
+
     def loadUi(self, filename: str) -> 'Tuple[Type, Type]':
         return typingcast(
             'Tuple[Type, Type]',

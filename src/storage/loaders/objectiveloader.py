@@ -46,23 +46,33 @@ def __createTimedObjectiveGroup(objective_content: 'MutableMapping[str, Any]') \
     return TimedObjectiveGroup(loadObjectives(objective_content['Objective']),
                                **kwargs)
 
-__OBJECTIVE_CREATE_FUNCTIONS = {
+_OBJECTIVE_CREATE_FUNCTIONS = {
 
     'goto': __createGoToObjective,
     'list': __createObjectiveGroup,
     'timed-list': __createTimedObjectiveGroup
 }
 
-def loadCustomObjectives(custom_objectives):
-
-    for objective in custom_objectives:
-        loadCustomObjectives(objective.children())
-
 def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
         -> 'Sequence[Objective]':
 
-    custom_objectives = fileinfo.FileInfo().listFilesTree(
-        fileinfo.FileInfo.FileDataType.OBJECTIVE)
+    return ObjectiveLoader().load(objectives)
 
-    return tuple(__OBJECTIVE_CREATE_FUNCTIONS[objective['type']](objective)
-                 for objective in objectives)
+class ObjectiveLoader:
+
+    def __init__(self):
+        self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
+
+    def clearCustomObjectives(self):
+        self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
+
+    def addCustomObjectives(self, custom_objective_info):
+        pass
+
+    def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
+            -> 'Sequence[Objective]':
+
+        create_functions = self.__create_functions
+
+        return tuple(create_functions[objective['type']](objective)
+                    for objective in objectives)
