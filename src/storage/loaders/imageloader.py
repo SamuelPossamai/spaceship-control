@@ -1,13 +1,18 @@
 
 from collections import namedtuple
+from typing import TYPE_CHECKING
 
 from ..configfileinheritance import resolvePrefix
+
+if TYPE_CHECKING:
+    from typing import Any, MutableMapping, Sequence
 
 ImageInfo = namedtuple('ImageInfo', (
     'name', 'width', 'height', 'x', 'y', 'z_value', 'angle', 'condition',
     'setup_script'))
 
-def loadImages(images, prefixes=()):
+def loadImages(images: 'Sequence[MutableMapping[str, Any]]',
+               prefixes: 'Sequence[str]' = ()) -> 'Sequence[ImageInfo]':
 
     images_info = []
     for image in images:

@@ -58,7 +58,7 @@ def mergeList(dict_obj: 'MutableMapping[str, List[Any]]', keys: 'Sequence[str]',
     mergeBase(dict_obj, keys, target, getListConcat)
 
 def merge(dict_obj: 'MutableMapping[str, Any]', keys: 'Sequence[str]',
-          target: str):
+          target: str) -> None:
 
     if keys:
         sample_val = next((val for val in (dict_obj.get(key) for key in keys)
@@ -128,7 +128,8 @@ def pathMatch(dict_obj: 'MutableMapping[str, Any]', path: 'Sequence[str]',
 
 def mergeMatch(dict_obj: 'MutableMapping[str, Any]', path: 'Sequence[str]',
                keys: 'Sequence[str]', target: str,
-               merge_function: 'MergeFunctionType' = merge, **kwargs) -> None:
+               merge_function: 'MergeFunctionType' = merge,
+               **kwargs: 'Any') -> None:
 
     if 'has_keys' not in kwargs:
         kwargs['has_keys'] = tuple(key for key in keys if key != target)
@@ -145,6 +146,7 @@ def writeEverywhere(
         obj: 'Union[MutableMapping[str, Any], List[MutableMapping[str, Any]]]',
         value: 'Any', dict_key: str = None, key_format: str = None) -> None:
 
+    elements: 'Sequence[MutableMapping[str, Any]]'
     if isinstance(obj, list):
         elements = obj
     elif isinstance(obj, dict):
