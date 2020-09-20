@@ -19,7 +19,8 @@ from anytree import Node
 from . import configfileinheritance, configfilevariables
 
 from .loaders import (
-    shiploader, scenarioloader, controllerloader, objectloader, textloader
+    shiploader, scenarioloader, controllerloader, objectloader, textloader,
+    objectiveloader
 )
 
 from ..utils import dictutils
@@ -523,10 +524,30 @@ class FileInfo:
 
         return content
 
-    def __loadCustomObjectives(self, custom_objectives):
+    def __loadCustomObjectives(self, objective_loader, objective_tree=None,
+                               prefix=None):
 
-        for objective in custom_objectives:
-            loadCustomObjectives(objective.children())
+        if objective_tree is None:
+            objective_tree = self.listFilesTree(
+                self.FileDataType.OBJECTIVE).children
+
+        for element in objective_tree:
+
+            children = element.children
+            if prefix:
+                path = f'{prefix}/{element.name}'
+            else:
+                path = element.name
+
+            if children:
+                self.__loadCustomObjectives(objective_loader, children,
+                                            prefix=path)
+            else:
+                try:
+                    objective_loader.addCustomObjective(
+                        self.__getContent(path, self.FileDataType.OBJECTIVE))
+                except Exception:
+                    pass
 
     def loadUi(self, filename: str) -> 'Tuple[Type, Type]':
         return typingcast(
@@ -534,6 +555,9 @@ class FileInfo:
             uic.loadUiType(self.getPath(self.FileDataType.UIDESIGN, filename)))
 
     def loadScenario(self, scenario_name: str) -> 'ScenarioInfo':
+
+        objective_loader = objectiveloader.ObjectiveLoader()
+        self.__loadCustomObjectives(objective_loader)
 
         prefixes = scenario_name.split('/')[:-1]
 

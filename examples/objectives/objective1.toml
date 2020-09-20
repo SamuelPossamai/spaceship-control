@@ -10,7 +10,7 @@ type = 'list'
 
 sequential = true
 
-    [[Objective.Objective]]
+    [[Info.Objective]]
 
     type = 'goto'
 
@@ -19,7 +19,7 @@ sequential = true
 
     distance = 10
 
-    [[Objective.Objective]]
+    [[Info.Objective]]
 
     type = 'goto'
 
@@ -28,7 +28,7 @@ sequential = true
 
     distance = 10
 
-    [[Objective.Objective]]
+    [[Info.Objective]]
 
     type = 'goto'
 

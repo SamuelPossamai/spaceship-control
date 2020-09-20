@@ -66,7 +66,7 @@ class ObjectiveLoader:
     def clearCustomObjectives(self) -> None:
         self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
 
-    def addCustomObjectives(self, custom_objective_info):
+    def addCustomObjective(self, custom_objective_info):
         pass
 
     def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
