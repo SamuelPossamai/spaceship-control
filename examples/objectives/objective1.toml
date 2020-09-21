@@ -1,16 +1,17 @@
 
 [Configuration]
 
-type = 'test'
-model = 'test'
+mode = 'static'
 
-[Info]
+type = 'test'
+
+[ModelInfo]
 
 type = 'list'
 
 sequential = true
 
-    [[Info.Objective]]
+    [[ModelInfo.Objective]]
 
     type = 'goto'
 
@@ -19,7 +20,7 @@ sequential = true
 
     distance = 10
 
-    [[Info.Objective]]
+    [[ModelInfo.Objective]]
 
     type = 'goto'
 
@@ -28,7 +29,7 @@ sequential = true
 
     distance = 10
 
-    [[Info.Objective]]
+    [[ModelInfo.Objective]]
 
     type = 'goto'
 

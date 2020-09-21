@@ -67,7 +67,40 @@ class ObjectiveLoader:
         self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
 
     def addCustomObjective(self, custom_objective_info):
-        pass
+
+        config = custom_objective_info.get('Configuration')
+
+        if config is None:
+            raise Exception('Objective \'Configuration\' is required')
+
+        obj_model_info = custom_objective_info.get('ModelInfo')
+
+        if obj_model_info is None:
+            raise Exception('Objective \'ModelInfo\' is required')
+
+        type_ = config.get('type')
+        if type_ is None:
+            raise Exception('Objective type is required')
+
+        if type_ in self.__create_functions:
+            raise Exception(f'Objective type \'{type_}\' already in use')
+
+        mode = config.get('mode')
+        if mode == 'static':
+            self.__create_functions[type_] = \
+                lambda objective_content, \
+                    obj_model_info=obj_model_info: \
+                        self.__createCustomStaticObjectiveFunction(
+                            obj_model_info, objective_content)
+        else:
+            raise Exception(f'Invalid mode \'{mode}\'')
+
+    @staticmethod
+    def __createCustomStaticObjectiveFunction(
+            custom_objective_info: 'MutableMapping[str, Any]',
+            objective_content: 'MutableMapping[str, Any]') -> 'Objective':
+
+        return create_functions[objective['type']](objective)
 
     def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
             -> 'Sequence[Objective]':
@@ -75,4 +108,4 @@ class ObjectiveLoader:
         create_functions = self.__create_functions
 
         return tuple(create_functions[objective['type']](objective)
-                    for objective in objectives)
+                     for objective in objectives)

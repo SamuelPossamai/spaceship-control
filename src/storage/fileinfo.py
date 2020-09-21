@@ -546,8 +546,9 @@ class FileInfo:
                 try:
                     objective_loader.addCustomObjective(
                         self.__getContent(path, self.FileDataType.OBJECTIVE))
-                except Exception:
-                    pass
+                except Exception as err:
+                    print(f'Error in objective file \'{path}\': {err}',
+                          file=sys.stderr)
 
     def loadUi(self, filename: str) -> 'Tuple[Type, Type]':
         return typingcast(
