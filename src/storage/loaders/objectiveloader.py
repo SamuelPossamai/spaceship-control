@@ -11,48 +11,6 @@ if TYPE_CHECKING:
     from typing import Any, MutableMapping, Sequence
     from ...objectives.objective import Objective
 
-def __createGoToObjective(objective_content: 'MutableMapping[str, Any]') \
-        -> 'GoToObjective':
-
-    position = (objective_content['x'], objective_content['y'])
-    distance = objective_content['distance']
-
-    kwargs = {key: value for key, value in objective_content.items()
-              if key in ('name', 'description', 'negation', 'valid_ships')}
-
-    return GoToObjective(position, distance, **kwargs)
-
-def __createObjectiveGroup(objective_content: 'MutableMapping[str, Any]') \
-        -> 'ObjectiveGroup':
-
-    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
-                    'negation', 'valid_ships')
-
-    kwargs = {key: value for key, value in objective_content.items()
-              if key in valid_kwargs}
-
-    return ObjectiveGroup(loadObjectives(objective_content['Objective']),
-                          **kwargs)
-
-def __createTimedObjectiveGroup(objective_content: 'MutableMapping[str, Any]') \
-        -> 'TimedObjectiveGroup':
-
-    valid_kwargs = ('name', 'description', 'required_quantity', 'sequential',
-                    'time_limit', 'negation', 'valid_ships')
-
-    kwargs = {key: value for key, value in objective_content.items()
-              if key in valid_kwargs}
-
-    return TimedObjectiveGroup(loadObjectives(objective_content['Objective']),
-                               **kwargs)
-
-_OBJECTIVE_CREATE_FUNCTIONS = {
-
-    'goto': __createGoToObjective,
-    'list': __createObjectiveGroup,
-    'timed-list': __createTimedObjectiveGroup
-}
-
 def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
         -> 'Sequence[Objective]':
 
@@ -61,10 +19,10 @@ def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
 class ObjectiveLoader:
 
     def __init__(self) -> None:
-        self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
+        self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
 
     def clearCustomObjectives(self) -> None:
-        self.__create_functions = _OBJECTIVE_CREATE_FUNCTIONS.copy()
+        self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
 
     def addCustomObjective(self, custom_objective_info):
 
@@ -109,3 +67,52 @@ class ObjectiveLoader:
 
         return tuple(create_functions[objective['type']](objective)
                      for objective in objectives)
+
+    @staticmethod
+    def __createGoToObjective(_loader: 'ObjectiveLoader',
+                              objective_content: 'MutableMapping[str, Any]') \
+            -> 'GoToObjective':
+
+        position = (objective_content['x'], objective_content['y'])
+        distance = objective_content['distance']
+
+        kwargs = {key: value for key, value in objective_content.items()
+                if key in ('name', 'description', 'negation', 'valid_ships')}
+
+        return GoToObjective(position, distance, **kwargs)
+
+    @staticmethod
+    def __createObjectiveGroup(loader: 'ObjectiveLoader',
+                               objective_content: 'MutableMapping[str, Any]') \
+            -> 'ObjectiveGroup':
+
+        valid_kwargs = ('name', 'description', 'required_quantity',
+                        'sequential', 'negation', 'valid_ships')
+
+        kwargs = {key: value for key, value in objective_content.items()
+                if key in valid_kwargs}
+
+        return ObjectiveGroup(loader.load(objective_content['Objective']),
+                              **kwargs)
+
+    @staticmethod
+    def __createTimedObjectiveGroup(
+            loader: 'ObjectiveLoader',
+            objective_content: 'MutableMapping[str, Any]') \
+                -> 'TimedObjectiveGroup':
+
+        valid_kwargs = ('name', 'description', 'required_quantity',
+                        'sequential', 'time_limit', 'negation', 'valid_ships')
+
+        kwargs = {key: value for key, value in objective_content.items()
+                if key in valid_kwargs}
+
+        return TimedObjectiveGroup(
+            loader.load(objective_content['Objective']), **kwargs)
+
+    __OBJECTIVE_CREATE_FUNCTIONS = {
+
+        'goto': __createGoToObjective,
+        'list': __createObjectiveGroup,
+        'timed-list': __createTimedObjectiveGroup
+    }
