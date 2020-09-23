@@ -27,6 +27,8 @@ class ForceEmitter(Actuator):
         min_angle: float = kwargs.get('max_angle', 0)
         max_angle: float = kwargs.get('min_angle', min_angle)
 
+        self.__reaction_pc = kwargs.get('impulse_reaction', 0)
+
         self.__thrust_error = kwargs.get('thrust_error_gen')
         self.__angle_error = kwargs.get('angle_error_gen')
         self.__pos_error = kwargs.get('position_error_gen')
@@ -110,4 +112,6 @@ class ForceEmitter(Actuator):
         first_collision.shape.body.apply_force_at_world_point(
             force, first_collision.point)
 
-        body.apply_force_at_world_point(-force, pos)
+        reaction_force = -self.__reaction_pc*force
+
+        body.apply_force_at_world_point(reaction_force, pos)
