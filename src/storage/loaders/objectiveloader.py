@@ -1,7 +1,7 @@
 
 from typing import TYPE_CHECKING
 
-from .. import fileinfo
+from .. import fileinfo, configfilevariables
 
 from ...objectives.objective import ObjectiveGroup
 from ...objectives.gotoobjective import GoToObjective
@@ -48,7 +48,13 @@ class ObjectiveLoader:
             self.__create_functions[type_] = \
                 lambda objective_content, \
                     obj_model_info=obj_model_info: \
-                        self.__createCustomStaticObjectiveFunction(
+                        self.__createCustomDynamicObjectiveFunction(
+                            obj_model_info, objective_content)
+        elif mode == 'dynamic':
+            self.__create_functions[type_] = \
+                lambda objective_content, \
+                    obj_model_info=obj_model_info: \
+                        self.__createCustomDynamicObjectiveFunction(
                             obj_model_info, objective_content)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
@@ -57,6 +63,15 @@ class ObjectiveLoader:
     def __createCustomStaticObjectiveFunction(
             custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
+
+        return create_functions[objective['type']](objective)
+
+    @staticmethod
+    def __createCustomDynamicObjectiveFunction(
+            custom_objective_info: 'MutableMapping[str, Any]',
+            objective_content: 'MutableMapping[str, Any]') -> 'Objective':
+
+        configfilevariables.subVariables(objective_content)
 
         return create_functions[objective['type']](objective)
 
