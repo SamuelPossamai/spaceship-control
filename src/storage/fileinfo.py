@@ -570,7 +570,8 @@ class FileInfo:
         scenario_content = configfileinheritance.mergeInheritedFiles(
             scenario_content, self.__getScenarioContent, prefixes=prefixes)
 
-        return scenarioloader.loadScenario(scenario_content, prefixes=prefixes)
+        return scenarioloader.loadScenario(scenario_content, prefixes=prefixes,
+                                           objective_loader=objective_loader)
 
     def loadShip(self, model: str, name: str, space: 'Space',
                  communication_engine: 'CommunicationEngine' = None,

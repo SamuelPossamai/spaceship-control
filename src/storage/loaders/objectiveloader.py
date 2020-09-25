@@ -46,45 +46,42 @@ class ObjectiveLoader:
         mode = config.get('mode')
         if mode == 'static':
             self.__create_functions[type_] = \
-                lambda objective_content, \
+                lambda loader, objective_content, \
                     obj_model_info=obj_model_info: \
-                        self.__createCustomDynamicObjectiveFunction(
-                            obj_model_info, objective_content)
-        elif mode == 'dynamic':
+                        loader.__createCustomDynamicObjectiveFunction(
+                            objective_content, obj_model_info)
+        elif mode is None or mode == 'dynamic':
             self.__create_functions[type_] = \
-                lambda objective_content, \
+                lambda loader, objective_content, \
                     obj_model_info=obj_model_info: \
-                        self.__createCustomDynamicObjectiveFunction(
-                            obj_model_info, objective_content)
+                        loader.__createCustomDynamicObjectiveFunction(
+                            objective_content, obj_model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
-    @staticmethod
     def __createCustomStaticObjectiveFunction(
-            custom_objective_info: 'MutableMapping[str, Any]',
+            self, custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
 
-        return create_functions[objective['type']](objective)
+        return self.__createObjectiveGroup(objective_content)
 
-    @staticmethod
     def __createCustomDynamicObjectiveFunction(
-            custom_objective_info: 'MutableMapping[str, Any]',
+            self, custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
 
         configfilevariables.subVariables(objective_content)
 
-        return create_functions[objective['type']](objective)
+        return self.__createObjectiveGroup(objective_content)
 
     def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
             -> 'Sequence[Objective]':
 
         create_functions = self.__create_functions
 
-        return tuple(create_functions[objective['type']](objective)
+        return tuple(create_functions[objective['type']](self, objective)
                      for objective in objectives)
 
-    @staticmethod
-    def __createGoToObjective(_loader: 'ObjectiveLoader',
+    def __createGoToObjective(self,
                               objective_content: 'MutableMapping[str, Any]') \
             -> 'GoToObjective':
 
@@ -96,8 +93,7 @@ class ObjectiveLoader:
 
         return GoToObjective(position, distance, **kwargs)
 
-    @staticmethod
-    def __createObjectiveGroup(loader: 'ObjectiveLoader',
+    def __createObjectiveGroup(self,
                                objective_content: 'MutableMapping[str, Any]') \
             -> 'ObjectiveGroup':
 
@@ -105,15 +101,13 @@ class ObjectiveLoader:
                         'sequential', 'negation', 'valid_ships')
 
         kwargs = {key: value for key, value in objective_content.items()
-                if key in valid_kwargs}
+                  if key in valid_kwargs}
 
-        return ObjectiveGroup(loader.load(objective_content['Objective']),
+        return ObjectiveGroup(self.load(objective_content['Objective']),
                               **kwargs)
 
-    @staticmethod
     def __createTimedObjectiveGroup(
-            loader: 'ObjectiveLoader',
-            objective_content: 'MutableMapping[str, Any]') \
+            self, objective_content: 'MutableMapping[str, Any]') \
                 -> 'TimedObjectiveGroup':
 
         valid_kwargs = ('name', 'description', 'required_quantity',
@@ -123,7 +117,7 @@ class ObjectiveLoader:
                 if key in valid_kwargs}
 
         return TimedObjectiveGroup(
-            loader.load(objective_content['Objective']), **kwargs)
+            self.load(objective_content['Objective']), **kwargs)
 
     __OBJECTIVE_CREATE_FUNCTIONS = {
 

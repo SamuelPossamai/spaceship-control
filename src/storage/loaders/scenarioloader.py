@@ -133,7 +133,8 @@ def loadCommunicationEngine(engine_info: 'MutableMapping[str, Any]') \
                                engine_info.get('negligible_intensity', 10000))
 
 def loadScenario(scenario_info: 'MutableMapping[str, Any]',
-                 prefixes: 'Sequence[str]' = ()) -> 'ScenarioInfo':
+                 prefixes: 'Sequence[str]' = (),
+                 objective_loader=None) -> 'ScenarioInfo':
 
     scenario_content = scenario_info.get('Scenario', {})
 
@@ -141,7 +142,12 @@ def loadScenario(scenario_info: 'MutableMapping[str, Any]',
     ships = tuple(__readShipInfo(ship, prefixes)
                   for ship in scenario_info.get('Ship', ()))
 
-    objectives = tuple(loadObjectives(scenario_info.get('Objective', ())))
+    if objective_loader is None:
+        load_objectives_func = loadObjectives
+    else:
+        load_objectives_func = objective_loader.load
+
+    objectives = tuple(load_objectives_func(scenario_info.get('Objective', ())))
 
     objects = tuple(__readObjectInfo(obj, prefixes)
                     for obj in scenario_info.get('Object', ()))

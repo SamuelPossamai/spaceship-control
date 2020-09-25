@@ -66,3 +66,7 @@ x = -200
 y = -200
 
 height = 100
+
+[[Objective]]
+
+type = 'test1'
