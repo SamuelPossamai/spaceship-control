@@ -17,7 +17,8 @@ PACKAGE_BASE_NAME = 'spaceship_control'
 SOURCE_PATH = 'src'
 EXTRA_PACKAGES = ('examples.ships', 'examples.scenarios', 'examples.images',
                   'examples.controllers', 'examples.objects',
-                  'examples.controllers.lib', 'forms', 'docs')
+                  'examples.objectives', 'examples.controllers.lib', 'forms',
+                  'docs')
 
 packages = [PACKAGE_BASE_NAME]
 packages.extend(add_package_prefix(find_namespace_packages(where=SOURCE_PATH),
@@ -59,12 +60,14 @@ setup(
 
         'spaceship_control.forms': ['*.ui'],
         'spaceship_control.examples.ships':
-            ['*.toml', '*.json', '*.yml', '*.yaml'],
+            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
         'spaceship_control.examples.scenarios':
-            ['*.toml', '*.json', '*.yml', '*.yaml'],
+            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
         'spaceship_control.examples.objects':
-            ['*.toml', '*.json', '*.yml', '*.yaml'],
-        'spaceship_control.examples.images': ['*.png'],
+            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
+        'spaceship_control.examples.objectives':
+            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
+        'spaceship_control.examples.images': ['*/*.png'],
         'spaceship_control.examples.controllers': ['*.py'],
         'spaceship_control.examples.controllers.lib': ['*.py'],
         'spaceship_control.docs': ['*/**/*']
