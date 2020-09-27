@@ -44,6 +44,9 @@ with open('data/spaceshipcontrol.desktop') as file:
     with open(TEMP_DESKTOP_FILE, 'w') as outf:
         outf.write(desktop_file)
 
+DEFAULT_DESC_FILE_GLOB = ['*.toml', '*/*.toml', '*.json', '*/*.json', '*.yml',
+                          '*/*.yml', '*.yaml', '*/*.yaml']
+
 setup(
     name='spaceship-control',
     version='0.1',
@@ -59,15 +62,11 @@ setup(
     package_data={
 
         'spaceship_control.forms': ['*.ui'],
-        'spaceship_control.examples.ships':
-            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
-        'spaceship_control.examples.scenarios':
-            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
-        'spaceship_control.examples.objects':
-            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
-        'spaceship_control.examples.objectives':
-            ['*/*.toml', '*/*.json', '*/*.yml', '*/*.yaml'],
-        'spaceship_control.examples.images': ['*/*.png'],
+        'spaceship_control.examples.ships': DEFAULT_DESC_FILE_GLOB,
+        'spaceship_control.examples.scenarios': DEFAULT_DESC_FILE_GLOB,
+        'spaceship_control.examples.objects': DEFAULT_DESC_FILE_GLOB,
+        'spaceship_control.examples.objectives': DEFAULT_DESC_FILE_GLOB,
+        'spaceship_control.examples.images': ['*.png', '*/*.png'],
         'spaceship_control.examples.controllers': ['*.py'],
         'spaceship_control.examples.controllers.lib': ['*.py'],
         'spaceship_control.docs': ['*/**/*']

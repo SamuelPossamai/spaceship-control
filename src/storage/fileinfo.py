@@ -60,7 +60,8 @@ class FileInfo:
     __instance: 'Optional[FileInfo]' = None
 
     FileDataType = Enum('FileDataType', ('CONTROLLER', 'SHIPMODEL', 'SCENARIO',
-                                         'OBJECTMODEL', 'OBJECTIVE', 'IMAGE',
+                                         'OBJECTMODEL', 'OBJECTIVEMODEL',
+                                         'SHAPEMODEL', 'DEVICEMODEL', 'IMAGE',
                                          'UIDESIGN', 'HANDBOOK', 'METADATA'))
 
     FileMetadataType = _FileInfo_FileMetadataType
@@ -97,8 +98,16 @@ class FileInfo:
             'objects', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
             metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
-        FileDataType.OBJECTIVE: __DataTypeInfoType(
+        FileDataType.OBJECTIVEMODEL: __DataTypeInfoType(
             'objectives', False, __CONF_FILE_SUFFIX_LIST, True, (),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
+        FileDataType.SHAPEMODEL: __DataTypeInfoType(
+            'shapes', False, __CONF_FILE_SUFFIX_LIST, True, (),
+            __CONF_FILE_GLOB_LIST, 0o644,
+            metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
+        FileDataType.DEVICEMODEL: __DataTypeInfoType(
+            'devices', False, __CONF_FILE_SUFFIX_LIST, True, (),
             __CONF_FILE_GLOB_LIST, 0o644,
             metadata_type=FileMetadataType.CONF_FILE_DEFAULT),
         FileDataType.IMAGE: __DataTypeInfoType(
@@ -529,7 +538,7 @@ class FileInfo:
 
         if objective_tree is None:
             objective_tree = self.listFilesTree(
-                self.FileDataType.OBJECTIVE).children
+                self.FileDataType.OBJECTIVEMODEL).children
 
         for element in objective_tree:
 
@@ -545,7 +554,7 @@ class FileInfo:
             else:
                 try:
                     objective_loader.addCustomObjective(
-                        self.__getContent(path, self.FileDataType.OBJECTIVE))
+                        self.__getContent(path, self.FileDataType.OBJECTIVEMODEL))
                 except Exception as err:
                     print(f'Error in objective file \'{path}\': {err}',
                           file=sys.stderr)
