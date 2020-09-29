@@ -18,34 +18,41 @@ if TYPE_CHECKING:
 def loadObject(obj_info: 'MutableMapping[str, Any]', space: 'pymunk.Space',
                prefixes: 'Sequence[str]' = ()) -> 'ObjectInfo':
 
-    config_content = obj_info.get('Config', {})
+    return ObjectLoader().load(obj_info, space, prefixes)
 
-    if config_content is None:
-        is_static = False
-    else:
-        is_static = config_content.get('static', False)
+class ObjectLoader:
 
-    shapes = loadShapes(obj_info['Shape'])
+    def load(self, obj_info: 'MutableMapping[str, Any]', space: 'pymunk.Space',
+             prefixes: 'Sequence[str]' = ()) -> 'ObjectInfo':
 
-    if is_static is True:
+        config_content = obj_info.get('Config', {})
 
-        body = Body(body_type=Body.STATIC)
+        if config_content is None:
+            is_static = False
+        else:
+            is_static = config_content.get('static', False)
 
-        for shape in shapes:
-            shape.body = body
+        shapes = loadShapes(obj_info['Shape'])
 
-        space.add(shapes)
+        if is_static is True:
 
-    else:
-        mass = sum(shape.mass for shape in shapes)
-        moment = sum(shape.moment for shape in shapes)
+            body = Body(body_type=Body.STATIC)
 
-        body = Body(mass, moment)
+            for shape in shapes:
+                shape.body = body
 
-        for shape in shapes:
-            shape.body = body
+            space.add(shapes)
 
-        space.add(body, shapes)
+        else:
+            mass = sum(shape.mass for shape in shapes)
+            moment = sum(shape.moment for shape in shapes)
 
-    return ObjectInfo(body, loadImages(obj_info.get('Image', ()),
-                                       prefixes=prefixes))
+            body = Body(mass, moment)
+
+            for shape in shapes:
+                shape.body = body
+
+            space.add(body, shapes)
+
+        return ObjectInfo(body, loadImages(obj_info.get('Image', ()),
+                                           prefixes=prefixes))
