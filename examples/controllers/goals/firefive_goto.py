@@ -28,11 +28,6 @@ debug(goto_objectives)
 
 engines = ship.listEngines('linear-engine')
 
-for engine in engines:
-    engine.intensity = 4
-
-current_engine = 0
-
 objectives_iter = iter(goto_objectives)
 target = next(objectives_iter)
 
@@ -41,18 +36,66 @@ while True:
         debug(target)
 
         position = ship.position
-        angle = ship.angle
+        angle = ship.angle % 360
         speed = ship.speed
         angular_speed = ship.angular_speed
 
         debug(int(speed), int(angular_speed), position, angle)
 
-        engines[current_engine].intensity = 4*random.random()
+        desired_angle = 180*math.atan2(target[1] - position[1],
+                                       target[0] - position[0])/math.pi
 
-        current_engine = (current_engine + 1) % len(engines)
+        angle_diff = desired_angle - angle
+        if angle_diff > 180:
+            angle_diff -= 360
+        elif angle_diff < -180:
+            angle_diff += 360
 
-        if math.isclose(position[0], target[0], rel_tol=0, abs_tol=10) and \
-            math.isclose(position[1], target[1], rel_tol=0, abs_tol=10):
+        angle_diff_abs = abs(angle_diff)
+        angular_speed_abs = abs(angular_speed)
+
+        if angular_speed_abs > 4*angle_diff_abs:
+
+            if angular_speed_abs > 75:
+                intensity = 4
+            else:
+                intensity = angular_speed_abs//25 + 1
+
+            engines[0].intensity = 0
+            if angular_speed > 0:
+                engines[1].intensity = 0
+                engines[2].intensity = 0
+                engines[3].intensity = intensity
+                engines[4].intensity = intensity
+            else:
+                engines[1].intensity = intensity
+                engines[2].intensity = intensity
+                engines[3].intensity = 0
+                engines[4].intensity = 0
+        elif angle_diff_abs < 5 and angular_speed < 1:
+            engines[0].intensity = 4
+            engines[1].intensity = 4
+            engines[2].intensity = 4
+            engines[3].intensity = 4
+            engines[4].intensity = 4
+        else:
+            engines[0].intensity = 0
+            if angle_diff > 0:
+                engines[1].intensity = 1
+                engines[2].intensity = 4
+                engines[3].intensity = 0
+                engines[4].intensity = 0
+            else:
+                engines[1].intensity = 0
+                engines[2].intensity = 0
+                engines[3].intensity = 1
+                engines[4].intensity = 4
+
+        if angle_diff_abs > 60:
+            engines[0].intensity = 4
+
+        if math.isclose(position[0], target[0], rel_tol=0, abs_tol=30) and \
+            math.isclose(position[1], target[1], rel_tol=0, abs_tol=30):
 
             target = next(objectives_iter)
 
