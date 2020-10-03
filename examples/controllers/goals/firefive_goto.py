@@ -97,9 +97,14 @@ while True:
         if math.isclose(position[0], target[0], rel_tol=0, abs_tol=30) and \
             math.isclose(position[1], target[1], rel_tol=0, abs_tol=30):
 
-            target = next(objectives_iter)
+            target = next(objectives_iter, None)
 
             if target is None:
+                engines[0].intensity = 4
+                engines[1].intensity = 4
+                engines[2].intensity = 4
+                engines[3].intensity = 4
+                engines[4].intensity = 4
                 sys.exit()
 
     except BrokenPipeError:
