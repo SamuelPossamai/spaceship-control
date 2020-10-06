@@ -533,14 +533,12 @@ class FileInfo:
 
         return content
 
-    def __loadCustomObjectives(self, objective_loader, objective_tree=None,
-                               prefix=None):
+    def __loadCustom(self, filedatatype, loader, files_tree=None, prefix=None):
 
-        if objective_tree is None:
-            objective_tree = self.listFilesTree(
-                self.FileDataType.OBJECTIVEMODEL).children
+        if files_tree is None:
+            files_tree = self.listFilesTree(filedatatype).children
 
-        for element in objective_tree:
+        for element in files_tree:
 
             children = element.children
             if prefix:
@@ -549,15 +547,16 @@ class FileInfo:
                 path = element.name
 
             if children:
-                self.__loadCustomObjectives(objective_loader, children,
-                                            prefix=path)
+                self.__loadCustom(filedatatype, loader, children, prefix=path)
             else:
                 try:
-                    objective_loader.addCustomObjective(
-                        self.__getContent(path, self.FileDataType.OBJECTIVEMODEL))
+                    loader.addCustom(self.__getContent(path, filedatatype))
                 except Exception as err:
-                    print(f'Error in objective file \'{path}\': {err}',
-                          file=sys.stderr)
+
+                    filedatatype_info = self.__getFileDataTypeInfo(filedatatype)
+
+                    print(f'Error in objective file \'{filedatatype_info.path}'
+                          f'\': {err}', file=sys.stderr)
 
     def loadUi(self, filename: str) -> 'Tuple[Type, Type]':
         return typingcast(
@@ -567,7 +566,7 @@ class FileInfo:
     def loadScenario(self, scenario_name: str) -> 'ScenarioInfo':
 
         objective_loader = objectiveloader.ObjectiveLoader()
-        self.__loadCustomObjectives(objective_loader)
+        self.__loadCustom(self.FileDataType.OBJECTIVEMODEL, objective_loader)
 
         prefixes = scenario_name.split('/')[:-1]
 

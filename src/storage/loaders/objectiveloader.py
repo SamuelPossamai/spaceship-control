@@ -21,10 +21,10 @@ class ObjectiveLoader:
     def __init__(self) -> None:
         self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
 
-    def clearCustomObjectives(self) -> None:
+    def clearCustoms(self) -> None:
         self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
 
-    def addCustomObjective(self, custom_objective_info):
+    def addCustom(self, custom_objective_info):
 
         config = custom_objective_info.get('Configuration')
 
