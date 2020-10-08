@@ -1,8 +1,11 @@
 
 from .customloader import CustomLoader
 
+from .. import configfilevariables
+
 from ...utils.errorgenerator import ErrorGenerator
 
+from ...devices.device import DeviceGroup
 from ...devices.structure import StructuralPart
 from ...devices.sensors import (
     PositionSensor, AngleSensor, SpeedSensor, LineDetectSensor,
@@ -27,14 +30,39 @@ class DeviceLoader(CustomLoader):
 
         mode = config.get('mode')
         if mode == 'static':
-            pass # TODO: Implement
+            self._load_functions[model_type] = \
+                lambda loader, content, \
+                    obj_model_info=model_info: \
+                        loader.__createCustomDynamicDeviceFunction(
+                            content, model_info)
         elif mode is None or mode == 'dynamic':
-            pass # TODO: Implement
+            self._load_functions[model_type] = \
+                lambda loader, content, \
+                    obj_model_info=model_info: \
+                        loader.__createCustomDynamicDeviceFunction(
+                            content, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
+
+    def __createCustomStaticDeviceFunction(
+            self, custom_device_info: 'MutableMapping[str, Any]',
+            info: 'MutableMapping[str, Any]', part: StructuralPart) \
+                -> 'Tuple[Device, Sequence[QWidget]]':
+
+        raise NotImplementedError()
+
+    def __createCustomDynamicDeviceFunction(
+            self, custom_device_info: 'MutableMapping[str, Any]',
+            info: 'MutableMapping[str, Any]', part: StructuralPart) \
+                -> 'Tuple[Device, Sequence[QWidget]]':
+
+        configfilevariables.subVariables(custom_device_info)
+
+        raise NotImplementedError()
+
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
-             part: StructuralPart, **kwargs: 'Any') \
+             part: StructuralPart, device_group=None, **kwargs: 'Any') \
                  -> 'Tuple[Device, Sequence[QWidget]]':
 
         type_and_model = (device_type, info.get('type'), info.get('model'))
@@ -47,7 +75,10 @@ class DeviceLoader(CustomLoader):
 
         device, widgets = create_func(self, info, part, **kwargs)
 
-        part.addDevice(device, name=info.get('name'))
+        if device_group is None:
+            device_group = part
+
+        device_group.addDevice(device, name=info.get('name'))
 
         return device, widgets
 
@@ -312,6 +343,19 @@ class DeviceLoader(CustomLoader):
 
         return (ConfigurableSender(part, engine, info['intensity'],
                                 info['frequency'], **errors), ())
+
+    def __createDeviceGroup(self, info: 'MutableMapping[str, Any]',
+                            part: StructuralPart, **kwargs: 'Any') \
+                                -> 'Tuple[Device, Sequence[QWidget]]':
+
+        new_device = DeviceGroup()
+
+        kwargs['device_group'] = new_device
+
+        for device in info.get('Device', ()):
+            self.load(info, part, **kwargs)
+
+        return new_device, ()
 
     __DEVICE_CREATE_FUNCTIONS: 'DeviceCreateFunctionsType' = {
 

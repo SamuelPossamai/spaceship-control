@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from .customloader import CustomLoader
 
-from .. import fileinfo, configfilevariables
+from .. import configfilevariables
 
 from ...objectives.objective import ObjectiveGroup
 from ...objectives.gotoobjective import GoToObjective
