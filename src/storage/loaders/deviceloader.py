@@ -1,4 +1,6 @@
 
+from .customloader import CustomLoader
+
 from ...utils.errorgenerator import ErrorGenerator
 
 from ...devices.structure import StructuralPart
@@ -16,20 +18,27 @@ from ...devices.communicationdevices import (
     BasicReceiver, BasicSender, ConfigurableReceiver, ConfigurableSender
 )
 
-class DeviceLoader:
+class DeviceLoader(CustomLoader):
 
     def __init__(self) -> None:
-        self.__create_functions = self.__DEVICE_CREATE_FUNCTIONS.copy()
+        super().__init__(self.__DEVICE_CREATE_FUNCTIONS, label='Device')
 
-    def clearCustomDeviceModels(self) -> None:
-        self.__create_functions = self.__DEVICE_CREATE_FUNCTIONS.copy()
+    def _addCustom(self, config, model_type, model_info):
+
+        mode = config.get('mode')
+        if mode == 'static':
+            pass # TODO: Implement
+        elif mode is None or mode == 'dynamic':
+            pass # TODO: Implement
+        else:
+            raise Exception(f'Invalid mode \'{mode}\'')
 
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
              part: StructuralPart, **kwargs: 'Any') \
                  -> 'Tuple[Device, Sequence[QWidget]]':
 
         type_and_model = (device_type, info.get('type'), info.get('model'))
-        create_func = self.__create_functions.get(type_and_model)
+        create_func = self._load_functions.get(type_and_model)
 
         if create_func is None:
             type_and_model_str = f'{type_and_model[1]}/{type_and_model[2]}'

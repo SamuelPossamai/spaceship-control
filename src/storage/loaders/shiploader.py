@@ -93,7 +93,7 @@ class ShipLoader:
         if part is None:
             raise Exception(f"{device_type} has invalid part \'{part_name}\'.")
 
-        return self.__device_loader.load(device_type, info, part, **kwargs)
+        return self.__device_loader.load(device_type, info, part, **kwargs)[1]
 
     def __loadShipStructure(
             self, ship_info: 'MutableMapping[str, Any]', name: str,

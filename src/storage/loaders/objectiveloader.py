@@ -1,6 +1,8 @@
 
 from typing import TYPE_CHECKING
 
+from .customloader import CustomLoader
+
 from .. import fileinfo, configfilevariables
 
 from ...objectives.objective import ObjectiveGroup
@@ -16,46 +18,26 @@ def loadObjectives(objectives: 'Sequence[MutableMapping[str, Any]]') \
 
     return ObjectiveLoader().load(objectives)
 
-class ObjectiveLoader:
+class ObjectiveLoader(CustomLoader):
 
     def __init__(self) -> None:
-        self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
+        super().__init__(self.__OBJECTIVE_CREATE_FUNCTIONS, label='Objective')
 
-    def clearCustoms(self) -> None:
-        self.__create_functions = self.__OBJECTIVE_CREATE_FUNCTIONS.copy()
-
-    def addCustom(self, custom_objective_info):
-
-        config = custom_objective_info.get('Configuration')
-
-        if config is None:
-            raise Exception('Objective \'Configuration\' is required')
-
-        obj_model_info = custom_objective_info.get('ModelInfo')
-
-        if obj_model_info is None:
-            raise Exception('Objective \'ModelInfo\' is required')
-
-        type_ = config.get('type')
-        if type_ is None:
-            raise Exception('Objective type is required')
-
-        if type_ in self.__create_functions:
-            raise Exception(f'Objective type \'{type_}\' already in use')
+    def _addCustom(self, config, model_type, model_info):
 
         mode = config.get('mode')
         if mode == 'static':
-            self.__create_functions[type_] = \
+            self._load_functions[model_type] = \
                 lambda loader, objective_content, \
-                    obj_model_info=obj_model_info: \
+                    obj_model_info=model_info: \
                         loader.__createCustomDynamicObjectiveFunction(
-                            objective_content, obj_model_info)
+                            objective_content, model_info)
         elif mode is None or mode == 'dynamic':
-            self.__create_functions[type_] = \
+            self._load_functions[model_type] = \
                 lambda loader, objective_content, \
-                    obj_model_info=obj_model_info: \
+                    obj_model_info=model_info: \
                         loader.__createCustomDynamicObjectiveFunction(
-                            objective_content, obj_model_info)
+                            objective_content, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
@@ -76,7 +58,7 @@ class ObjectiveLoader:
     def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
             -> 'Sequence[Objective]':
 
-        create_functions = self.__create_functions
+        create_functions = self._load_functions
 
         return tuple(create_functions[objective['type']](self, objective)
                      for objective in objectives)
