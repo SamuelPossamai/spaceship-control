@@ -28,27 +28,27 @@ class ObjectiveLoader(CustomLoader):
         mode = config.get('mode')
         if mode == 'static':
             self._load_functions[model_type] = \
-                lambda loader, objective_content, \
+                lambda self, objective_content, \
                     obj_model_info=model_info: \
-                        loader.__createCustomDynamicObjectiveFunction(
+                        self.__createCustomDynamicObjectiveFunction(
                             objective_content, model_info)
         elif mode is None or mode == 'dynamic':
             self._load_functions[model_type] = \
-                lambda loader, objective_content, \
+                lambda self, objective_content, \
                     obj_model_info=model_info: \
-                        loader.__createCustomDynamicObjectiveFunction(
+                        self.__createCustomDynamicObjectiveFunction(
                             objective_content, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
     def __createCustomStaticObjectiveFunction(
-            self, custom_objective_info: 'MutableMapping[str, Any]',
+            self, _custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
 
         return self.__createObjectiveGroup(objective_content)
 
     def __createCustomDynamicObjectiveFunction(
-            self, custom_objective_info: 'MutableMapping[str, Any]',
+            self, _custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
 
         configfilevariables.subVariables(objective_content)
@@ -71,7 +71,7 @@ class ObjectiveLoader(CustomLoader):
         distance = objective_content['distance']
 
         kwargs = {key: value for key, value in objective_content.items()
-                if key in ('name', 'description', 'negation', 'valid_ships')}
+                  if key in ('name', 'description', 'negation', 'valid_ships')}
 
         return GoToObjective(position, distance, **kwargs)
 
@@ -96,7 +96,7 @@ class ObjectiveLoader(CustomLoader):
                         'sequential', 'time_limit', 'negation', 'valid_ships')
 
         kwargs = {key: value for key, value in objective_content.items()
-                if key in valid_kwargs}
+                  if key in valid_kwargs}
 
         return TimedObjectiveGroup(
             self.load(objective_content['Objective']), **kwargs)

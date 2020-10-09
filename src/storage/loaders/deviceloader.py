@@ -104,11 +104,11 @@ class DeviceLoader(CustomLoader):
 
         if error_max_minfac < 0 or error_max_minfac > 1:
             raise ValueError('error_max_minfac must be a value between 0 and 1'
-                            f', {error_max_minfac} is not a valid value')
+                             f', {error_max_minfac} is not a valid value')
 
         return ErrorGenerator(error_max=error_max,
-                            offset_max=offset_max,
-                            error_max_minfac=error_max_minfac)
+                              offset_max=offset_max,
+                              error_max_minfac=error_max_minfac)
 
     def __loadErrorMutableMapping(
             self, errors: 'MutableMapping[str, MutableMapping[str, Any]]') \
@@ -118,9 +118,9 @@ class DeviceLoader(CustomLoader):
                 if not name.startswith('__')}
 
     def __getErrorKwargs(
-        self, content: 'MutableMapping[str, MutableMapping[str, Any]]',
-        errors: 'MutableMapping[str, str]') \
-            -> 'MutableMapping[str, ErrorGenerator]':
+            self, content: 'MutableMapping[str, MutableMapping[str, Any]]',
+            errors: 'MutableMapping[str, str]') \
+                -> 'MutableMapping[str, ErrorGenerator]':
 
         errors_content = content.get('Error')
 
@@ -131,7 +131,7 @@ class DeviceLoader(CustomLoader):
 
         return {key: value for key, value in
                 ((error_keyword, errors_dict.get(error_tablename))
-                for error_tablename, error_keyword in errors.items())
+                 for error_tablename, error_keyword in errors.items())
                 if value is not None}
 
     def __engineErrorKwargs(
@@ -176,63 +176,61 @@ class DeviceLoader(CustomLoader):
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return PositionSensor(part, info['reading_time'],
-                            read_error_max=info.get('error_max', 0),
-                            read_offset_max=info.get('offset_max', 0)), ()
+                              read_error_max=info.get('error_max', 0),
+                              read_offset_max=info.get('offset_max', 0)), ()
 
     def __createAngleSensor(
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AngleSensor(part, info['reading_time'],
-                        read_error_max=info.get('error_max', 0),
-                        read_offset_max=info.get('offset_max', 0)), ()
+                           read_error_max=info.get('error_max', 0),
+                           read_offset_max=info.get('offset_max', 0)), ()
 
     def __createSpeedSensor(
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return SpeedSensor(part, info['reading_time'],
-                        read_error_max=info.get('error_max', 0),
-                        read_offset_max=info.get('offset_max', 0),
-                        angle=info.get('angle', 0)), ()
+                           read_error_max=info.get('error_max', 0),
+                           read_offset_max=info.get('offset_max', 0),
+                           angle=info.get('angle', 0)), ()
 
     def __createVelocitySensor(
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return VelocitySensor(part, info['reading_time'],
-                            read_error_max=info.get('error_max', 0),
-                            read_offset_max=info.get('offset_max', 0)), ()
+                              read_error_max=info.get('error_max', 0),
+                              read_offset_max=info.get('offset_max', 0)), ()
 
     def __createAccelerationSensor(self, info: 'MutableMapping[str, Any]',
                                    part: StructuralPart, **_kwargs: 'Any') \
             -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AccelerationSensor(part, info['reading_time'],
-                                read_error_max=info.get('error_max', 0),
-                                read_offset_max=info.get('offset_max', 0)), ()
+                                  read_error_max=info.get('error_max', 0),
+                                  read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createAngularAccelerationSensor(self, info: 'MutableMapping[str, Any]',
-                                        part: StructuralPart,
-                                        **_kwargs: 'Any') \
-            -> 'Tuple[Device, Sequence[QWidget]]':
+    def __createAngularAccelerationSensor(
+            self, info: 'MutableMapping[str, Any]', part: StructuralPart,
+            **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return (AngularAccelerationSensor(
             part, info['reading_time'], read_error_max=info.get('error_max', 0),
             read_offset_max=info.get('offset_max', 0)), ())
 
     def __createAngularSpeedSensor(self, info: 'MutableMapping[str, Any]',
-                                part: StructuralPart) \
-                                    -> 'Tuple[Device, Sequence[QWidget]]':
+                                   part: StructuralPart) \
+                                       -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AngularSpeedSensor(part, info['reading_time'],
-                                read_error_max=info.get('error_max', 0),
-                                read_offset_max=info.get('offset_max', 0)), ()
+                                  read_error_max=info.get('error_max', 0),
+                                  read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createObstacleDistanceSensor(self, info: 'MutableMapping[str, Any]',
-                                    part: StructuralPart,
-                                    **_kwargs: 'Any') \
-                                        -> 'Tuple[Device, Sequence[QWidget]]':
+    def __createObstacleDistanceSensor(
+            self, info: 'MutableMapping[str, Any]', part: StructuralPart,
+            **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return LineDetectSensor(part, info['reading_time'],
                                 read_error_max=info.get('error_max', 0),
@@ -242,18 +240,20 @@ class DeviceLoader(CustomLoader):
 
     def __createTextDisplay(self, info: 'MutableMapping[str, Any]',
                             _part: StructuralPart,
-                            **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
+                            **_kwargs: 'Any') \
+                                -> 'Tuple[Device, Sequence[QWidget]]':
 
         device = TextDisplayDevice()
 
         label = device.widget
 
         label.setGeometry(info.get('x', 0), info.get('y', 0),
-                        info.get('width', 100), info.get('height', 30))
+                          info.get('width', 100), info.get('height', 30))
 
         return device, (label,)
 
-    def __createConsole(self, info: 'MutableMapping[str, Any]', _part: StructuralPart,
+    def __createConsole(self, info: 'MutableMapping[str, Any]',
+                        _part: StructuralPart,
                         **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         device = ConsoleDevice(info.get('columns', 20), info.get('rows', 5))
@@ -261,14 +261,14 @@ class DeviceLoader(CustomLoader):
         text = device.widget
 
         text.setGeometry(info.get('x', 0), info.get('y', 0),
-                        info.get('width', 100), 0)
+                         info.get('width', 100), 0)
 
         return (device, (text,))
 
     def __createKeyboardReceiver(self, info: 'MutableMapping[str, Any]',
-                                _part: StructuralPart,
-                                **_kwargs: 'Any') \
-                                    -> 'Tuple[Device, Sequence[QWidget]]':
+                                 _part: StructuralPart,
+                                 **_kwargs: 'Any') \
+                                     -> 'Tuple[Device, Sequence[QWidget]]':
 
         device = KeyboardReceiverDevice()
 
@@ -278,32 +278,33 @@ class DeviceLoader(CustomLoader):
 
         return device, (button,)
 
-    def __createButton(self, info: 'MutableMapping[str, Any]', _part: StructuralPart,
-                    **_kwargs: 'Any') \
-                        -> 'Tuple[Device, Sequence[QWidget]]':
+    def __createButton(self, info: 'MutableMapping[str, Any]',
+                       _part: StructuralPart,
+                       **_kwargs: 'Any') \
+                           -> 'Tuple[Device, Sequence[QWidget]]':
 
         device = ButtonDevice()
 
         button = device.widget
 
         button.setGeometry(info.get('x', 0), info.get('y', 0),
-                        info.get('width', 20), info.get('height', 20))
+                           info.get('width', 20), info.get('height', 20))
 
         return device, (button,)
 
     def __createBasicReceiver(self, info: 'MutableMapping[str, Any]',
-                            part: StructuralPart,
-                            engine: 'CommunicationEngine' = None,
-                            **_kwargs: 'Any') \
-                                -> 'Tuple[Device, Sequence[QWidget]]':
+                              part: StructuralPart,
+                              engine: 'CommunicationEngine' = None,
+                              **_kwargs: 'Any') \
+                                  -> 'Tuple[Device, Sequence[QWidget]]':
 
         if engine is None:
             raise Exception('Communication module is present, but communication'
                             ' was not enabled')
 
         return BasicReceiver(part, info.get('minimum_intensity', 0),
-                            info['frequency'], info.get('tolerance', 0.5),
-                            engine=engine), ()
+                             info['frequency'], info.get('tolerance', 0.5),
+                             engine=engine), ()
 
     def __createBasicSender(self, info: 'MutableMapping[str, Any]', part: StructuralPart,
                             engine: 'CommunicationEngine' = None,
@@ -314,7 +315,7 @@ class DeviceLoader(CustomLoader):
             raise Exception('Communication module is present, but communication'
                             ' was not enabled')
 
-        errors = __getErrorKwargs(info, {
+        errors = self.__getErrorKwargs(info, {
             'Frequency': 'frequency_err_gen',
             'Intensity': 'intensity_err_gen'
         })
@@ -322,27 +323,29 @@ class DeviceLoader(CustomLoader):
         return (BasicSender(part, engine, info['intensity'], info['frequency'],
                             **errors), ())
 
-    def __createConfReceiver(self, info: 'MutableMapping[str, Any]', part: StructuralPart,
-                            engine: 'CommunicationEngine' = None,
-                            **_kwargs: 'Any') \
-                                -> 'Tuple[Device, Sequence[QWidget]]':
+    def __createConfReceiver(self, info: 'MutableMapping[str, Any]',
+                             part: StructuralPart,
+                             engine: 'CommunicationEngine' = None,
+                             **_kwargs: 'Any') \
+                                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         return ConfigurableReceiver(part, info.get('minimum_intensity', 0),
                                     info['frequency'], info.get('tolerance', 0.5),
                                     engine=engine), ()
 
-    def __createConfSender(self, info: 'MutableMapping[str, Any]', part: StructuralPart,
-                        engine: 'CommunicationEngine' = None,
-                        **_kwargs: 'Any') \
-                            -> 'Tuple[Device, Sequence[QWidget]]':
+    def __createConfSender(self, info: 'MutableMapping[str, Any]',
+                           part: StructuralPart,
+                           engine: 'CommunicationEngine' = None,
+                           **_kwargs: 'Any') \
+                               -> 'Tuple[Device, Sequence[QWidget]]':
 
-        errors = __getErrorKwargs(info, {
+        errors = self.__getErrorKwargs(info, {
             'Frequency': 'frequency_err_gen',
             'Intensity': 'intensity_err_gen'
         })
 
         return (ConfigurableSender(part, engine, info['intensity'],
-                                info['frequency'], **errors), ())
+                                   info['frequency'], **errors), ())
 
     def __createDeviceGroup(self, info: 'MutableMapping[str, Any]',
                             part: StructuralPart, **kwargs: 'Any') \
@@ -353,7 +356,7 @@ class DeviceLoader(CustomLoader):
         kwargs['device_group'] = new_device
 
         for device in info.get('Device', ()):
-            self.load(info, part, **kwargs)
+            self.load(device.get('kind', 'Sensor'), device, part, **kwargs)
 
         return new_device, ()
 

@@ -26,7 +26,7 @@ class ControllerLoader:
              debug_queue: 'SimpleQueue', lock: 'Lock') -> 'Thread':
 
         process = Popen([program_path, json_info], stdin=PIPE, stdout=PIPE,
-                    stderr=PIPE)
+                        stderr=PIPE)
 
         Thread(target=self.__controllerThreadWatcher,
                args=(process, ship, lock)).start()
