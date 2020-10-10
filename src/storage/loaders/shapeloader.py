@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 from pymunk import Circle, Poly, Segment
 
+from .customloader import CustomLoader
+
 if TYPE_CHECKING:
     from typing import Any, Dict, Sequence, Tuple
     import pymunk
@@ -12,10 +14,13 @@ def loadShapes(info_list: 'Sequence[Dict[str, Any]]') \
 
     return ShapeLoader().load(info_list)
 
-class ShapeLoader:
+class ShapeLoader(CustomLoader):
 
     def __init__(self):
-        self.__shape_create_functions = self.__SHAPE_CREATE_FUNCTIONS.copy()
+        super().__init__(self.__SHAPE_CREATE_FUNCTIONS, label='Shape')
+
+    def _addCustom(self, config, model_type, model_info):
+        pass
 
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
@@ -26,7 +31,7 @@ class ShapeLoader:
 
         type_ = info.get('type')
 
-        create_func = self.__shape_create_functions.get(type_)
+        create_func = self._load_functions.get(type_)
 
         if create_func is None:
             raise Exception(f'Invalid shape type \'{type_}\'')
