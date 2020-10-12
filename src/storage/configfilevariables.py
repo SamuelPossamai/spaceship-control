@@ -79,7 +79,7 @@ def subVariables(content: 'Any', enabled: bool = None,
     if enabled is False:
         return content
 
-    if isinstance(content, MutableMapping):
+    if isinstance(content, MutableMapping): # pylint: disable=isinstance-second-argument-not-valid-type
         must_return, ret_val = __dictSubVariables(content, enabled, variables)
         if must_return:
             return ret_val

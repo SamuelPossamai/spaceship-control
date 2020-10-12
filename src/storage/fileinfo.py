@@ -679,6 +679,6 @@ class FileInfo:
         info = FileInfo.__DATA_TYPE_INFO.get(filedatatype)
 
         if info is None:
-            raise ValueError(f'Invalid file data type')
+            raise ValueError('Invalid file data type')
 
         return info

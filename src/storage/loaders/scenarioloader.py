@@ -174,7 +174,7 @@ class ScenarioLoader:
             model, _ = resolvePrefix(model, prefixes)
 
             if model is None:
-                raise ValueError(f'Object model not found')
+                raise ValueError('Object model not found')
 
         position = (obj_content.get('x', 0), obj_content.get('y', 0))
         angle = pi*obj_content.get('angle', 0)/180

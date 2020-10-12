@@ -31,28 +31,28 @@ class DeviceLoader(CustomLoader):
         mode = config.get('mode')
         if mode == 'static':
             self._load_functions[model_type] = \
-                lambda loader, content, \
+                lambda self, content, \
                     obj_model_info=model_info: \
-                        loader.__createCustomDynamicDeviceFunction(
+                        self.__createCustomDynamicDeviceFunction(
                             content, model_info)
         elif mode is None or mode == 'dynamic':
             self._load_functions[model_type] = \
-                lambda loader, content, \
+                lambda self, content, \
                     obj_model_info=model_info: \
-                        loader.__createCustomDynamicDeviceFunction(
+                        self.__createCustomDynamicDeviceFunction(
                             content, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
 
-    def __createCustomStaticDeviceFunction(
+    def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
             info: 'MutableMapping[str, Any]', part: StructuralPart) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         raise NotImplementedError()
 
-    def __createCustomDynamicDeviceFunction(
+    def __createCustomDynamicDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
             info: 'MutableMapping[str, Any]', part: StructuralPart) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
@@ -82,7 +82,8 @@ class DeviceLoader(CustomLoader):
 
         return device, widgets
 
-    def __loadError(self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
+    @staticmethod
+    def __loadError(info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
         error_max = info.get('error_max', 0)
 
@@ -144,7 +145,7 @@ class DeviceLoader(CustomLoader):
             'Position': 'position_error_gen'
         })
 
-    def __createLinearEngine(
+    def __createLinearEngine( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -158,7 +159,7 @@ class DeviceLoader(CustomLoader):
             intensity_offset=info.get('intensity_offset', 0),
             **self.__engineErrorKwargs(info)), ()
 
-    def __createForceEmitter(
+    def __createForceEmitter( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -171,7 +172,7 @@ class DeviceLoader(CustomLoader):
             **fe_kwargs,
             **self.__engineErrorKwargs(info)), ()
 
-    def __createPositionSensor(
+    def __createPositionSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -179,7 +180,7 @@ class DeviceLoader(CustomLoader):
                               read_error_max=info.get('error_max', 0),
                               read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createAngleSensor(
+    def __createAngleSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -187,7 +188,7 @@ class DeviceLoader(CustomLoader):
                            read_error_max=info.get('error_max', 0),
                            read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createSpeedSensor(
+    def __createSpeedSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -196,7 +197,7 @@ class DeviceLoader(CustomLoader):
                            read_offset_max=info.get('offset_max', 0),
                            angle=info.get('angle', 0)), ()
 
-    def __createVelocitySensor(
+    def __createVelocitySensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -204,7 +205,7 @@ class DeviceLoader(CustomLoader):
                               read_error_max=info.get('error_max', 0),
                               read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createAccelerationSensor(self, info: 'MutableMapping[str, Any]',
+    def __createAccelerationSensor(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                                    part: StructuralPart, **_kwargs: 'Any') \
             -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -212,7 +213,7 @@ class DeviceLoader(CustomLoader):
                                   read_error_max=info.get('error_max', 0),
                                   read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createAngularAccelerationSensor(
+    def __createAngularAccelerationSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -220,7 +221,7 @@ class DeviceLoader(CustomLoader):
             part, info['reading_time'], read_error_max=info.get('error_max', 0),
             read_offset_max=info.get('offset_max', 0)), ())
 
-    def __createAngularSpeedSensor(self, info: 'MutableMapping[str, Any]',
+    def __createAngularSpeedSensor(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                                    part: StructuralPart) \
                                        -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -228,7 +229,7 @@ class DeviceLoader(CustomLoader):
                                   read_error_max=info.get('error_max', 0),
                                   read_offset_max=info.get('offset_max', 0)), ()
 
-    def __createObstacleDistanceSensor(
+    def __createObstacleDistanceSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -238,7 +239,7 @@ class DeviceLoader(CustomLoader):
                                 angle=info.get('angle'),
                                 distance=info.get('distance')), ()
 
-    def __createTextDisplay(self, info: 'MutableMapping[str, Any]',
+    def __createTextDisplay(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                             _part: StructuralPart,
                             **_kwargs: 'Any') \
                                 -> 'Tuple[Device, Sequence[QWidget]]':
@@ -252,7 +253,7 @@ class DeviceLoader(CustomLoader):
 
         return device, (label,)
 
-    def __createConsole(self, info: 'MutableMapping[str, Any]',
+    def __createConsole(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                         _part: StructuralPart,
                         **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -265,7 +266,7 @@ class DeviceLoader(CustomLoader):
 
         return (device, (text,))
 
-    def __createKeyboardReceiver(self, info: 'MutableMapping[str, Any]',
+    def __createKeyboardReceiver(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                                  _part: StructuralPart,
                                  **_kwargs: 'Any') \
                                      -> 'Tuple[Device, Sequence[QWidget]]':
@@ -278,7 +279,7 @@ class DeviceLoader(CustomLoader):
 
         return device, (button,)
 
-    def __createButton(self, info: 'MutableMapping[str, Any]',
+    def __createButton(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                        _part: StructuralPart,
                        **_kwargs: 'Any') \
                            -> 'Tuple[Device, Sequence[QWidget]]':
@@ -292,7 +293,7 @@ class DeviceLoader(CustomLoader):
 
         return device, (button,)
 
-    def __createBasicReceiver(self, info: 'MutableMapping[str, Any]',
+    def __createBasicReceiver(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                               part: StructuralPart,
                               engine: 'CommunicationEngine' = None,
                               **_kwargs: 'Any') \
@@ -306,7 +307,8 @@ class DeviceLoader(CustomLoader):
                              info['frequency'], info.get('tolerance', 0.5),
                              engine=engine), ()
 
-    def __createBasicSender(self, info: 'MutableMapping[str, Any]', part: StructuralPart,
+    def __createBasicSender(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
+                            part: StructuralPart,
                             engine: 'CommunicationEngine' = None,
                             **_kwargs: 'Any') \
                                 -> 'Tuple[Device, Sequence[QWidget]]':

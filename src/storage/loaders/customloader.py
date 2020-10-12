@@ -9,9 +9,9 @@ class CustomLoader(ABC):
         self._load_functions = create_functions_base.copy()
 
     def clearCustoms(self) -> None:
-        self._load_functions = create_functions_base.copy()
+        self._load_functions = self.__create_functions_base.copy()
 
-    def _getType(self, config):
+    def _getType(self, config): # pylint: disable=no-self-use
         return config.get('type')
 
     @abstractmethod

@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING, cast as typingcast
 
 from pymunk import Body
 
-from ...utils.errorgenerator import ErrorGenerator
-
 from ...devices.structure import Structure, StructuralPart
 
 from .shapeloader import loadShapes
