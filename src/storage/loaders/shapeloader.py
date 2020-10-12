@@ -1,7 +1,7 @@
 
 from typing import TYPE_CHECKING
 
-from pymunk import Circle, Poly, Segment
+from pymunk import Shape, Circle, Poly, Segment
 
 from .customloader import CustomLoader
 
@@ -25,7 +25,17 @@ class ShapeLoader(CustomLoader):
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
 
-        return tuple(self.__createShape(shape_info) for shape_info in info_list)
+        shapes = []
+
+        for shape_info in info_list:
+            new_shapes = self.__createShape(shape_info)
+            if new_shapes is not None:
+                if isinstance(new_shapes, Shape):
+                    shapes.append(new_shapes)
+                else:
+                    shapes.extend(new_shapes)
+
+        return tuple(shapes)
 
     def __createShape(self, info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
@@ -112,10 +122,20 @@ class ShapeLoader(CustomLoader):
 
         return shape
 
+    def __createShapeGroup(self, info: 'Dict[str, Any]') -> 'pymunk.Shape':
+
+        shapes_info = info.get('Shape')
+
+        if shapes_info:
+            return self.load(shapes_info)
+
+        return None
+
     __SHAPE_CREATE_FUNCTIONS = {
 
         'circle': __createCircleShape,
         'polygon': __createPolyShape,
         'line': __createLineShape,
-        'rectangle': __createRectangleShape
+        'rectangle': __createRectangleShape,
+        'group': __createShapeGroup
     }
