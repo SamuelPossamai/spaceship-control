@@ -44,7 +44,6 @@ class DeviceLoader(CustomLoader):
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
-
     def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
             info: 'MutableMapping[str, Any]', part: StructuralPart) \

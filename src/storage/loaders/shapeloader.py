@@ -20,7 +20,36 @@ class ShapeLoader(CustomLoader):
         super().__init__(self.__SHAPE_CREATE_FUNCTIONS, label='Shape')
 
     def _addCustom(self, config, model_type, model_info):
-        pass
+
+        mode = config.get('mode')
+        if mode == 'static':
+            self._load_functions[model_type] = \
+                lambda self, content, \
+                    obj_model_info=model_info: \
+                        self.__createCustomDynamicShapeFunction(
+                            content, model_info)
+        elif mode is None or mode == 'dynamic':
+            self._load_functions[model_type] = \
+                lambda self, content, \
+                    obj_model_info=model_info: \
+                        self.__createCustomDynamicShapeFunction(
+                            content, model_info)
+        else:
+            raise Exception(f'Invalid mode \'{mode}\'')
+
+    def __createCustomStaticShapeFunction(
+            self, _custom_shape_info: 'MutableMapping[str, Any]',
+            shape_content: 'MutableMapping[str, Any]'):
+
+        return self.__createShapeGroup(objective_content)
+
+    def __createCustomDynamicShapeFunction(
+            self, _custom_shape_info: 'MutableMapping[str, Any]',
+            shape_content: 'MutableMapping[str, Any]'):
+
+        configfilevariables.subVariables(objective_content)
+
+        return self.__createShapeGroup(objective_content)
 
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
