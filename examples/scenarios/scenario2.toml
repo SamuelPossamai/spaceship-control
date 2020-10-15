@@ -69,4 +69,9 @@ height = 100
 
 [[Objective]]
 
-type = 'test1'
+type = 'test2'
+
+    [[Objective.Variable]]
+
+    id = 'var1'
+    value = 14

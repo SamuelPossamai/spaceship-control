@@ -48,10 +48,15 @@ class ObjectiveLoader(CustomLoader):
         return self.__createObjectiveGroup(objective_content)
 
     def __createCustomDynamicObjectiveFunction(
-            self, _custom_objective_info: 'MutableMapping[str, Any]',
+            self, custom_objective_info: 'MutableMapping[str, Any]',
             objective_content: 'MutableMapping[str, Any]') -> 'Objective':
 
-        configfilevariables.subVariables(objective_content)
+        variables = {variable['id']: variable['value'] for variable in
+                     custom_objective_info.get('Variable', ())}
+
+        configfilevariables.subVariables(objective_content,
+                                         variables=variables,
+                                         enabled=True)
 
         return self.__createObjectiveGroup(objective_content)
 
