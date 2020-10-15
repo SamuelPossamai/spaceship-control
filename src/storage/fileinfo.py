@@ -20,7 +20,7 @@ from . import configfileinheritance, configfilevariables
 
 from .loaders import (
     shiploader, scenarioloader, controllerloader, objectloader, textloader,
-    objectiveloader
+    objectiveloader, shapeloader
 )
 
 from ..utils import dictutils
@@ -154,7 +154,8 @@ class FileInfo:
             self.__config_content = {}
 
         create_n_link_example_dirs = ['controllers', 'ships', 'scenarios',
-                                      'objects', 'objectives', 'images']
+                                      'objects', 'objectives', 'images',
+                                      'shapes']
 
         dist_data_examples_path = self.__dist_data_path.joinpath('examples')
 
@@ -585,6 +586,9 @@ class FileInfo:
                  communication_engine: 'CommunicationEngine' = None,
                  variables: 'Dict[str, Any]' = None) -> 'ShipInfo':
 
+        shape_loader = shapeloader.ShapeLoader()
+        self.__loadCustom(self.FileDataType.SHAPEMODEL, shape_loader)
+
         prefixes = model.split('/')[:-1]
 
         ship_content = self.__getShipContent(model, variables=variables)
@@ -593,7 +597,8 @@ class FileInfo:
             ship_content, self.__getShipContent, prefixes=prefixes)
 
         return shiploader.loadShip(ship_content, name, space, prefixes=prefixes,
-                                   communication_engine=communication_engine)
+                                   communication_engine=communication_engine,
+                                   shape_loader=shape_loader)
 
     def loadObject(self, model: str, space: 'Space',
                    variables: 'Dict[str, Any]' = None) \

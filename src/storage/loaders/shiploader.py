@@ -6,7 +6,7 @@ from pymunk import Body
 
 from ...devices.structure import Structure, StructuralPart
 
-from .shapeloader import loadShapes
+from .shapeloader import ShapeLoader
 from .imageloader import loadImages
 from .deviceloader import DeviceLoader
 
@@ -29,23 +29,29 @@ ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 
 def loadShip(ship_info: 'MutableMapping[str, Any]', name: str,
              space: 'pymunk.Space', prefixes: 'Sequence[str]' = (),
-             communication_engine: 'Optional[CommunicationEngine]' = None) \
+             communication_engine: 'Optional[CommunicationEngine]' = None,
+             shape_loader=None) \
         -> 'ShipInfo':
 
-    return ShipLoader().load(ship_info, name, space, prefixes=prefixes,
-                             communication_engine=communication_engine)
+    return ShipLoader(shape_loader=shape_loader).load(
+        ship_info, name, space, prefixes=prefixes,
+        communication_engine=communication_engine,)
 
 class ShipLoader:
 
-    def __init__(self) -> None:
+    def __init__(self, shape_loader=None) -> None:
         self.__device_loader = DeviceLoader()
+        if shape_loader is None:
+            self.__shape_loader = ShapeLoader()
+        else:
+            self.__shape_loader = shape_loader
 
     def load(self, ship_info: 'MutableMapping[str, Any]', name: str,
              space: 'pymunk.Space', prefixes: 'Sequence[str]' = (),
              communication_engine: 'Optional[CommunicationEngine]' = None) \
         -> 'ShipInfo':
 
-        shapes = loadShapes(ship_info['Shape'])
+        shapes = self.__shape_loader.load(ship_info['Shape'])
 
         mass = sum(shape.mass for shape in shapes)
         moment = sum(shape.moment for shape in shapes)
