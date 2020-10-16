@@ -5,6 +5,8 @@ from pymunk import Shape, Circle, Poly, Segment
 
 from .customloader import CustomLoader
 
+from .. import configfilevariables
+
 if TYPE_CHECKING:
     from typing import Any, Dict, Sequence, Tuple
     import pymunk
@@ -47,9 +49,14 @@ class ShapeLoader(CustomLoader):
             self, _custom_shape_info: 'MutableMapping[str, Any]',
             shape_content: 'MutableMapping[str, Any]'):
 
-        configfilevariables.subVariables(objective_content)
+        variables = {variable['id']: variable['value'] for variable in
+                     shape_content.get('Variable', ())}
 
-        return self.__createShapeGroup(objective_content)
+        configfilevariables.subVariables(shape_content,
+                                         variables=variables,
+                                         enabled=True)
+
+        return self.__createShapeGroup(shape_content)
 
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
