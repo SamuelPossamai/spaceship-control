@@ -43,7 +43,7 @@ class ShapeLoader(CustomLoader):
             self, _custom_shape_info: 'MutableMapping[str, Any]',
             shape_content: 'MutableMapping[str, Any]'):
 
-        return self.__createShapeGroup(objective_content)
+        return self.load((shape_content,))
 
     def __createCustomDynamicShapeFunction(
             self, _custom_shape_info: 'MutableMapping[str, Any]',
@@ -56,7 +56,7 @@ class ShapeLoader(CustomLoader):
                                          variables=variables,
                                          enabled=True)
 
-        return self.__createShapeGroup(shape_content)
+        return self.load((shape_content,))
 
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
