@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from pymunk import Body
 
-from .shapeloader import loadShapes
+from .shapeloader import ShapeLoader
 from .imageloader import loadImages
 
 ObjectInfo = namedtuple('ObjectInfo', ('body', 'images'))
@@ -16,11 +16,19 @@ if TYPE_CHECKING:
     from ...devices.structure import Structure
 
 def loadObject(obj_info: 'MutableMapping[str, Any]', space: 'pymunk.Space',
-               prefixes: 'Sequence[str]' = ()) -> 'ObjectInfo':
+               prefixes: 'Sequence[str]' = (), shape_loader=None) \
+                   -> 'ObjectInfo':
 
-    return ObjectLoader().load(obj_info, space, prefixes)
+    return ObjectLoader(shape_loader=shape_loader).load(
+        obj_info, space, prefixes)
 
 class ObjectLoader:
+
+    def __init__(self, shape_loader=None):
+        if shape_loader is None:
+            self.__shape_loader = ShapeLoader()
+        else:
+            self.__shape_loader = shape_loader
 
     def load(self, obj_info: 'MutableMapping[str, Any]', space: 'pymunk.Space',
              prefixes: 'Sequence[str]' = ()) -> 'ObjectInfo':
@@ -32,7 +40,7 @@ class ObjectLoader:
         else:
             is_static = config_content.get('static', False)
 
-        shapes = loadShapes(obj_info['Shape'])
+        shapes = self.__shape_loader.load(obj_info['Shape'])
 
         if is_static is True:
 

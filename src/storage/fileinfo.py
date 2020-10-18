@@ -604,6 +604,9 @@ class FileInfo:
                    variables: 'Dict[str, Any]' = None) \
                        -> 'ObjectInfo':
 
+        shape_loader = shapeloader.ShapeLoader()
+        self.__loadCustom(self.FileDataType.SHAPEMODEL, shape_loader)
+
         prefixes = model.split('/')[:-1]
 
         obj_content = self.__getObjectContent(model, variables=variables)
@@ -614,7 +617,8 @@ class FileInfo:
         obj_content = configfileinheritance.mergeInheritedFiles(
             obj_content, self.__getObjectContent, prefixes=prefixes)
 
-        return objectloader.loadObject(obj_content, space, prefixes=prefixes)
+        return objectloader.loadObject(obj_content, space, prefixes=prefixes,
+                                       shape_loader=shape_loader)
 
     def loadController(self, controller_name: str, ship: 'Structure',
                        json_info: str, debug_queue: 'SimpleQueue',
