@@ -95,7 +95,7 @@ class ShapeLoader(CustomLoader):
     def __createCircleShape(self, info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
         shape = Circle(None, info['radius'],
-                    (info.get('x', 0), info.get('y', 0)))
+                       (info.get('x', 0), info.get('y', 0)))
 
         self.__setGeneralProperties(shape, info)
 
@@ -104,7 +104,7 @@ class ShapeLoader(CustomLoader):
     def __createPolyShape(self, info: 'Dict[str, Any]') -> 'pymunk.Shape':
 
         points = tuple((point.get('x', 0), point.get('y', 0))
-                    for point in info['Point'])
+                       for point in info['Point'])
         shape = Poly(None, points)
 
         self.__setGeneralProperties(shape, info)
@@ -118,14 +118,14 @@ class ShapeLoader(CustomLoader):
 
         if pos_x is None or pos_y is None:
             raise ValueError('Both \'x\' and \'y\' position of a rectangle '
-                            'shape must be provided')
+                             'shape must be provided')
 
         width = info.get('width')
         height = info.get('height')
 
         if width is None or height is None:
             raise ValueError('Both \'width\' and \'height\' of a rectangle '
-                            'shape must be provided')
+                             'shape must be provided')
 
         shape = Poly(None, (
             (pos_x, pos_y), (pos_x + width, pos_y),
@@ -143,7 +143,7 @@ class ShapeLoader(CustomLoader):
             raise ValueError('Line must have exactly two points')
 
         points = tuple((point.get('x', 0), point.get('y', 0))
-                    for point in points)
+                       for point in points)
 
         if points[0] == points[1]:
             raise ValueError('Start and end of the line must be different')

@@ -145,7 +145,7 @@ class ScenarioLoader:
         variables: 'Optional[MutableMapping[str, Any]]'
         if variables_content:
             variables = {variable['id']: variable['value']
-                        for variable in variables_content}
+                         for variable in variables_content}
         else:
             variables = None
 
@@ -185,7 +185,7 @@ class ScenarioLoader:
         variables: 'Optional[MutableMapping[str, Any]]'
         if variables_content:
             variables = {variable['id']: variable['value']
-                        for variable in variables_content}
+                         for variable in variables_content}
         else:
             variables = None
 

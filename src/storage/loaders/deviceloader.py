@@ -162,7 +162,8 @@ class DeviceLoader(CustomLoader):
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
-        valid_keys = {'min_intensity', 'max_intensity', 'min_angle', 'max_angle'}
+        valid_keys = {'min_intensity', 'max_intensity', 'min_angle',
+                      'max_angle'}
 
         fe_kwargs = {key: val for key, val in info.items() if key in valid_keys}
 
@@ -331,7 +332,8 @@ class DeviceLoader(CustomLoader):
                                  -> 'Tuple[Device, Sequence[QWidget]]':
 
         return ConfigurableReceiver(part, info.get('minimum_intensity', 0),
-                                    info['frequency'], info.get('tolerance', 0.5),
+                                    info['frequency'],
+                                    info.get('tolerance', 0.5),
                                     engine=engine), ()
 
     def __createConfSender(self, info: 'MutableMapping[str, Any]',
@@ -371,7 +373,8 @@ class DeviceLoader(CustomLoader):
         ('Sensor', 'angular-speed', None): __createAngularSpeedSensor,
         ('Sensor', 'velocity', None): __createVelocitySensor,
         ('Sensor', 'acceleration', None): __createAccelerationSensor,
-        ('Sensor', 'angular-acceleration', None): __createAngularAccelerationSensor,
+        ('Sensor', 'angular-acceleration', None):
+            __createAngularAccelerationSensor,
         ('Sensor', 'detect', 'linear-distance'): __createObstacleDistanceSensor,
         ('InterfaceDevice', 'text-display', None): __createTextDisplay,
         ('InterfaceDevice', 'text-display', 'line'): __createTextDisplay,
