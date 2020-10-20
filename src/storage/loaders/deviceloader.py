@@ -46,19 +46,25 @@ class DeviceLoader(CustomLoader):
 
     def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
-            info: 'MutableMapping[str, Any]', part: StructuralPart) \
+            info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
-        raise NotImplementedError()
+        return self.load(custom_device_info.get('function_type'),
+                         info. part, **kwargs)
 
     def __createCustomDynamicDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
-            info: 'MutableMapping[str, Any]', part: StructuralPart) \
+            info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
-        configfilevariables.subVariables(custom_device_info)
+        variables = {variable['id']: variable['value'] for variable in
+                     shape_content.get('Variable', ())}
 
-        raise NotImplementedError()
+        configfilevariables.subVariables(info, variables=variables,
+                                         enabled=True)
+
+        return self.load(custom_device_info.get('function_type'),
+                         info. part, **kwargs)
 
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
              part: StructuralPart, device_group=None, **kwargs: 'Any') \
