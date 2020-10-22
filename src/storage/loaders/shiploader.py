@@ -30,21 +30,26 @@ ShipInfo = namedtuple('ShipInfo', ('device', 'images', 'widgets'))
 def loadShip(ship_info: 'MutableMapping[str, Any]', name: str,
              space: 'pymunk.Space', prefixes: 'Sequence[str]' = (),
              communication_engine: 'Optional[CommunicationEngine]' = None,
-             shape_loader=None) \
+             shape_loader=None, device_loader=None) \
         -> 'ShipInfo':
 
-    return ShipLoader(shape_loader=shape_loader).load(
+    return ShipLoader(shape_loader=shape_loader,
+                      device_loader=device_loader).load(
         ship_info, name, space, prefixes=prefixes,
         communication_engine=communication_engine,)
 
 class ShipLoader:
 
-    def __init__(self, shape_loader=None) -> None:
-        self.__device_loader = DeviceLoader()
+    def __init__(self, shape_loader=None, device_loader=None) -> None:
         if shape_loader is None:
             self.__shape_loader = ShapeLoader()
         else:
             self.__shape_loader = shape_loader
+
+        if device_loader is None:
+            self.__device_loader = DeviceLoader()
+        else:
+            self.__device_loader = device_loader
 
     def load(self, ship_info: 'MutableMapping[str, Any]', name: str,
              space: 'pymunk.Space', prefixes: 'Sequence[str]' = (),
