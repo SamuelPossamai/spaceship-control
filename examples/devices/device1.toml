@@ -1,0 +1,18 @@
+
+[Configuration]
+
+mode = 'static'
+
+function_type = 'InterfaceDevice'
+type = 'device1'
+
+[ModelInfo]
+
+function_type = 'InterfaceDevice'
+type = 'text-display'
+model = 'console'
+
+x = 10
+y = 200
+columns = 25
+rows = 15

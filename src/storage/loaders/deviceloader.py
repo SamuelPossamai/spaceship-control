@@ -26,21 +26,25 @@ class DeviceLoader(CustomLoader):
     def __init__(self) -> None:
         super().__init__(self.__DEVICE_CREATE_FUNCTIONS, label='Device')
 
+    def _getType(self, config): # pylint: disable=no-self-use
+        return (config.get('function_type'), config.get('type'),
+                config.get('model'))
+
     def _addCustom(self, config, model_type, model_info):
 
         mode = config.get('mode')
         if mode == 'static':
             self._load_functions[model_type] = \
-                lambda self, content, \
+                lambda self, content, part, \
                     obj_model_info=model_info: \
-                        self.__createCustomDynamicDeviceFunction(
-                            content, model_info)
+                        self.__createCustomStaticDeviceFunction(
+                            model_info, content, part)
         elif mode is None or mode == 'dynamic':
             self._load_functions[model_type] = \
-                lambda self, content, \
+                lambda self, content, part, \
                     obj_model_info=model_info: \
                         self.__createCustomDynamicDeviceFunction(
-                            content, model_info)
+                            model_info, content, part)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
@@ -50,7 +54,7 @@ class DeviceLoader(CustomLoader):
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         return self.load(custom_device_info.get('function_type'),
-                         info. part, **kwargs)
+                         custom_device_info, part, **kwargs)
 
     def __createCustomDynamicDeviceFunction( # pylint: disable=no-self-use
             self, custom_device_info: 'MutableMapping[str, Any]',
@@ -58,13 +62,14 @@ class DeviceLoader(CustomLoader):
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         variables = {variable['id']: variable['value'] for variable in
-                     shape_content.get('Variable', ())}
+                     info.get('Variable', ())}
 
-        configfilevariables.subVariables(info, variables=variables,
+        configfilevariables.subVariables(custom_device_info,
+                                         variables=variables,
                                          enabled=True)
 
         return self.load(custom_device_info.get('function_type'),
-                         info. part, **kwargs)
+                         custom_device_info, part, **kwargs)
 
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
              part: StructuralPart, device_group=None, **kwargs: 'Any') \

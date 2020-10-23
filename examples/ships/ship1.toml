@@ -212,10 +212,4 @@ y = 28
 part = 'part2'
 
 name = 'display2'
-type = 'text-display'
-model = 'console'
-
-x = 10
-y = 200
-columns = 25
-rows = 15
+type = 'device1'
