@@ -1,4 +1,6 @@
 
+import functools
+
 from .customloader import CustomLoader
 
 from .. import configfilevariables
@@ -34,30 +36,28 @@ class DeviceLoader(CustomLoader):
 
         mode = config.get('mode')
         if mode == 'static':
-            self._load_functions[model_type] = \
-                lambda self, content, part, \
-                    obj_model_info=model_info: \
-                        self.__createCustomStaticDeviceFunction(
-                            model_info, content, part)
+            self._load_functions[model_type] = functools.partial(
+                self.__createCustomStaticDeviceFunction, model_info)
         elif mode is None or mode == 'dynamic':
-            self._load_functions[model_type] = \
-                lambda self, content, part, \
-                    obj_model_info=model_info: \
-                        self.__createCustomDynamicDeviceFunction(
-                            model_info, content, part)
+            self._load_functions[model_type] = functools.partial(
+                self.__createCustomDynamicDeviceFunction, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
+    @staticmethod
     def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
-            self, custom_device_info: 'MutableMapping[str, Any]',
+            custom_device_info: 'MutableMapping[str, Any]',
+            loader: 'DeviceLoader',
             info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
-        return self.load(custom_device_info.get('function_type'),
-                         custom_device_info, part, **kwargs)
+        return loader.load(custom_device_info.get('function_type'),
+                           custom_device_info, part, **kwargs)
 
+    @staticmethod
     def __createCustomDynamicDeviceFunction( # pylint: disable=no-self-use
-            self, custom_device_info: 'MutableMapping[str, Any]',
+            custom_device_info: 'MutableMapping[str, Any]',
+            loader: 'DeviceLoader',
             info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -68,8 +68,8 @@ class DeviceLoader(CustomLoader):
                                          variables=variables,
                                          enabled=True)
 
-        return self.load(custom_device_info.get('function_type'),
-                         custom_device_info, part, **kwargs)
+        return loader.load(custom_device_info.get('function_type'),
+                           custom_device_info, part, **kwargs)
 
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
              part: StructuralPart, device_group=None, **kwargs: 'Any') \
