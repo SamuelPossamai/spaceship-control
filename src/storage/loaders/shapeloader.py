@@ -1,4 +1,5 @@
 
+import functools
 from typing import TYPE_CHECKING
 
 from pymunk import Shape, Circle, Poly, Segment
@@ -25,29 +26,25 @@ class ShapeLoader(CustomLoader):
 
         mode = config.get('mode')
         if mode == 'static':
-            self._load_functions[model_type] = \
-                lambda self, content, \
-                    obj_model_info=model_info: \
-                        self.__createCustomDynamicShapeFunction(
-                            content, model_info)
+            self._load_functions[model_type] = functools.partial(
+                self.__createCustomDynamicShapeFunction, model_info)
         elif mode is None or mode == 'dynamic':
-            self._load_functions[model_type] = \
-                lambda self, content, \
-                    obj_model_info=model_info: \
-                        self.__createCustomDynamicShapeFunction(
-                            content, model_info)
+            self._load_functions[model_type] = functools.partial(
+                self.__createCustomDynamicShapeFunction, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
+    @staticmethod
     def __createCustomStaticShapeFunction(
-            self, _custom_shape_info: 'MutableMapping[str, Any]',
-            shape_content: 'MutableMapping[str, Any]'):
+            shape_content: 'MutableMapping[str, Any]', loader,
+            custom_shape_info: 'MutableMapping[str, Any]'):
 
-        return self.load((shape_content,))
+        return loader.load((shape_content,))
 
+    @staticmethod
     def __createCustomDynamicShapeFunction(
-            self, _custom_shape_info: 'MutableMapping[str, Any]',
-            shape_content: 'MutableMapping[str, Any]'):
+            shape_content: 'MutableMapping[str, Any]', loader,
+            custom_shape_info: 'MutableMapping[str, Any]'):
 
         variables = {variable['id']: variable['value'] for variable in
                      shape_content.get('Variable', ())}
@@ -56,7 +53,7 @@ class ShapeLoader(CustomLoader):
                                          variables=variables,
                                          enabled=True)
 
-        return self.load((shape_content,))
+        return loader.load((shape_content,))
 
     def load(self, info_list: 'Sequence[Dict[str, Any]]') \
             -> 'Tuple[pymunk.Shape, ...]':
