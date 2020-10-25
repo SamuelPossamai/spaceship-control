@@ -28,9 +28,20 @@ class DeviceLoader(CustomLoader):
     def __init__(self) -> None:
         super().__init__(self.__DEVICE_CREATE_FUNCTIONS, label='Device')
 
-    def _getType(self, config): # pylint: disable=no-self-use
-        return (config.get('function_type'), config.get('type'),
-                config.get('model'))
+    def _getTypes(self, config): # pylint: disable=no-self-use
+
+        function_type = config.get('function_type')
+        type_ = config.get('type')
+        models = config.get('model')
+
+        if isinstance(models, list):
+            types = []
+            for model in models:
+                types.append((function_type, type_, model))
+
+            return types
+
+        return ((function_type, type_, models), )
 
     def _addCustom(self, config, model_type, model_info):
 
@@ -395,5 +406,6 @@ class DeviceLoader(CustomLoader):
         ('Communication', 'receiver', None): __createBasicReceiver,
         ('Communication', 'sender', None): __createBasicSender,
         ('Communication', 'receiver', 'configurable'): __createConfReceiver,
-        ('Communication', 'sender', 'configurable'): __createConfSender
+        ('Communication', 'sender', 'configurable'): __createConfSender,
+        ('DeviceGroup', None, None): __createDeviceGroup
     }

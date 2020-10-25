@@ -11,8 +11,8 @@ class CustomLoader(ABC):
     def clearCustoms(self) -> None:
         self._load_functions = self.__create_functions_base.copy()
 
-    def _getType(self, config): # pylint: disable=no-self-use
-        return config.get('type')
+    def _getTypes(self, config): # pylint: disable=no-self-use
+        return (config.get('type'),)
 
     @abstractmethod
     def _addCustom(self, config, model_type, model_info):
@@ -30,12 +30,13 @@ class CustomLoader(ABC):
         if model_info is None:
             raise Exception('{self.__label} \'ModelInfo\' is required')
 
-        model_type = self._getType(config)
-        if model_type is None:
+        model_types = self._getTypes(config)
+        if model_types is None:
             raise Exception('{self.__label} type is required')
 
-        if model_type in self._load_functions:
-            raise Exception(f'{self.__label} type \'{model_type}\''
-                            ' already in use')
+        for type_ in model_types:
+            if type_ in self._load_functions:
+                raise Exception(f'{self.__label} type \'{type_}\''
+                                ' already in use')
 
-        return self._addCustom(config, model_type, model_info)
+            self._addCustom(config, type_, model_info)
