@@ -1,5 +1,6 @@
 
 import functools
+from typing import TYPE_CHECKING
 
 from .customloader import CustomLoader
 
@@ -22,6 +23,15 @@ from ...devices.interfacedevice import (
 from ...devices.communicationdevices import (
     BasicReceiver, BasicSender, ConfigurableReceiver, ConfigurableSender
 )
+
+if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
+    from typing import Sequence, Tuple, Any, MutableMapping
+    from PyQt5.QtWidgets import QWidget
+    from ...devices.device import Device
+    from ...devices.communicationdevices import CommunicationEngine
+    # pylint: enable=ungrouped-imports
+
 
 class DeviceLoader(CustomLoader):
 
