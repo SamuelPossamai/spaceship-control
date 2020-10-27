@@ -7,8 +7,12 @@ type = 'shape1'
 
 [ModelInfo]
 
-type = 'circle'
-mass = 10
-radius = 50
+type = 'group'
 elasticity = 0.95
 friction = 0.9
+
+    [[ModelInfo.Shape]]
+
+    type = 'circle'
+    mass = 10
+    radius = 50
