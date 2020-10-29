@@ -9,10 +9,12 @@ from PyQt5.QtGui import QPolygonF
 import pymunk
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import List, Sequence, Any, Optional
     from pymunk import Shape
     from PyQt5.QtGui import QColor, QPainter
     from PyQt5.QtWidgets import QStyleOptionGraphicsItem, QWidget
+    # pylint: enable=ungrouped-imports
 
 class DrawingPart(ABC):
 

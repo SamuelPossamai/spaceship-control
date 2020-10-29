@@ -35,8 +35,8 @@ def loadShip(ship_info: 'MutableMapping[str, Any]', name: str,
 
     return ShipLoader(shape_loader=shape_loader,
                       device_loader=device_loader).load(
-        ship_info, name, space, prefixes=prefixes,
-        communication_engine=communication_engine,)
+                          ship_info, name, space, prefixes=prefixes,
+                          communication_engine=communication_engine,)
 
 class ShipLoader:
 

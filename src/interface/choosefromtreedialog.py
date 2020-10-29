@@ -17,9 +17,11 @@ UiChooseFromTree, _ = FileInfo().loadUi('choosefromtree.ui') # pylint: disable=i
 sys.path.pop(0)
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     import anytree
     from typing import Sequence, Optional
     from PyQt5.QtWidgets import QWidget
+    # pylint: enable=ungrouped-imports
 
 class ChooseFromTreeDialog(QDialog):
 

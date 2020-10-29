@@ -5,9 +5,11 @@ from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import Sequence, List, Optional
     import anytree
     from PyQt5.QtWidgets import QWidget
+    # pylint: enable=ungrouped-imports
 
 class NodeValue:
 

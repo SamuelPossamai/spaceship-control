@@ -198,8 +198,8 @@ class ShapeLoader(CustomLoader):
         return shape
 
     def __createShapeGroup(self, info: 'Dict[str, Any]',
-                          default_elasticity: float = None,
-                          default_friction: float = None) -> 'pymunk.Shape':
+                           default_elasticity: float = None,
+                           default_friction: float = None) -> 'pymunk.Shape':
 
         shapes_info = info.get('Shape')
 

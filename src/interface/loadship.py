@@ -16,12 +16,14 @@ from .loadgraphicitem import loadGraphicItem
 from ..storage.fileinfo import FileInfo
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from threading import Lock
     from typing import Optional, Dict, Any, Callable, Sequence
     import pymunk
     from anytree import Node
     from ..devices.communicationdevices import CommunicationEngine
     from ..storage.loaders.scenarioloader import ShipInfo
+    # pylint: enable=ungrouped-imports
 
     DialogCallable = Callable[[Node], Optional[Sequence[str]]]
 
