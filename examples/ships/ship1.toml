@@ -5,26 +5,6 @@ type = 'shape1'
 
 [[Shape]]
 
-id = 'small-circle-1'
-type = 'circle'
-mass = 1
-radius = 10
-elasticity = 0.95
-friction = 0.9
-y = 60
-
-[[Shape]]
-
-id = 'small-circle-2'
-type = 'circle'
-mass = 1
-radius = 10
-elasticity = 0.95
-friction = 0.9
-y = -60
-
-[[Shape]]
-
 id = 'poly-shape'
 type = 'polygon'
 mass = 3

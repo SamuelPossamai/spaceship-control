@@ -4,15 +4,30 @@
 mode = 'static'
 
 type = 'shape1'
+mass = 12
 
 [ModelInfo]
 
 type = 'group'
 elasticity = 0.95
 friction = 0.9
+mass = 12
 
     [[ModelInfo.Shape]]
 
     type = 'circle'
     mass = 10
     radius = 50
+
+    [[ModelInfo.Shape]]
+
+    type = 'circle'
+    radius = 10
+    y = 60
+
+    [[ModelInfo.Shape]]
+
+    id = 'small-circle-2'
+    type = 'circle'
+    radius = 10
+    y = -60

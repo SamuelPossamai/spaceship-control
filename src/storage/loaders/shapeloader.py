@@ -1,4 +1,5 @@
 
+import sys
 import functools
 from typing import TYPE_CHECKING
 
@@ -112,8 +113,6 @@ class ShapeLoader(CustomLoader):
         shape.elasticity = info.get('elasticity', default_elasticity)
         shape.friction = info.get('friction', default_friction)
 
-        print(shape.elasticity)
-
     def __createCircleShape(self, info: 'Dict[str, Any]',
                             default_elasticity: float = None,
                             default_friction: float = None) -> 'pymunk.Shape':
@@ -210,9 +209,30 @@ class ShapeLoader(CustomLoader):
 
             default_friction = info.get('friction', default_friction)
 
-            return self.load(shapes_info,
-                             default_elasticity=default_elasticity,
-                             default_friction=default_friction)
+            all_shapes = self.load(shapes_info,
+                                   default_elasticity=default_elasticity,
+                                   default_friction=default_friction)
+
+            mass = info.get('mass')
+            if mass is not None:
+                mass -= sum(shape.mass for shape in all_shapes
+                            if shape.mass != 0)
+
+                if mass > 0:
+
+
+                    not_specified_mass = [shape for shape in all_shapes
+                                          if shape.mass == 0]
+
+                    total_area = sum(shape.area for shape in not_specified_mass)
+
+                    for shape in not_specified_mass:
+                        shape.mass = mass*shape.area/total_area
+                elif mass < 0:
+                    print(('Total mass is higher than shape group '
+                           'specified mass'), file=sys.stderr)
+
+            return all_shapes
 
         return None
 
