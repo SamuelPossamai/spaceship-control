@@ -3,6 +3,7 @@ import functools
 from typing import TYPE_CHECKING
 
 from .customloader import CustomLoader
+from .errorloader import loadError
 
 from .. import configfilevariables
 
@@ -113,40 +114,11 @@ class DeviceLoader(CustomLoader):
 
         return device, widgets
 
-    @staticmethod
-    def __loadError(info: 'MutableMapping[str, Any]') -> ErrorGenerator:
-
-        error_max = info.get('error_max', 0)
-
-        if not isinstance(error_max, (int, float)):
-            raise TypeError(
-                f'error_max must be a number and not {type(error_max)}')
-
-        offset_max = info.get('offset_max', 0)
-
-        if not isinstance(offset_max, (int, float)):
-            raise TypeError(
-                f'offset_max must be a number and not {type(offset_max)}')
-
-        error_max_minfac = info.get('error_max_minfac', 1)
-
-        if not isinstance(error_max_minfac, (int, float)):
-            raise TypeError('error_max_minfac must be a '
-                            f'number and not {type(error_max_minfac)}')
-
-        if error_max_minfac < 0 or error_max_minfac > 1:
-            raise ValueError('error_max_minfac must be a value between 0 and 1'
-                             f', {error_max_minfac} is not a valid value')
-
-        return ErrorGenerator(error_max=error_max,
-                              offset_max=offset_max,
-                              error_max_minfac=error_max_minfac)
-
     def __loadErrorMutableMapping(
             self, errors: 'MutableMapping[str, MutableMapping[str, Any]]') \
                 -> 'MutableMapping[str, ErrorGenerator]':
 
-        return {name: self.__loadError(info) for name, info in errors.items()
+        return {name: loadError(info) for name, info in errors.items()
                 if not name.startswith('__')}
 
     def __getErrorKwargs(

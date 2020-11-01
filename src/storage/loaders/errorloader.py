@@ -4,54 +4,55 @@ from typing import TYPE_CHECKING
 
 from ...utils.errorgenerator import ErrorGenerator
 
+from .customloader import CustomLoader
+
 if TYPE_CHECKING:
     from typing import Any, MutableMapping, Sequence
 
-def loadError(objectives: 'Sequence[MutableMapping[str, Any]]') \
+def loadError(info: 'Sequence[MutableMapping[str, Any]]') \
         -> 'Sequence[Objective]':
 
-    return ErrorLoader().load(objectives)
+    return ErrorLoader().load(info)
 
-class ErrorLoader:
+class ErrorLoader(CustomLoader):
 
     def __init__(self) -> None:
-        super().__init__(self.__OBJECTIVE_CREATE_FUNCTIONS, label='Objective')
+        super().__init__(self.__CREATE_FUNCTIONS, label='Error')
 
     def _addCustom(self, config, model_type, model_info):
 
         mode = config.get('mode')
         if mode == 'static':
             self._load_functions[model_type] = functools.partial(
-                self.__createCustomDynamicObjectiveFunction, model_info)
+                self.__createCustomDynamicFunction, model_info)
         elif mode is None or mode == 'dynamic':
             self._load_functions[model_type] = functools.partial(
-                self.__createCustomDynamicObjectiveFunction, model_info)
+                self.__createCustomDynamicFunction, model_info)
         else:
             raise Exception(f'Invalid mode \'{mode}\'')
 
     @staticmethod
-    def __createCustomStaticObjectiveFunction(
+    def __createCustomStaticFunction(
             content: 'MutableMapping[str, Any]', loader,
             custom_info: 'MutableMapping[str, Any]'):
 
         raise NotImplementedError()
 
     @staticmethod
-    def __createCustomDynamicObjectiveFunction(
+    def __createCustomDynamicFunction(
             content: 'MutableMapping[str, Any]', loader,
             custom_info: 'MutableMapping[str, Any]'):
 
         raise NotImplementedError()
 
-    def load(self, info: 'MutableMapping[str, Any]') -> ErrorGenerator\
-            -> 'Sequence[Objective]':
+    def load(self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
         create_functions = self._load_functions
 
-        return create_functions[objective['type']](self, info)
+        return create_functions[info.get('type')](self, info)
 
-    @staticmethod
-    def __loadLinearError(info: 'MutableMapping[str, Any]') -> ErrorGenerator:
+    def __loadLinearError(self,
+                          info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
         error_max = info.get('error_max', 0)
 
