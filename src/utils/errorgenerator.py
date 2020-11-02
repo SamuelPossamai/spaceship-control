@@ -45,4 +45,14 @@ class NormalDistributionErrorGenerator(ErrorGenerator):
         if self.__error_max == 0:
             return val
 
-        return val + numpy.random.normal(val, self.__error_max/2, 1000)
+        return val + numpy.random.normal(val, self.__error_max/2)
+
+class TriangularDistributionErrorGenerator(ErrorGenerator):
+
+    def __call__(self, val: float) -> float:
+        val += self.__offset
+        if self.__error_max == 0:
+            return val
+
+        return val + numpy.random.triangular(
+            val - self.__error_max, val, val + self.__error_max)
