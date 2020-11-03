@@ -2,7 +2,10 @@
 import functools
 from typing import TYPE_CHECKING
 
-from ...utils.errorgenerator import ErrorGenerator
+from ...utils.errorgenerator import (
+    ErrorGenerator, NormalDistributionErrorGenerator,
+    TriangularDistributionErrorGenerator
+)
 
 from .customloader import CustomLoader
 
@@ -51,37 +54,70 @@ class ErrorLoader(CustomLoader):
 
         return create_functions[info.get('type')](self, info)
 
+    @staticmethod
+    def __loadNumber(info: 'MutableMapping[str, Any]', field: str,
+                     default: float = 0) -> float:
+
+        value = info.get(field, default)
+
+        if not isinstance(value, (int, float)):
+            raise TypeError(
+                f'{field} must be a number and not {type(value)}')
+
+        return value
+
+    @staticmethod
+    def __loadNumberInterval(info: 'MutableMapping[str, Any]', field: str,
+                             min_, max_, default: float = 0) -> float:
+
+        value = ErrorLoader.__loadNumber(info, field, default=default)
+
+        if value < min_ or value > max_:
+            raise ValueError(f'{field} must be a value between {min_} and '
+                             f'{max_}, {value} is not a valid value')
+
+        return value
+
     def __loadLinearError(self,
                           info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
-        error_max = info.get('error_max', 0)
-
-        if not isinstance(error_max, (int, float)):
-            raise TypeError(
-                f'error_max must be a number and not {type(error_max)}')
-
-        offset_max = info.get('offset_max', 0)
-
-        if not isinstance(offset_max, (int, float)):
-            raise TypeError(
-                f'offset_max must be a number and not {type(offset_max)}')
-
-        error_max_minfac = info.get('error_max_minfac', 1)
-
-        if not isinstance(error_max_minfac, (int, float)):
-            raise TypeError('error_max_minfac must be a '
-                            f'number and not {type(error_max_minfac)}')
-
-        if error_max_minfac < 0 or error_max_minfac > 1:
-            raise ValueError('error_max_minfac must be a value between 0 and 1'
-                             f', {error_max_minfac} is not a valid value')
+        error_max = self.__loadNumber(info, 'error_max')
+        offset_max = self.__loadNumber(info, 'offset_max')
+        error_max_minfac = self.__loadNumberInterval(
+            info, 'error_max_minfac', 0, 1)
 
         return ErrorGenerator(error_max=error_max,
                               offset_max=offset_max,
                               error_max_minfac=error_max_minfac)
 
+    def __loadTriangularError(
+            self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
+
+        error_max = self.__loadNumber(info, 'error_max')
+        offset_max = self.__loadNumber(info, 'offset_max')
+        error_max_minfac = self.__loadNumberInterval(
+            info, 'error_max_minfac', 0, 1, default=1)
+
+        return TriangularDistributionErrorGenerator(
+            error_max=error_max, offset_max=offset_max,
+            error_max_minfac=error_max_minfac)
+
+    def __loadNormalError(
+            self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
+
+        error_max = 2*self.__loadNumber(info, 'sigma')
+        offset_max = self.__loadNumber(info, 'offset_max')
+        error_max_minfac = self.__loadNumberInterval(
+            info, 'error_max_minfac', 0, 1)
+
+        return NormalDistributionErrorGenerator(
+            error_max=error_max, offset_max=offset_max,
+            error_max_minfac=error_max_minfac)
+
     __CREATE_FUNCTIONS = {
 
         None: __loadLinearError,
-        'goto': __loadLinearError
+        'uniform': __loadLinearError,
+        'triangular': __loadTriangularError,
+        'normal': __loadNormalError
     }
