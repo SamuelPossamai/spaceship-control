@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 
 from ...utils.errorgenerator import (
     ErrorGenerator, NormalDistributionErrorGenerator,
-    TriangularDistributionErrorGenerator
+    TriangularDistributionErrorGenerator,
+    UniformDistributionErrorGenerator
 )
 
 from .customloader import CustomLoader
@@ -86,9 +87,9 @@ class ErrorLoader(CustomLoader):
         error_max_minfac = self.__loadNumberInterval(
             info, 'error_max_minfac', 0, 1)
 
-        return ErrorGenerator(error_max=error_max,
-                              offset_max=offset_max,
-                              error_max_minfac=error_max_minfac)
+        return UniformDistributionErrorGenerator(
+            error_max=error_max, offset_max=offset_max,
+            error_max_minfac=error_max_minfac)
 
     def __loadTriangularError(
             self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:

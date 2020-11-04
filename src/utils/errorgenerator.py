@@ -1,13 +1,34 @@
 
+from abc import ABC, abstractmethod
 import random
+
 import numpy
 
-class ErrorGenerator:
+class ErrorGenerator(ABC):
+
+    def __init__(self, offset_max: float) -> None:
+
+        self.__offset_max = offset_max
+        self.__offset = (2*random.random() - 1)*offset_max
+
+    @property
+    def max_offset(self) -> float:
+        return self.__offset_max
+
+    @abstractmethod
+    def _applyValError(self, val: float) -> float:
+        pass
+
+    def __call__(self, val: float) -> float:
+        return self._applyValError(val) + self.__offset
+
+class UniformDistributionErrorGenerator(ErrorGenerator):
 
     def __init__(self,
                  error_max: float,
                  offset_max: float,
-                 error_max_minfac: float = 1):
+                 error_max_minfac: float = 1) -> None:
+        super().__init__(offset_max)
 
         self.__error_max_before = error_max
 
@@ -16,8 +37,6 @@ class ErrorGenerator:
                 random.random()*(1 - error_max_minfac)
 
         self.__error_max = error_max
-        self.__offset_max = offset_max
-        self.__offset = (2*random.random() - 1)*offset_max
 
     @property
     def _real_max_error(self) -> float:
@@ -27,32 +46,28 @@ class ErrorGenerator:
     def max_error(self) -> float:
         return self.__error_max_before
 
-    @property
-    def max_offset(self) -> float:
-        return self.__offset_max
+    def _applyValError(self, val: float) -> float:
 
-    def __call__(self, val: float) -> float:
-        val += self.__offset
         if self.__error_max == 0:
-            return val
+            return 0
 
-        return val + (2*random.random() - 1)*self.__error_max
+        return (2*random.random() - 1)*self.__error_max
 
-class NormalDistributionErrorGenerator(ErrorGenerator):
+class NormalDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
-    def __call__(self, val: float) -> float:
-        val += self.__offset
+    def _applyValError(self, val: float) -> float:
+
         if self.__error_max == 0:
-            return val
+            return 0
 
-        return val + numpy.random.normal(val, self.__error_max/2)
+        return numpy.random.normal(val, self.__error_max/2)
 
-class TriangularDistributionErrorGenerator(ErrorGenerator):
+class TriangularDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
-    def __call__(self, val: float) -> float:
-        val += self.__offset
+    def _applyValError(self, val: float) -> float:
+
         if self.__error_max == 0:
-            return val
+            return 0
 
-        return val + numpy.random.triangular(
+        return numpy.random.triangular(
             val - self.__error_max, val, val + self.__error_max)

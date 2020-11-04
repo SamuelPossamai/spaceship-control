@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, cast as typingcast
 
 from .device import DeviceGroup, DefaultDevice
 
-from ..utils.errorgenerator import ErrorGenerator
+from ..utils.errorgenerator import NormalDistributionErrorGenerator
 
 if TYPE_CHECKING:
     from typing import Any, Dict, Type, List, Tuple, Callable, Optional
@@ -141,7 +141,8 @@ class Sensor(DefaultDevice):
         self.__last_read_time: float = 0
         self.__last_value: float = 0
         self.__read_time = read_time
-        self.__error_gen = ErrorGenerator(read_error_max, read_offset_max)
+        self.__error_gen = NormalDistributionErrorGenerator(
+            read_error_max, read_offset_max)
 
     @property
     def structural_part(self) -> StructuralPart:
