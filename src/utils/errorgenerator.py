@@ -16,6 +16,14 @@ class ErrorGenerator(ABC):
     def __call__(self, val: float) -> float:
         return self._applyValError(val) + self.__offset
 
+    @staticmethod
+    def _calculateDecreaseFactor(factor, random_func):
+
+        if factor == 1:
+            return 1
+
+        return factor + random_func()*(1 - factor)
+
 class UniformDistributionErrorGenerator(ErrorGenerator):
 
     def __init__(self,
@@ -29,9 +37,8 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
 
         self.__error_max_before = error_max
 
-        if error_max_minfac != 1:
-            error_max *= error_max_minfac + \
-                random.random()*(1 - error_max_minfac)
+        error_max *= self._calculateDecreaseFactor(
+            error_max_minfac, random.random)
 
         self.__error_max = error_max
 
