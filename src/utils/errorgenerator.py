@@ -9,6 +9,10 @@ class ErrorGenerator(ABC):
     def __init__(self, offset: float) -> None:
         self.__offset = offset
 
+    @property
+    def offset(self):
+        return self.__offset
+
     @abstractmethod
     def _applyValError(self, val: float) -> float:
         pass
@@ -23,6 +27,9 @@ class ErrorGenerator(ABC):
             return 1
 
         return factor + random_func()*(1 - factor)
+
+    def toDict():
+        return {}
 
 class UniformDistributionErrorGenerator(ErrorGenerator):
 
@@ -63,6 +70,12 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
             return 0
 
         return self._getRandom(self.__error_max)
+
+    def toDict():
+        return {
+            'max-offset': self.__offset_max,
+            'max-error': self.__error_max_before
+        }
 
 class NormalDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
