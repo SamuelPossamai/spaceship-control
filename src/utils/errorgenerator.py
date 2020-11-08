@@ -84,20 +84,19 @@ class NormalDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
     def _applyValError(self, val: float) -> float:
 
-        if self.__error_max == 0:
+        if self._real_max_error == 0:
             return 0
 
-        return self._getRandom(self.__error_max)
+        return self._getRandom(self._real_max_error)
 
 class TriangularDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
     def _getRandom(self, value: float) -> float:
-        return numpy.random.triangular(0, val - self.__error_max, val,
-                                       val + self.__error_max)
+        return numpy.random.triangular(0, -value, 0, +value)
 
     def _applyValError(self, val: float) -> float:
 
-        if self.__error_max == 0:
+        if self._real_max_error == 0:
             return 0
 
-        return self._getRandom(self.__error_max)
+        return self._getRandom(self._real_max_error)
