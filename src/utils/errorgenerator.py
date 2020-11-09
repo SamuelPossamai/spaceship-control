@@ -18,7 +18,7 @@ class ErrorGenerator(ABC):
         pass
 
     def __call__(self, val: float) -> float:
-        return self._applyValError(val) + self.__offset
+        return val + self._applyValError(val) + self.__offset
 
     @staticmethod
     def _calculateDecreaseFactor(factor, random_func):
@@ -77,17 +77,37 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
             'max-error': self.__error_max_before
         }
 
-class NormalDistributionErrorGenerator(UniformDistributionErrorGenerator):
+class NormalDistributionErrorGenerator(ErrorGenerator):
 
-    def _getRandom(self, value: float) -> float:
-        return numpy.random.normal(value/2)
+    def __init__(self,
+                 error_sigma: float,
+                 offset_sigma: float,
+                 sigma_minfac: float = 1) -> None:
+        super().__init__(self._getRandom(offset_sigma))
+
+        self.__base_error_sigma = error_sigma
+
+        error_sigma *= self._calculateDecreaseFactor(
+            sigma_minfac, random.random)
+
+        self.__error_sigma = error_sigma
+        self.__offset_sigma = offset_sigma
+
+    def _getRandom(self, sigma: float) -> float:
+        return numpy.random.normal(0, sigma)
 
     def _applyValError(self, val: float) -> float:
 
-        if self._real_max_error == 0:
+        if self.__error_sigma == 0:
             return 0
 
-        return self._getRandom(self._real_max_error)
+        return self._getRandom(self.__error_sigma)
+
+    def toDict():
+        return {
+            'error-sigma': self.__base_error_sigma,
+            'offset-sigma': self.__offset_sigma
+        }
 
 class TriangularDistributionErrorGenerator(UniformDistributionErrorGenerator):
 
