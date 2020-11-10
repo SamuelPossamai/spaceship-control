@@ -54,10 +54,6 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
         return self.__offset_max
 
     @property
-    def _real_max_error(self) -> float:
-        return self.__error_max
-
-    @property
     def max_error(self) -> float:
         return self.__error_max_before
 
@@ -74,7 +70,8 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
     def toDict():
         return {
             'max-offset': self.__offset_max,
-            'max-error': self.__error_max_before
+            'max-error': self.__error_max_before,
+            'type': 'uniform'
         }
 
 class NormalDistributionErrorGenerator(ErrorGenerator):
@@ -106,17 +103,49 @@ class NormalDistributionErrorGenerator(ErrorGenerator):
     def toDict():
         return {
             'error-sigma': self.__base_error_sigma,
-            'offset-sigma': self.__offset_sigma
+            'offset-sigma': self.__offset_sigma,
+            'type': 'normal'
         }
 
-class TriangularDistributionErrorGenerator(UniformDistributionErrorGenerator):
+class TriangularDistributionErrorGenerator(ErrorGenerator):
 
-    def _getRandom(self, value: float) -> float:
-        return numpy.random.triangular(0, -value, 0, +value)
+    def __init__(self,
+                 left_error_max: float,
+                 right_error_max: float,
+                 offset_max: float,
+                 error_max_minfac: float = 1) -> None:
+        super().__init__(self._getRandom(offset_max, offset_max))
+
+        self.__offset_max = offset_max
+
+        self.__left_error_max_before = left_error_max
+        self.__right_error_max_before = right_error_max
+
+        left_error_max *= self._calculateDecreaseFactor(
+            error_max_minfac, random.random)
+
+        right_error_max *= self._calculateDecreaseFactor(
+            error_max_minfac, random.random)
+
+        self.__left_error_max = left_error_max
+        self.__right_error_max = right_error_max
+
+    def _getRandom(self, left: float, right: float) -> float:
+        return numpy.random.triangular(0, -left, 0, +right)
 
     def _applyValError(self, val: float) -> float:
 
         if self._real_max_error == 0:
             return 0
 
-        return self._getRandom(self._real_max_error)
+        return self._getRandom(self.__left_error_max, self.__right_error_max)
+
+    def toDict():
+        return {
+            'max-offset': self.__offset_max,
+            'left-max-offset': self.__left_error_max_before,
+            'right-max-offset': self.__right_error_max_before,
+            'max-error': max(self.__left_error_max_before,
+                             self.__right_error_max_before),
+            'type': 'triangular'
+        }
