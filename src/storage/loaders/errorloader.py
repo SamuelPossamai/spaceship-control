@@ -95,25 +95,29 @@ class ErrorLoader(CustomLoader):
             self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
         error_max = self.__loadNumber(info, 'error_max')
+        left_error_max = self.__loadNumber(info, 'left_error_max',
+                                           default=error_max)
+        right_error_max = self.__loadNumber(info, 'right_error_max',
+                                            default=error_max)
         offset_max = self.__loadNumber(info, 'offset_max')
         error_max_minfac = self.__loadNumberInterval(
             info, 'error_max_minfac', 0, 1, default=1)
 
         return TriangularDistributionErrorGenerator(
-            error_max=error_max, offset_max=offset_max,
-            error_max_minfac=error_max_minfac)
+            left_error_max=left_error_max, right_error_max=right_error_max,
+            offset_max=offset_max, error_max_minfac=error_max_minfac)
 
     def __loadNormalError(
             self, info: 'MutableMapping[str, Any]') -> ErrorGenerator:
 
-        error_max = 2*self.__loadNumber(info, 'sigma')
-        offset_max = self.__loadNumber(info, 'offset_max')
+        sigma = self.__loadNumber(info, 'sigma')
+        offset_sigma = self.__loadNumber(info, 'offset_sigma')
         error_max_minfac = self.__loadNumberInterval(
-            info, 'error_max_minfac', 0, 1)
+            info, 'sigma_max_minfac', 0, 1)
 
         return NormalDistributionErrorGenerator(
-            error_max=error_max, offset_max=offset_max,
-            error_max_minfac=error_max_minfac)
+            error_sigma=sigma, offset_sigma=offset_sigma,
+            sigma_minfac=error_max_minfac)
 
     __CREATE_FUNCTIONS = {
 
