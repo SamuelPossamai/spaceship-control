@@ -132,8 +132,7 @@ class Sensor(DefaultDevice):
 
     def __init__(self, st_part: StructuralPart,
                  read_time: float,
-                 read_error_max: float = 0,
-                 read_offset_max: float = 0,
+                 read_error_gen: 'ErrorGenerator' = None,
                  **kwargs: 'Any') -> None:
         super().__init__(**kwargs)
 
@@ -141,8 +140,7 @@ class Sensor(DefaultDevice):
         self.__last_read_time: float = 0
         self.__last_value: float = 0
         self.__read_time = read_time
-        self.__error_gen = NormalDistributionErrorGenerator(
-            read_error_max, read_offset_max)
+        self.__error_gen = read_error_gen
 
     @property
     def structural_part(self) -> StructuralPart:
@@ -153,7 +151,7 @@ class Sensor(DefaultDevice):
         return self.__read_time
 
     @property
-    def max_read_error(self) -> float:
+    def max_read_error(self) -> float: # TODO: replace this using getDict method
         return self.__error_gen.max_error + self.__error_gen.max_offset
 
     @property
@@ -170,7 +168,12 @@ class Sensor(DefaultDevice):
         now = time.time()
 
         if now - self.__last_read_time > self.__read_time:
-            self.__last_value = self.__error_gen(self.read())
+
+            read_val = self.read()
+            if self.__error_gen:
+                self.__last_value = self.__error_gen(read_val)
+            else:
+                self.__last_value = read_val
             self.__last_read_time = now
 
         return self.__last_value
@@ -192,16 +195,14 @@ class MultiSensor(DeviceGroup):
     def __init__(self, sensors: 'Dict[str, Type[Sensor]]',
                  st_part: 'StructuralPart',
                  read_time: float,
-                 read_error_max: float = 0,
-                 read_offset_max: float = 0,
+                 read_error_gen: 'ErrorGenerator' = None,
                  **kwargs: 'Any'):
         super().__init__(**kwargs)
 
         self.__sensors = []
         for sensor_name, sensor_type in sensors.items():
             self.__sensors.append(sensor_type(st_part, read_time,
-                                              read_error_max=read_error_max,
-                                              read_offset_max=read_offset_max))
+                                              read_error_gen=read_error_gen))
             self.addDevice(self.__sensors[-1], name=sensor_name)
 
     def command(self, command: 'List[str]', *args) -> 'Any':

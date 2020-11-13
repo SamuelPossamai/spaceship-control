@@ -148,6 +148,14 @@ class DeviceLoader(CustomLoader):
             'Position': 'position_error_gen'
         })
 
+    def __sensorErrorKwargs(
+            self, content: 'MutableMapping[str, MutableMapping[str, Any]]') \
+                -> 'MutableMapping[str, ErrorGenerator]':
+
+        return self.__getErrorKwargs(content, {
+            'Read': 'read_error_gen'
+        })
+
     def __createLinearEngine( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
@@ -181,24 +189,21 @@ class DeviceLoader(CustomLoader):
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return PositionSensor(part, info['reading_time'],
-                              read_error_max=info.get('error_max', 0),
-                              read_offset_max=info.get('offset_max', 0)), ()
+                              **self.__sensorErrorKwargs(info)), ()
 
     def __createAngleSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AngleSensor(part, info['reading_time'],
-                           read_error_max=info.get('error_max', 0),
-                           read_offset_max=info.get('offset_max', 0)), ()
+                           **self.__sensorErrorKwargs(info)), ()
 
     def __createSpeedSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return SpeedSensor(part, info['reading_time'],
-                           read_error_max=info.get('error_max', 0),
-                           read_offset_max=info.get('offset_max', 0),
+                           **self.__sensorErrorKwargs(info),
                            angle=info.get('angle', 0)), ()
 
     def __createVelocitySensor( # pylint: disable=no-self-use
@@ -206,40 +211,35 @@ class DeviceLoader(CustomLoader):
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return VelocitySensor(part, info['reading_time'],
-                              read_error_max=info.get('error_max', 0),
-                              read_offset_max=info.get('offset_max', 0)), ()
+                              **self.__sensorErrorKwargs(info)), ()
 
     def __createAccelerationSensor(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                                    part: StructuralPart, **_kwargs: 'Any') \
             -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AccelerationSensor(part, info['reading_time'],
-                                  read_error_max=info.get('error_max', 0),
-                                  read_offset_max=info.get('offset_max', 0)), ()
+                                  **self.__sensorErrorKwargs(info)), ()
 
     def __createAngularAccelerationSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return (AngularAccelerationSensor(
-            part, info['reading_time'], read_error_max=info.get('error_max', 0),
-            read_offset_max=info.get('offset_max', 0)), ())
+            part, info['reading_time'], **self.__sensorErrorKwargs(info)), ())
 
     def __createAngularSpeedSensor(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                                    part: StructuralPart) \
                                        -> 'Tuple[Device, Sequence[QWidget]]':
 
         return AngularSpeedSensor(part, info['reading_time'],
-                                  read_error_max=info.get('error_max', 0),
-                                  read_offset_max=info.get('offset_max', 0)), ()
+                                  **self.__sensorErrorKwargs(info)), ()
 
     def __createObstacleDistanceSensor( # pylint: disable=no-self-use
             self, info: 'MutableMapping[str, Any]', part: StructuralPart,
             **_kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         return LineDetectSensor(part, info['reading_time'],
-                                read_error_max=info.get('error_max', 0),
-                                read_offset_max=info.get('offset_max', 0),
+                                **self.__sensorErrorKwargs(info),
                                 angle=info.get('angle'),
                                 distance=info.get('distance')), ()
 
