@@ -27,7 +27,7 @@ from ...devices.communicationdevices import (
 
 if TYPE_CHECKING:
     # pylint: disable=ungrouped-imports
-    from typing import Sequence, Tuple, Any, MutableMapping
+    from typing import Sequence, Tuple, Any, MutableMapping, Iterable
     from PyQt5.QtWidgets import QWidget
     from ...devices.device import Device
     from ...devices.communicationdevices import CommunicationEngine
@@ -39,7 +39,7 @@ class DeviceLoader(CustomLoader):
     def __init__(self) -> None:
         super().__init__(self.__DEVICE_CREATE_FUNCTIONS, label='Device')
 
-    def _getTypes(self, config): # pylint: disable=no-self-use
+    def _getTypes(self, config: 'MutableMapping[str, Any]') -> 'Iterable[Any]': # pylint: disable=no-self-use
 
         function_type = config.get('function_type')
         type_ = config.get('type')
@@ -54,7 +54,8 @@ class DeviceLoader(CustomLoader):
 
         return ((function_type, type_, models), )
 
-    def _addCustom(self, config, model_type, model_info):
+    def _addCustom(self, config: 'MutableMapping[str, Any]', model_type: 'Any',
+                   model_info: 'MutableMapping[str, Any]') -> None:
 
         mode = config.get('mode')
         if mode == 'static':
@@ -70,7 +71,8 @@ class DeviceLoader(CustomLoader):
     def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
             custom_device_info: 'MutableMapping[str, Any]',
             loader: 'DeviceLoader',
-            info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
+            info: 'MutableMapping[str, Any]', part: 'StructuralPart',
+            **kwargs: 'Any') \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         return loader.load(custom_device_info.get('function_type'),
@@ -80,7 +82,8 @@ class DeviceLoader(CustomLoader):
     def __createCustomDynamicDeviceFunction( # pylint: disable=no-self-use
             custom_device_info: 'MutableMapping[str, Any]',
             loader: 'DeviceLoader',
-            info: 'MutableMapping[str, Any]', part: StructuralPart, **kwargs) \
+            info: 'MutableMapping[str, Any]', part: 'StructuralPart',
+            **kwargs: 'Any') \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
         variables = {variable['id']: variable['value'] for variable in
@@ -94,8 +97,8 @@ class DeviceLoader(CustomLoader):
                            custom_device_info, part, **kwargs)
 
     def load(self, device_type: str, info: 'MutableMapping[str, Any]',
-             part: StructuralPart, device_group=None, **kwargs: 'Any') \
-                 -> 'Tuple[Device, Sequence[QWidget]]':
+             part: StructuralPart, device_group: 'DeviceGroup' = None,
+             **kwargs: 'Any') -> 'Tuple[Device, Sequence[QWidget]]':
 
         type_and_model = (device_type, info.get('type'), info.get('model'))
         create_func = self._load_functions.get(type_and_model)

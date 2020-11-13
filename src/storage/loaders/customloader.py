@@ -1,5 +1,9 @@
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any, MutableMapping, Iterable
 
 class CustomLoader(ABC):
 
@@ -11,11 +15,12 @@ class CustomLoader(ABC):
     def clearCustoms(self) -> None:
         self._load_functions = self.__create_functions_base.copy()
 
-    def _getTypes(self, config): # pylint: disable=no-self-use
+    def _getTypes(self, config: 'MutableMapping[str, Any]') -> 'Iterable[Any]': # pylint: disable=no-self-use
         return (config.get('type'),)
 
     @abstractmethod
-    def _addCustom(self, config, model_type, model_info):
+    def _addCustom(self, config: 'MutableMapping[str, Any]', model_type: 'Any',
+                   model_info: 'MutableMapping[str, Any]') -> None:
         pass
 
     def addCustom(self, custom_model_info):

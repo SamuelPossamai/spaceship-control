@@ -24,7 +24,8 @@ class ObjectiveLoader(CustomLoader):
     def __init__(self) -> None:
         super().__init__(self.__OBJECTIVE_CREATE_FUNCTIONS, label='Objective')
 
-    def _addCustom(self, config, model_type, model_info):
+    def _addCustom(self, config: 'MutableMapping[str, Any]', model_type: 'Any',
+                   model_info: 'MutableMapping[str, Any]') -> None:
 
         mode = config.get('mode')
         if mode == 'static':
@@ -38,14 +39,16 @@ class ObjectiveLoader(CustomLoader):
 
     @staticmethod
     def __createCustomStaticObjectiveFunction(
-            objective_content: 'MutableMapping[str, Any]', loader,
+            objective_content: 'MutableMapping[str, Any]',
+            loader: 'ObjectiveLoader',
             custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
 
         return loader.__createObjectiveGroup(objective_content)
 
     @staticmethod
     def __createCustomDynamicObjectiveFunction(
-            objective_content: 'MutableMapping[str, Any]', loader,
+            objective_content: 'MutableMapping[str, Any]',
+            loader: 'ObjectiveLoader',
             custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
 
         variables = {variable['id']: variable['value'] for variable in

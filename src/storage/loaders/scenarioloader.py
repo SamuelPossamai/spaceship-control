@@ -13,6 +13,7 @@ from ...devices.communicationdevices import CommunicationEngine
 if TYPE_CHECKING:
     from typing import Any, MutableMapping, Optional, Sequence
     from ...objectives.objective import Objective
+    from .objectiveloader import ObjectiveLoader
 
 ObjectInfo = namedtuple('ObjectInfo', (
     'model', 'position', 'angle', 'variables'))
@@ -32,14 +33,14 @@ ScenarioInfo = namedtuple('ScenarioInfo', (
 
 def loadScenario(scenario_info: 'MutableMapping[str, Any]',
                  prefixes: 'Sequence[str]' = (),
-                 objective_loader=None) -> 'ScenarioInfo':
+                 objective_loader: 'ObjectiveLoader' = None) -> 'ScenarioInfo':
 
     return ScenarioLoader(objective_loader=objective_loader).load(
         scenario_info, prefixes)
 
 class ScenarioLoader:
 
-    def __init__(self, objective_loader=None) -> None:
+    def __init__(self, objective_loader: 'ObjectiveLoader' = None) -> None:
         self.__objective_loader = objective_loader
         self.__communication_engine = CommunicationEngine(10, 10000, 10000)
 
@@ -90,6 +91,8 @@ class ScenarioLoader:
             engine_info.get('max_noise', 10),
             engine_info.get('speed', 10000),
             engine_info.get('negligible_intensity', 10000))
+
+        return self.__communication_engine
 
     @staticmethod
     def __loadPhysicsEngine(engine_info: 'MutableMapping[str, Any]') \

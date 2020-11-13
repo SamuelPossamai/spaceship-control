@@ -72,8 +72,10 @@ type = 'angle'
 
 reading_time = 5
 
-error_max = 10
-offset_max = 2
+[Sensor.Error.Read]
+
+    error_max = 10
+    offset_max = 0
 
 [[Sensor]]
 
@@ -108,11 +110,6 @@ min_angle = 0
 max_angle = 0
 
 intensity_mult = 20
-
-[Actuator.Error.Position]
-
-error_max = 2
-offset_max = 0
 
 [[Actuator]]
 
