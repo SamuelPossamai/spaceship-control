@@ -9,8 +9,9 @@ from queue import Empty as EmptyQueueException
 from typing import TYPE_CHECKING, cast as typingcast
 
 from PyQt5.QtWidgets import (
-    QMainWindow, QGraphicsScene, QFileDialog, QMessageBox, QTextBrowser
+    QMainWindow, QFileDialog, QMessageBox, QTextBrowser
 )
+from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QTimer, Qt
 
 import pymunk
@@ -21,6 +22,7 @@ from .choosefromtreedialog import ChooseFromTreeDialog
 from .helpdialog import HelpDialog
 from .loadgraphicitem import loadGraphicItem
 from .loadship import loadShip
+from .graphicsscene import GraphicsScene
 
 from ..storage.fileinfo import FileInfo
 
@@ -78,7 +80,11 @@ class MainWindow(QMainWindow):
         self.__ui = UiMainWindow()
         self.__ui.setupUi(self)
 
-        self.__ui.view.setScene(QGraphicsScene(parent))
+        scene = GraphicsScene(parent)
+        scene.setImage(QImage(str(FileInfo().getPath(
+            FileInfo.FileDataType.IMAGE, 'examples/background/space.png'))))
+
+        self.__ui.view.setScene(scene)
 
         self.__lock = Lock()
 
