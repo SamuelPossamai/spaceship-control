@@ -621,6 +621,9 @@ class MainWindow(QMainWindow):
         for node_value in self.__objectives_node_value:
             node_value.update()
 
+        self.__ui.view.scene().setBackgroundRect(
+            self.__ui.view.mapToScene(self.__ui.view.rect()).boundingRect())
+
         self.__handleDebugMessages()
 
         self.__updateTitle()
