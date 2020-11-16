@@ -25,10 +25,12 @@ PhysicsEngineInfo = namedtuple('PhysicsEngineInfo',
                                ('damping', 'gravity', 'collision_slop',
                                 'collision_persistence', 'iterations'))
 
+BackgroundInfo = namedtuple('BackgroundInfo', ('image'))
+
 ScenarioInfo = namedtuple('ScenarioInfo', (
     'name', 'ships', 'objectives', 'objects', 'visible_user_interface',
     'communication_engine', 'visible_debug_window', 'static_images',
-    'physics_engine'
+    'physics_engine', 'background'
 ))
 
 def loadScenario(scenario_info: 'MutableMapping[str, Any]',
@@ -81,8 +83,9 @@ class ScenarioLoader:
                             objects=objects,
                             static_images=images,
                             physics_engine=self.__loadPhysicsEngine(
-                                scenario_info.get('PhysicsEngine', {})))
-
+                                scenario_info.get('PhysicsEngine', {})),
+                            background=self.__loadBackground(
+                                scenario_info.get('Background', {})))
 
     def loadCommunicationEngine(self, engine_info: 'MutableMapping[str, Any]') \
             -> 'CommunicationEngine':
@@ -109,6 +112,12 @@ class ScenarioLoader:
                                  engine_info.get('collision_slop', 0.1),
                                  engine_info.get('collision_persistence', 3),
                                  engine_info.get('iterations', 10))
+
+    @staticmethod
+    def __loadBackground(background_info: 'MutableMapping[str, Any]') \
+            -> 'BackgroundInfo':
+
+        return BackgroundInfo(background_info.get('image'))
 
     @staticmethod
     def __resolveShipModelPrefix(model: str, prefixes: 'Sequence[str]') -> str:

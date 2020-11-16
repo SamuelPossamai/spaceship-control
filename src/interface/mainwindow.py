@@ -80,11 +80,7 @@ class MainWindow(QMainWindow):
         self.__ui = UiMainWindow()
         self.__ui.setupUi(self)
 
-        scene = GraphicsScene(parent)
-        scene.setImage(QImage(str(FileInfo().getPath(
-            FileInfo.FileDataType.IMAGE, 'examples/background/space.png'))))
-
-        self.__ui.view.setScene(scene)
+        self.__ui.view.setScene(GraphicsScene(parent))
 
         self.__lock = Lock()
 
@@ -421,6 +417,10 @@ class MainWindow(QMainWindow):
                 'An error occurred loading the scenario: \n'
                 f'{type(err).__name__}: {err}'))
             return
+
+        self.__ui.view.scene().setImage(
+            QImage(str(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
+                                          scenario_info.background.image))))
 
         self.__loadSpaceProperties(scenario_info)
 

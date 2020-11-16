@@ -12,6 +12,10 @@ damping = 0.5
 name = 'example2'
 debug = true
 
+[Background]
+
+image = 'examples/background/space.png'
+
 [[Ship]]
 
 id = 's1'
