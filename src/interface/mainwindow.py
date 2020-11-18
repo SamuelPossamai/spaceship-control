@@ -827,6 +827,8 @@ class MainWindow(QMainWindow):
         else:
             if key in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down):
                 self.__ui.view.keyPressEvent(event)
+                self.__ui.view.scale(2, 1)
+                self.__ui.view.scale(.5, 1)
                 updated_view = True
 
         if updated_view is True:

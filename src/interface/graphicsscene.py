@@ -28,7 +28,6 @@ class GraphicsScene(QGraphicsScene):
             image_size = self.__image.size()
 
             source_rect = QRectF()
-
             try:
                 source_rect.setX(image_size.width()*(rect.x() - bg_rect.x())/
                                  bg_rect.width())
