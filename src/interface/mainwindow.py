@@ -805,28 +805,35 @@ class MainWindow(QMainWindow):
         key = event.key()
         modifiers = event.modifiers()
 
+        updated_view = False
         if modifiers == Qt.ControlModifier:
             if key == Qt.Key_Equal:
                 self.__ui.view.scale(1.25, 1.25)
-                return
-            if key == Qt.Key_Minus:
+                updated_view = True
+            elif key == Qt.Key_Minus:
                 self.__ui.view.scale(1/1.25, 1/1.25)
-                return
-            if key == Qt.Key_A:
+                updated_view = True
+            elif key == Qt.Key_A:
                 self.__ui.view.rotate(-5)
-                return
-            if key == Qt.Key_D:
+                updated_view = True
+            elif key == Qt.Key_D:
                 self.__ui.view.rotate(5)
-                return
-            if key == Qt.Key_R:
+                updated_view = True
+            elif key == Qt.Key_R:
                 self.__ui.view.fitInView(
                     self.__ui.view.scene().itemsBoundingRect(),
                     Qt.KeepAspectRatio)
-                return
+                updated_view = True
         else:
             if key in (Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down):
                 self.__ui.view.keyPressEvent(event)
-                return
+                updated_view = True
+
+        if updated_view is True:
+            self.__ui.view.scene().setBackgroundRect(
+                self.__ui.view.mapToScene(self.__ui.view.rect()).boundingRect())
+            self.__ui.view.repaint()
+            return
 
         if Qt.Key_0 <= key <= Qt.Key_9:
 
