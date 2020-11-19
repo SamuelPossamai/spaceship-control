@@ -6,26 +6,40 @@ class GraphicsScene(QGraphicsScene):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.__image = None
-        self.__rect = None
+        self.__bg_image = None
+        self.__bg_rect = None
+        self.__fg_image = None
+        self.__fg_rect = None
 
-    def setImage(self, image):
-        self.__image = image
+    def setBackgroundImage(self, image):
+        self.__bg_image = image
 
-    def image(self):
-        return self.__image
+    def backgroundImage(self):
+        return self.__bg_image
+
+    def setForegroundImage(self, image):
+        self.__fg_image = image
+
+    def foregroundImage(self):
+        return self.__fg_image
 
     def setBackgroundRect(self, rect):
-        self.__rect = rect
+        self.__bg_rect = rect
 
     def backgroundRect(self):
-        return self.__rect
+        return self.__bg_rect
 
-    def drawBackground(self, painter, rect) -> None:
-        if self.__image is not None and self.__rect is not None:
+    def setForegroundRect(self, rect):
+        self.__bg_rect = rect
 
-            bg_rect = self.__rect
-            image_size = self.__image.size()
+    def foregroundRect(self):
+        return self.__bg_rect
+
+    def __draw(self, painter, rect, image, bg_rect):
+
+        if image is not None and bg_rect is not None:
+
+            image_size = image.size()
 
             source_rect = QRectF()
             try:
@@ -40,4 +54,10 @@ class GraphicsScene(QGraphicsScene):
             except ZeroDivisionError:
                 pass
             else:
-                painter.drawImage(rect, self.__image, source_rect)
+                painter.drawImage(rect, image, source_rect)
+
+    def drawBackground(self, painter, rect) -> None:
+        self.__draw(painter, rect, self.__bg_image, self.__bg_rect)
+
+    def drawForeground(self, painter, rect) -> None:
+        self.__draw(painter, rect, self.__fg_image, self.__fg_rect)

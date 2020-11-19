@@ -418,7 +418,7 @@ class MainWindow(QMainWindow):
                 f'{type(err).__name__}: {err}'))
             return
 
-        self.__ui.view.scene().setImage(
+        self.__ui.view.scene().setBackgroundImage(
             QImage(str(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
                                           scenario_info.background.image))))
 
