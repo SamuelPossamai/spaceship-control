@@ -837,8 +837,10 @@ class MainWindow(QMainWindow):
                 updated_view = True
 
         if updated_view is True:
-            self.__ui.view.scene().setBackgroundRect(
-                self.__ui.view.mapToScene(self.__ui.view.rect()).boundingRect())
+            view_rect = self.__ui.view.mapToScene(
+                self.__ui.view.rect()).boundingRect()
+            self.__ui.view.scene().setBackgroundRect(view_rect)
+            self.__ui.view.scene().setForegroundRect(view_rect)
             self.__ui.view.repaint()
             return
 
