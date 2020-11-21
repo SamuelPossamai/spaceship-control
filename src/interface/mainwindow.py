@@ -421,6 +421,9 @@ class MainWindow(QMainWindow):
         self.__ui.view.scene().setBackgroundImage(
             QImage(str(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
                                           scenario_info.background.image))))
+        self.__ui.view.scene().setForegroundImage(
+            QImage(str(FileInfo().getPath(FileInfo.FileDataType.IMAGE,
+                                          scenario_info.foreground.image))))
 
         self.__loadSpaceProperties(scenario_info)
 
@@ -621,8 +624,10 @@ class MainWindow(QMainWindow):
         for node_value in self.__objectives_node_value:
             node_value.update()
 
-        self.__ui.view.scene().setBackgroundRect(
-            self.__ui.view.mapToScene(self.__ui.view.rect()).boundingRect())
+        view_rect = self.__ui.view.mapToScene(
+            self.__ui.view.rect()).boundingRect()
+        self.__ui.view.scene().setBackgroundRect(view_rect)
+        self.__ui.view.scene().setForegroundRect(view_rect)
 
         self.__handleDebugMessages()
 

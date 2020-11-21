@@ -30,10 +30,10 @@ class GraphicsScene(QGraphicsScene):
         return self.__bg_rect
 
     def setForegroundRect(self, rect):
-        self.__bg_rect = rect
+        self.__fg_rect = rect
 
     def foregroundRect(self):
-        return self.__bg_rect
+        return self.__fg_rect
 
     def __draw(self, painter, rect, image, bg_rect):
 

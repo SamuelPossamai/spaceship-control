@@ -16,6 +16,10 @@ debug = true
 
 image = 'examples/background/space.png'
 
+[Foreground]
+
+image = 'examples/foreground/bottom_right_title.png'
+
 [[Ship]]
 
 id = 's1'
