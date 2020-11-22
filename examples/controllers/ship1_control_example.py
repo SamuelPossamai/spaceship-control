@@ -14,6 +14,9 @@ color_id = 0
 print('\n   Spaceship Control')
 print('\n\n This is just an example controller')
 
+for i in range(100):
+    print(str(i))
+
 engines = ship.listEngines('linear-engine')
 
 while True:

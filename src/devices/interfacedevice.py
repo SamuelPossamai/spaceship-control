@@ -215,7 +215,7 @@ class ConsoleDevice(InterfaceDevice):
         self.__text = self.__text[: pos] + text + self.__text[pos + len(text):]
 
         total_size = self.__total_cols*self.__total_rows
-        if len(text) > total_size:
+        if len(self.__text) > total_size:
             self.__text = self.__text[: total_size]
 
         pos += len(text)

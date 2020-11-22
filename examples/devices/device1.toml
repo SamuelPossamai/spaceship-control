@@ -13,6 +13,6 @@ type = 'text-display'
 model = 'console'
 
 x = 10
-y = 200
+y = 150
 columns = 25
 rows = 15
