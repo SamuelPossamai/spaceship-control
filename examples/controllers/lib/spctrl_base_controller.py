@@ -5,10 +5,12 @@ import time
 
 import collections
 
+from abc import ABC, abstractmethod
+
 __device_comm_write = sys.__stdout__
 __device_comm_read = sys.__stdin__
 
-class Device:
+class Device(ABC):
 
     _DEVICE_TYPE_MAP = {}
 
@@ -142,6 +144,59 @@ Device._DEVICE_TYPE_MAP['line-dist-sensor'] = Sensor
 SensorInfo = collections.namedtuple('SensorInfo', (
     'reading_time', 'max_error', 'max_offset', 'estimated_offset'))
 
+class TextInputDevice(Device):
+
+    @abstractmethod
+    def readline(self):
+        pass
+
+class SimpleKeyboardInputDevice(TextInputDevice):
+
+    def readline(self):
+        return self.sendMessage('get')
+
+Device._DEVICE_TYPE_MAP['keyboard'] = SimpleKeyboardInputDevice
+
+class TextOutputDevice(Device):
+
+    @abstractmethod
+    def write(self, text):
+        pass
+
+    def flush(self):
+        pass
+
+class SimpleConsoleOutputDevice(TextOutputDevice):
+
+    def __init__(self, device_path=''):
+        super().__init__(device_path=device_path)
+
+        self.__message_buffer = ''
+
+    def write(self, text):
+        self.__message_buffer += text
+
+    def flush(self):
+
+        self.__message_buffer = \
+            self.__message_buffer.replace("'", "\\'").replace('\\', '\\\\')
+
+        messages = iter(self.__message_buffer.split('\n'))
+
+        self.__printMsg(next(messages))
+        for message in messages:
+            self.sendMessage('LF')
+            if message:
+                self.__printMsg(message)
+
+        self.sendMessage('update')
+        self.__message_buffer = ''
+
+    def __printMsg(self, text):
+        self.sendMessage(f'write "{text}"')
+
+Device._DEVICE_TYPE_MAP['console-text-display'] = SimpleConsoleOutputDevice
+
 class Ship:
 
     class ConsolePrinter:
@@ -170,7 +225,6 @@ class Ship:
         self.__engine_devices = {}
         self.__console_printer = Ship.ConsolePrinter(self)
         self.__keyboard_reader = Ship.KeyboardReader(self)
-        self.__message_buffer = ''
 
         self.__find_devices(self.__device)
 
@@ -186,27 +240,11 @@ class Ship:
         else:
             self.__main_keyboard = None
 
-    def __printMsg(self, text):
-        self.__main_console.sendMessage(f'write "{text}"')
-
     def run(self, seconds):
         start_time = time.time()
 
         if self.__main_console is not None:
-
-            self.__message_buffer = \
-                self.__message_buffer.replace("'", "\\'").replace('\\', '\\\\')
-
-            messages = iter(self.__message_buffer.split('\n'))
-
-            self.__printMsg(next(messages))
-            for message in messages:
-                self.__main_console.sendMessage('LF')
-                if message:
-                    self.__printMsg(message)
-
-            self.__main_console.sendMessage('update')
-            self.__message_buffer = ''
+            self.__main_console.flush()
 
         time.sleep(max(seconds - (time.time() - start_time), 0))
 
@@ -231,10 +269,10 @@ class Ship:
         return self.__keyboard_reader
 
     def writeConsole(self, text):
-        self.__message_buffer += text
+        self.__main_console.write(text)
 
     def readKeyboard(self):
-        return self.__main_keyboard.sendMessage('get')
+        return self.__main_keyboard.readline()
 
     def displayPrint(self, message):
 
