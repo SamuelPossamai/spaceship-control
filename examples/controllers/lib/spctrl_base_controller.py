@@ -147,12 +147,47 @@ SensorInfo = collections.namedtuple('SensorInfo', (
 class TextInputDevice(Device):
 
     @abstractmethod
+    def read(self, size=-1):
+        pass
+
+    @abstractmethod
     def readline(self):
+        pass
+
+    def flush(self):
         pass
 
 class SimpleKeyboardInputDevice(TextInputDevice):
 
+    def __init__(self, device_path=''):
+        super().__init__(device_path=device_path)
+
+        self.__buffer = None
+
+    def read(self, size=-1):
+
+        if self.__buffer is None:
+            self.__buffer = self.__read()
+        elif size < 0 or len(self.__buffer) < size:
+            self.__buffer += self.__read()
+
+        if size < 0 or len(self.__buffer) < size:
+            read_content = self.__buffer
+            self.__buffer = None
+            return read_content
+
+        read_content = self.__buffer[:size]
+        self.__buffer = self.__buffer[size:]
+
+        return self.__buffer
+
     def readline(self):
+        return self.read()
+
+    def flush(self):
+        pass
+
+    def __read(self):
         return self.sendMessage('get')
 
 Device._DEVICE_TYPE_MAP['keyboard'] = SimpleKeyboardInputDevice
