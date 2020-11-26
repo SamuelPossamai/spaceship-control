@@ -14,9 +14,10 @@ class Device(ABC):
 
     _DEVICE_TYPE_MAP = {}
 
-    def __init__(self, device_path=''):
+    def __init__(self, device_path='', parent=None):
 
         self.__device_path = device_path
+        self.__parent = parent
 
         if self.sendMessage('get-info is-device-group') == 'yes':
 
@@ -31,7 +32,8 @@ class Device(ABC):
             for i in range(children_count):
                 child_type = self.sendMessage(f'{i}: device-type')
                 child_class = self._DEVICE_TYPE_MAP.get(child_type, Device)
-                children.append(child_class(device_path=f'{device_path}{i}:'))
+                children.append(child_class(
+                    device_path=f'{device_path}{i}:', parent=self))
 
             self.__children = tuple(children)
         else:
@@ -43,6 +45,10 @@ class Device(ABC):
             'get-info device-name-in-group')
         if self.__device_name == '<<null>>':
             self.__device_name = self.__device_type
+
+    @property
+    def parent(self):
+        return self.__parent
 
     @property
     def children(self):
@@ -159,8 +165,8 @@ class TextInputDevice(Device):
 
 class SimpleKeyboardInputDevice(TextInputDevice):
 
-    def __init__(self, device_path=''):
-        super().__init__(device_path=device_path)
+    def __init__(self, device_path='', parent=None):
+        super().__init__(device_path=device_path, parent=parent)
 
         self.__buffer = None
 
@@ -203,8 +209,8 @@ class TextOutputDevice(Device):
 
 class SimpleConsoleOutputDevice(TextOutputDevice):
 
-    def __init__(self, device_path=''):
-        super().__init__(device_path=device_path)
+    def __init__(self, device_path='', parent=None):
+        super().__init__(device_path=device_path, parent=parent)
 
         self.__message_buffer = ''
 
