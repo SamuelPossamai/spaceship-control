@@ -7,6 +7,8 @@ import collections
 
 from abc import ABC, abstractmethod
 
+from PyQt5.QtCore import Qt
+
 __device_comm_write = sys.__stdout__
 __device_comm_read = sys.__stdin__
 
@@ -15,6 +17,10 @@ class Device(ABC):
     _DEVICE_TYPE_MAP = {}
 
     def __init__(self, device_path='', parent=None):
+
+        if isinstance(device_path, Device):
+            parent = device_path.parent
+            device_path = device_path.device_path
 
         self.__device_path = device_path
         self.__parent = parent
@@ -45,6 +51,10 @@ class Device(ABC):
             'get-info device-name-in-group')
         if self.__device_name == '<<null>>':
             self.__device_name = self.__device_type
+
+    @property
+    def device_path(self):
+        return self.__device_path
 
     @property
     def parent(self):
@@ -185,7 +195,7 @@ class SimpleKeyboardInputDevice(TextInputDevice):
         read_content = self.__buffer[:size]
         self.__buffer = self.__buffer[size:]
 
-        return self.__buffer
+        return read_content
 
     def readline(self):
         return self.read()
@@ -197,6 +207,39 @@ class SimpleKeyboardInputDevice(TextInputDevice):
         return self.sendMessage('get')
 
 Device._DEVICE_TYPE_MAP['keyboard'] = SimpleKeyboardInputDevice
+
+class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
+
+    Key = collections.namedtuple('Key', ('char', 'code', 'modifiers'))
+
+
+    def read(self, size=-1):
+        content = super().read(size)
+        key_list = []
+
+        for i in range(0, len(content) - 9, 10):
+
+            key_content = int(content[i: i+10], 16)
+
+            key_modifiers = key_content >> 8
+            key_code = key_content & 0xffffffff
+
+            shift_up = key_modifiers & Qt.ShiftModifier
+
+            key_char = None
+            if key_code >= Qt.Key_A and key_code <= Qt.Key_Z:
+                if shift_up:
+                    key_char = chr(ord('A') + key_code - Qt.Key_A)
+                else:
+                    key_char = chr(ord('a') + key_code - Qt.Key_A)
+
+            key_list.append(self.Key(
+                char=key_char,
+                code=key_code,
+                modifiers=key_modifiers
+            ))
+
+        return key_list
 
 class TextOutputDevice(Device):
 
@@ -288,6 +331,12 @@ class Ship:
             self.__main_console.flush()
 
         time.sleep(max(seconds - (time.time() - start_time), 0))
+
+    def listInterfaceDevices(self, device_type=None):
+        if device_type is None:
+            return self.__interface_devices
+
+        return self.__interface_devices.get(device_type, ())
 
     def listEngines(self, engine_type=None):
         if engine_type is None:

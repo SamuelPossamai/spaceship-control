@@ -1,5 +1,8 @@
 
 import shlex
+from .spctrl_base_controller import (
+    SimpleConsoleOutputDevice, TranslatedKeyboardInputDevice
+)
 
 class ConsoleInterface:
 
@@ -7,15 +10,17 @@ class ConsoleInterface:
 
         self.__ship = ship
         self.__cur_ship = ship
-        self.__istream = input_stream
-        self.__ostream = output_stream
+        self.__istream = TranslatedKeyboardInputDevice(input_stream)
+        self.__ostream = SimpleConsoleOutputDevice(output_stream)
         self.__commands = self.__COMMANDS.copy()
 
-    def run():
+    def run(self):
 
-        result = None
-        command = self.__istream.readline()
-        if command:
+        key_list = self.__istream.read()
+        command = ''.join(key.char for key in key_list if key.char is not None)
+        output = command
+
+        if False and command:
             tokens = shlex.split(command, comments=True)
 
             cmd = tokens[0]
@@ -24,22 +29,20 @@ class ConsoleInterface:
             cmd_function = self.__commands.get(cmd)
 
             if cmd_function is None:
-                result = 'Command \'{cmd}\' not found'
+                output += f'Command \'{cmd}\' not found'
             else:
                 try:
-                    result = cmd_args(cmd, cmd_args)
+                    output += cmd_args(cmd, cmd_args)
                 except Exception:
-                    result = 'Error running command \'{cmd}\''
+                    output += f'Error running command \'{cmd}\''
 
-        self.__ostream.write(result)
-
-    @staticmethod
-    def __cmd_echo(cmd, cmd_args):
-        self.__ostream.write(' '.join(cmd_args))
+        if output:
+            self.__ostream.write(output)
+            self.__ostream.flush()
 
     @staticmethod
     def __cmd_echo(cmd, cmd_args):
-        self.__ostream.write(' '.join(cmd_args))
+        return ' '.join(cmd_args)
 
     __COMMANDS = {
         'echo': __cmd_echo

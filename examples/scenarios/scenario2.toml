@@ -25,7 +25,7 @@ image = 'examples/foreground/bottom_right_title.png'
 id = 's1'
 name = 'ship1'
 model = 'examples/ship1'
-controller = 'examples/ship1_control_example.py'
+controller = 'examples/ship1_control_example2.py'
 
 x = 50
 y = 100
