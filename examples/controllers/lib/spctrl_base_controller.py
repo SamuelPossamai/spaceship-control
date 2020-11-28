@@ -212,7 +212,6 @@ class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
 
     Key = collections.namedtuple('Key', ('char', 'code', 'modifiers'))
 
-
     def read(self, size=-1):
         content = super().read(size)
         key_list = []
@@ -227,11 +226,12 @@ class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
             shift_up = key_modifiers & Qt.ShiftModifier
 
             key_char = None
-            if key_code >= Qt.Key_A and key_code <= Qt.Key_Z:
-                if shift_up:
-                    key_char = chr(ord('A') + key_code - Qt.Key_A)
-                else:
-                    key_char = chr(ord('a') + key_code - Qt.Key_A)
+            if key_code >= Qt.Key_Space and key_code <= Qt.Key_AsciiTilde:
+                ascii_code = key_code
+                if not shift_up:
+                    if key_code >= Qt.Key_A and key_code <= Qt.Key_Z:
+                        ascii_code = key_code + ord('a') - ord('A')
+                key_char = chr(ascii_code)
 
             key_list.append(self.Key(
                 char=key_char,
