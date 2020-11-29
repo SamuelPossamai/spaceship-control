@@ -203,6 +203,12 @@ class SimpleKeyboardInputDevice(TextInputDevice):
     def flush(self):
         pass
 
+    def _returnToBuffer(self, text):
+        if self.__buffer is None:
+            self.__buffer = text
+        else:
+            self.__buffer = text + self.__buffer
+
     def __read(self):
         return self.sendMessage('get')
 
@@ -210,9 +216,9 @@ Device._DEVICE_TYPE_MAP['keyboard'] = SimpleKeyboardInputDevice
 
 class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
 
-    Key = collections.namedtuple('Key', ('char', 'code', 'modifiers'))
+    Key = collections.namedtuple('Key', ('char', 'code', 'modifiers', 'shift'))
 
-    def read(self, size=-1):
+    def read(self, size=-1, end_at=None):
         content = super().read(size)
         key_list = []
 
@@ -233,13 +239,25 @@ class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
                         ascii_code = key_code + ord('a') - ord('A')
                 key_char = chr(ascii_code)
 
+            elif key_code == Qt.Key_Return:
+                key_char = '\n'
+
             key_list.append(self.Key(
                 char=key_char,
                 code=key_code,
-                modifiers=key_modifiers
+                modifiers=key_modifiers,
+                shift=shift_up
             ))
 
+            if end_at is not None:
+                if key_char == end_at or key_code == end_at:
+                    self._returnToBuffer(content[i+10:])
+                    return key_list
+
         return key_list
+
+    def readline(self):
+        return self.read(end_at='\n')
 
 class TextOutputDevice(Device):
 
