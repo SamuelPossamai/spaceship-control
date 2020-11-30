@@ -38,7 +38,7 @@ class ConsoleInterface:
                     output += f'Command \'{cmd}\' not found'
                 else:
                     try:
-                        output += cmd_function(self, cmd, cmd_args)
+                        output += str(cmd_function(self, cmd, cmd_args))
                     except Exception:
                         raise
                         output += f'Error running command \'{cmd}\''
@@ -55,6 +55,22 @@ class ConsoleInterface:
     def __cmd_echo(self, cmd, cmd_args):
         return ' '.join(cmd_args)
 
+    def __cmd_show_position(self, cmd, cmd_args):
+        return self.__ship.position
+
+    def __cmd_show_angle(self, cmd, cmd_args):
+        return self.__ship.angle
+
+    def __cmd_show_speed(self, cmd, cmd_args):
+        return self.__ship.speed
+
+    def __cmd_show_angular_speed(self, cmd, cmd_args):
+        return self.__ship.angular_speed
+
     __COMMANDS = {
-        'echo': __cmd_echo
+        'echo': __cmd_echo,
+        'show-position': __cmd_show_position,
+        'show-angle': __cmd_show_angle,
+        'show-speed': __cmd_show_speed,
+        'show-angular-speed': __cmd_show_angular_speed
     }
