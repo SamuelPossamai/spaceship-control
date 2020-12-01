@@ -226,7 +226,14 @@ class ConsoleDevice(InterfaceDevice):
 
     def __update(self) -> str:
 
-        text = html.escape(self.__text).replace(' ', '&nbsp;')
+        i = 0
+        for i, char in enumerate(reversed(self.__text)):
+            if char != ' ':
+                break
+
+        last_space = len(self.__text) - i
+
+        text = html.escape(self.__text[:last_space+1]).replace(' ', '&nbsp;')
         self.addAction(Action(QTextEdit.setHtml, self.__text_widget, text))
 
         return '<<ok>>'
