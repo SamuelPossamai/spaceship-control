@@ -216,7 +216,8 @@ Device._DEVICE_TYPE_MAP['keyboard'] = SimpleKeyboardInputDevice
 
 class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
 
-    Key = collections.namedtuple('Key', ('char', 'code', 'modifiers', 'shift'))
+    Key = collections.namedtuple('Key', (
+        'char', 'code', 'modifiers', 'shift', 'control'))
 
     def read(self, size=-1, end_at=None):
         content = super().read(size)
@@ -246,7 +247,8 @@ class TranslatedKeyboardInputDevice(SimpleKeyboardInputDevice):
                 char=key_char,
                 code=key_code,
                 modifiers=key_modifiers,
-                shift=shift_up
+                shift=shift_up,
+                control=key_modifiers & Qt.ControlModifier
             ))
 
             if end_at is not None:
@@ -292,6 +294,11 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
                 self.__printMsg(message)
 
         self.sendMessage('update')
+        self.__message_buffer = ''
+
+    def clear(self):
+        self.sendMessage('clear')
+        self.sendMessage('set-cursor-pos 0 0')
         self.__message_buffer = ''
 
     def __printMsg(self, text):

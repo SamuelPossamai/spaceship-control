@@ -21,7 +21,18 @@ class ConsoleInterface:
     def run(self):
 
         key_list = self.__istream.readline()
-        output = ''.join(key.char for key in key_list if key.char is not None)
+
+        input_chars = []
+        for key in key_list:
+            if key.control:
+                if  key.char == 'l' or key.char == 'L':
+                    self.__ostream.clear()
+                    self.__ostream.write('> ')
+                    self.__ostream.flush()
+            elif key.char is not None:
+                input_chars.append(key.char)
+
+        output = ''.join(input_chars)
         self.__cur_command += output
 
         if self.__cur_command and self.__cur_command[-1] == '\n':
