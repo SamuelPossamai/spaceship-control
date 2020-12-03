@@ -25,10 +25,17 @@ class ConsoleInterface:
         input_chars = []
         for key in key_list:
             if key.control:
-                if  key.char == 'l' or key.char == 'L':
+                if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
                     self.__ostream.write('> ')
                     self.__ostream.flush()
+                elif key.char == 'u' or key.char == 'U':
+                    self.__ostream.sendMessage('set-cursor-pos-x 2')
+                    self.__ostream.write(' '*len(self.__cur_command))
+                    self.__ostream.flush()
+                    self.__ostream.sendMessage('set-cursor-pos-x 2')
+                    self.__cur_command = ''
+
             elif key.char is not None:
                 input_chars.append(key.char)
 

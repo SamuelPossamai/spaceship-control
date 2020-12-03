@@ -168,6 +168,28 @@ class ConsoleDevice(InterfaceDevice):
                 *args: 'Dict[str, Callable]') -> 'Any':
         return super().command(command, ConsoleDevice.__COMMANDS, *args)
 
+    def __setPosX(self, column_s: str) -> str:
+
+        column = int(column_s)
+
+        if column < 0 or column > self.__total_cols:
+            return '<<err>>'
+
+        self.__col = column
+
+        return '<<ok>>'
+
+    def __setPosY(self, row_s: str) -> str:
+
+        row = int(row_s)
+
+        if row < 0 or row > self.__total_rows:
+            return '<<err>>'
+
+        self.__row = row
+
+        return '<<ok>>'
+
     def __setPos(self, column_s: str, row_s: str) -> str:
 
         column = int(column_s)
@@ -246,6 +268,8 @@ class ConsoleDevice(InterfaceDevice):
     __COMMANDS: 'Dict[str, Callable[..., Any]]' = {
 
         'write': __write,
+        'set-cursor-pos-x': __setPosX,
+        'set-cursor-pos-y': __setPosY,
         'set-cursor-pos': __setPos,
         'get-cursor-pos': __getPos,
         'LF': __newline,
