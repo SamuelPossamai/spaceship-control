@@ -109,9 +109,18 @@ class KeyboardReceiverDevice(InterfaceDevice):
     def __get(self) -> 'Any':
         return self.__receiver.getAll()
 
-    __COMMANDS = {
+    def __activate(self) -> str:
+        self.__receiver.setFocus()
+        return '<<OK>>'
 
-        'get': __get
+    def __desactivate(self) -> str:
+        self.__receiver.clearFocus()
+        return '<<OK>>'
+
+    __COMMANDS = {
+        'get': __get,
+        'activate': __activate,
+        'desactivate': __desactivate
     }
 
 class ConsoleDevice(InterfaceDevice):

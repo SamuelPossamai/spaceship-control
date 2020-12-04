@@ -10,6 +10,8 @@ input_device = ship.listInterfaceDevices('keyboard')[0]
 
 console = ConsoleInterface(ship, input_device, output_device)
 
+input_device.sendMessage('activate')
+
 while True:
     try:
         pass
