@@ -1,5 +1,8 @@
 
 import shlex
+
+from PyQt5.QtCore import Qt
+
 from .spctrl_base_controller import (
     SimpleConsoleOutputDevice, TranslatedKeyboardInputDevice
 )
@@ -24,7 +27,12 @@ class ConsoleInterface:
 
         input_chars = []
         for key in key_list:
-            if key.control:
+            if key.code == Qt.Key_Backspace:
+                self.__ostream.sendMessage('BS')
+                self.__ostream.write(' ')
+                self.__ostream.flush()
+                self.__ostream.sendMessage('BS')
+            elif key.control:
                 if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
                     self.__ostream.write('> ')
