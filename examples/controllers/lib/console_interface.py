@@ -32,6 +32,7 @@ class ConsoleInterface:
                 self.__ostream.write(' ')
                 self.__ostream.flush()
                 self.__ostream.sendMessage('BS')
+                self.__cur_command = self.__cur_command[:-1]
             elif key.control:
                 if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
