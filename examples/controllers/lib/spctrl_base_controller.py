@@ -283,7 +283,7 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
     def flush(self):
 
         self.__message_buffer = \
-            self.__message_buffer.replace("'", "\\'").replace('\\', '\\\\')
+            self.__message_buffer.replace('\\', '\\\\').replace('"', '\\"')
 
         messages = iter(self.__message_buffer.split('\n'))
 
