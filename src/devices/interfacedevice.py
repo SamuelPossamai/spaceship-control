@@ -257,14 +257,26 @@ class ConsoleDevice(InterfaceDevice):
 
     def __update(self) -> str:
 
+        pos = self.__row*self.__total_cols + self.__col
+
         i = 0
         for i, char in enumerate(reversed(self.__text)):
             if char != ' ':
                 break
 
         last_space = len(self.__text) - i
+        if last_space <= pos:
+            last_space = pos + 1
 
-        text = html.escape(self.__text[:last_space+1]).replace(' ', '&nbsp;')
+        pos_text = self.__text[pos]
+        text_before = html.escape(self.__text[:pos]).replace(' ', '&nbsp;')
+        text_after = html.escape(self.__text[pos+1:last_space+1]).replace(
+            ' ', '&nbsp;')
+
+        text = (
+            f'{text_before}<font color="black" style="background-color: '
+            f'white;">{pos_text}</font>{text_after}')
+
         self.addAction(Action(QTextEdit.setHtml, self.__text_widget, text))
 
         return '<<ok>>'
