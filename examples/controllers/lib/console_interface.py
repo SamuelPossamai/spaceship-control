@@ -28,11 +28,12 @@ class ConsoleInterface:
         input_chars = []
         for key in key_list:
             if key.code == Qt.Key_Backspace:
-                self.__ostream.sendMessage('BS')
-                self.__ostream.write(' ')
-                self.__ostream.flush()
-                self.__ostream.sendMessage('BS')
-                self.__cur_command = self.__cur_command[:-1]
+                if self.__cur_command:
+                    self.__ostream.sendMessage('BS')
+                    self.__ostream.write(' ')
+                    self.__ostream.flush()
+                    self.__ostream.sendMessage('BS')
+                    self.__cur_command = self.__cur_command[:-1]
             elif key.control:
                 if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
