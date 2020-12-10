@@ -17,6 +17,7 @@ class ConsoleInterface:
         self.__ostream = SimpleConsoleOutputDevice(output_stream)
         self.__commands = self.__COMMANDS.copy()
         self.__cur_command = ''
+        self.__cur_start_console_line = 0
 
         self.__ostream.write('> ')
         self.__ostream.flush()
@@ -40,10 +41,12 @@ class ConsoleInterface:
                     self.__ostream.write('> ')
                     self.__ostream.flush()
                 elif key.char == 'u' or key.char == 'U':
-                    self.__ostream.sendMessage('set-cursor-pos-x 2')
+                    set_pos_command = \
+                        f'set-cursor-pos 2 {self.__cur_start_console_line}'
+                    self.__ostream.sendMessage(set_pos_command)
                     self.__ostream.write(' '*len(self.__cur_command))
                     self.__ostream.flush()
-                    self.__ostream.sendMessage('set-cursor-pos-x 2')
+                    self.__ostream.sendMessage(set_pos_command)
                     self.__cur_command = ''
 
             elif key.char is not None:
@@ -72,6 +75,11 @@ class ConsoleInterface:
                         output += f'Error running command \'{cmd}\''
 
                 output += '\n'
+                try:
+                    self.__cur_start_console_line = int(
+                        self.__ostream.sendMessage('get-cursor-pos-y'))
+                except ValueError:
+                    pass
 
             output += '> '
             self.__cur_command = ''

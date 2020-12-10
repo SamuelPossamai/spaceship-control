@@ -215,6 +215,12 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
+    def __getPosX(self) -> int:
+        return self.__col
+
+    def __getPosY(self) -> int:
+        return self.__row
+
     def __getPos(self) -> str:
         return f'{self.__col}-{self.__row}'
 
@@ -292,6 +298,8 @@ class ConsoleDevice(InterfaceDevice):
         'set-cursor-pos-x': __setPosX,
         'set-cursor-pos-y': __setPosY,
         'set-cursor-pos': __setPos,
+        'get-cursor-pos-x': __getPosX,
+        'get-cursor-pos-y': __getPosY,
         'get-cursor-pos': __getPos,
         'LF': __newline,
         'BS': __columndec,
