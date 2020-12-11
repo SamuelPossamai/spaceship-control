@@ -242,6 +242,18 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
+    def __backspace(self) -> str:
+        if self.__col == 0 and self.__row == 0:
+            return '<<err>>'
+
+        self.__col -= 1
+
+        if self.__col < 0:
+            self.__row -= 1
+            self.__col = self.__total_cols - 1
+
+        return '<<ok>>'
+
     def __columnstart(self) -> str:
         self.__col = 0
 
@@ -301,8 +313,9 @@ class ConsoleDevice(InterfaceDevice):
         'get-cursor-pos-x': __getPosX,
         'get-cursor-pos-y': __getPosY,
         'get-cursor-pos': __getPos,
+        'column-dec': __columndec,
         'LF': __newline,
-        'BS': __columndec,
+        'BS': __backspace,
         'CR': __columnstart,
         'update': __update,
         'clear': __clear
