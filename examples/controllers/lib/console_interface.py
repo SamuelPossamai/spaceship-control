@@ -18,6 +18,8 @@ class ConsoleInterface:
         self.__commands = self.__COMMANDS.copy()
         self.__cur_command = ''
         self.__cur_start_console_line = 0
+        self.__history = []
+        self.__cur_cmd_history_index = None
 
         self.__ostream.write('> ')
         self.__ostream.flush()
@@ -35,30 +37,36 @@ class ConsoleInterface:
                     self.__ostream.flush()
                     self.__ostream.sendMessage('BS')
                     self.__cur_command = self.__cur_command[:-1]
+            elif key.code == Qt.Key_Up:
+                if self.__cur_cmd_history_index is None:
+                    self.__cur_cmd_history_index = len(self.__history) - 1
+                else:
+                    self.__cur_cmd_history_index -= 1
+
+                if self.__cur_cmd_history_index >= 0:
+                    self.__replace_string(
+                        self.__history[self.__cur_cmd_history_index])
             elif key.control:
                 if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
                     self.__ostream.write('> ')
                     self.__ostream.flush()
                 elif key.char == 'u' or key.char == 'U':
-                    set_pos_command = \
-                        f'set-cursor-pos 2 {self.__cur_start_console_line}'
-                    self.__ostream.sendMessage(set_pos_command)
-                    self.__ostream.write(' '*len(self.__cur_command))
-                    self.__ostream.flush()
-                    self.__ostream.sendMessage(set_pos_command)
-                    self.__cur_command = ''
-
+                    self.__replace_string('')
             elif key.char is not None:
                 input_chars.append(key.char)
 
         output = ''.join(input_chars)
         self.__cur_command += output
 
+        new_line = False
         if self.__cur_command and self.__cur_command[-1] == '\n':
-            tokens = shlex.split(self.__cur_command[:-1], comments=True)
+            cur_command = self.__cur_command[:-1]
+            tokens = shlex.split(cur_command, comments=True)
 
             if tokens:
+                self.__history.append(cur_command)
+                self.__cur_cmd_history_index = None
 
                 cmd = tokens[0]
                 cmd_args = tokens[1:]
@@ -75,18 +83,30 @@ class ConsoleInterface:
                         output += f'Error running command \'{cmd}\''
 
                 output += '\n'
-                try:
-                    self.__cur_start_console_line = int(
-                        self.__ostream.sendMessage('get-cursor-pos-y'))
-                except ValueError:
-                    pass
 
+            new_line = True
             output += '> '
             self.__cur_command = ''
 
         if output:
             self.__ostream.write(output)
             self.__ostream.flush()
+
+        if new_line is True:
+            try:
+                self.__cur_start_console_line = int(
+                    self.__ostream.sendMessage('get-cursor-pos-y'))
+            except ValueError:
+                pass
+
+    def __replace_string(self, new_string):
+        set_pos_command = f'set-cursor-pos 2 {self.__cur_start_console_line}'
+        self.__ostream.sendMessage(set_pos_command)
+        self.__ostream.write(new_string)
+        self.__ostream.write(' '*(len(self.__cur_command) - len(new_string)))
+        self.__ostream.flush()
+        self.__ostream.sendMessage(set_pos_command)
+        self.__cur_command = ''
 
     def __cmd_echo(self, cmd, cmd_args):
         return ' '.join(cmd_args)
