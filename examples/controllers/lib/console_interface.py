@@ -4,7 +4,7 @@ import shlex
 from PyQt5.QtCore import Qt
 
 from .spctrl_base_controller import (
-    SimpleConsoleOutputDevice, TranslatedKeyboardInputDevice, debug
+    SimpleConsoleOutputDevice, TranslatedKeyboardInputDevice
 )
 
 class ConsoleInterface:
@@ -17,6 +17,7 @@ class ConsoleInterface:
         self.__ostream = SimpleConsoleOutputDevice(output_stream)
         self.__commands = self.__COMMANDS.copy()
         self.__cur_command = ''
+        self.__editing_command = ''
         self.__cur_start_console_line = 0
         self.__history = []
         self.__cur_cmd_history_index = None
@@ -40,13 +41,13 @@ class ConsoleInterface:
             elif key.code == Qt.Key_Up:
                 if self.__cur_cmd_history_index is None:
                     self.__cur_cmd_history_index = len(self.__history) - 1
+                    self.__editing_command = self.__cur_command
                 else:
                     self.__cur_cmd_history_index -= 1
 
                 if self.__cur_cmd_history_index >= 0:
-                    self.__cur_command = self.__history[
-                        self.__cur_cmd_history_index]
-                    self.__replace_string(self.__cur_command)
+                    self.__replace_string(
+                        self.__history[self.__cur_cmd_history_index])
                 else:
                     self.__cur_cmd_history_index = 0
             elif key.code == Qt.Key_Down:
@@ -58,9 +59,8 @@ class ConsoleInterface:
                             self.__cur_cmd_history_index]
                         self.__replace_string(self.__cur_command)
                     else:
-                        self.__cur_command = ''
-                        self.__replace_string('')
-                        self.__cur_cmd_history_index = len(self.__history)
+                        self.__replace_string(self.__editing_command)
+                        self.__cur_cmd_history_index = None
             elif key.control:
                 if key.char == 'l' or key.char == 'L':
                     self.__ostream.clear()
@@ -70,8 +70,6 @@ class ConsoleInterface:
                     self.__replace_string('')
             elif key.char is not None:
                 input_chars.append(key.char)
-
-        debug(self.__cur_command)
 
         output = ''.join(input_chars)
         self.__cur_command += output
@@ -119,7 +117,7 @@ class ConsoleInterface:
     def __replace_string(self, new_string):
         set_pos_command = f'set-cursor-pos 2 {self.__cur_start_console_line}'
         self.__ostream.sendMessage(set_pos_command)
-        self.__ostream.write(' '*(len(self.__cur_command) - len(new_string)))
+        self.__ostream.write(' '*len(self.__cur_command))
         self.__ostream.flush()
         self.__ostream.sendMessage(set_pos_command)
         self.__ostream.write(new_string)
