@@ -21,6 +21,7 @@ class ConsoleInterface:
         self.__cur_start_console_line = 0
         self.__history = []
         self.__cur_cmd_history_index = None
+        self.__cur_column_offset = 0
 
         self.__ostream.write('> ')
         self.__ostream.flush()
@@ -50,6 +51,14 @@ class ConsoleInterface:
                         self.__history[self.__cur_cmd_history_index])
                 else:
                     self.__cur_cmd_history_index = 0
+            elif key.code == Qt.Key_Left:
+                if self.__cur_column_offset < len(self.__cur_command):
+                    self.__cur_column_offset += 1
+                    self.__ostream.sendMessage('BS')
+            elif key.code == Qt.Key_Right:
+                if self.__cur_column_offset > 0:
+                    self.__cur_column_offset -= 1
+                    self.__ostream.sendMessage('advance-cursor')
             elif key.code == Qt.Key_Down:
                 if self.__cur_cmd_history_index is not None:
                     self.__cur_cmd_history_index += 1
