@@ -280,7 +280,8 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __write(self, text: str) -> str:
+    def __writeBase(self, text: str) -> int:
+
         pos = self.__row*self.__total_cols + self.__col
         self.__text = self.__text[: pos] + text + self.__text[pos + len(text):]
 
@@ -288,11 +289,20 @@ class ConsoleDevice(InterfaceDevice):
         if len(self.__text) > total_size:
             self.__text = self.__text[: total_size]
 
-        pos += len(text)
+        return pos
+
+    def __staticWrite(self, text: str) -> str:
+        self.__writeBase(text)
+
+        return '<<ok>>'
+
+    def __write(self, text: str) -> str:
+
+        pos = self.__writeBase(text) + len(text)
         self.__row = pos//self.__total_cols
         self.__col = pos%self.__total_cols
 
-        return '<<ok>>'
+        return ret
 
     def __update(self) -> str:
 
@@ -328,6 +338,7 @@ class ConsoleDevice(InterfaceDevice):
     __COMMANDS: 'Dict[str, Callable[..., Any]]' = {
 
         'write': __write,
+        'static-write': __staticWrite,
         'set-cursor-pos-x': __setPosX,
         'set-cursor-pos-y': __setPosY,
         'set-cursor-pos': __setPos,
