@@ -270,17 +270,33 @@ class TextOutputDevice(Device):
     def flush(self):
         pass
 
+_SimpleConsoleOutputDevice_WriteMode = collections.namedtuple(
+    'WriteMode', ('Normal', 'Push', 'Static'))
+
 class SimpleConsoleOutputDevice(TextOutputDevice):
+
+    WriteMode = _SimpleConsoleOutputDevice_WriteMode
 
     def __init__(self, device_path='', parent=None):
         super().__init__(device_path=device_path, parent=parent)
 
         self.__message_buffer = ''
+        self.__current_message_mode = \
+            SimpleConsoleOutputDevice.WriteMode.Normal;
 
-    def write(self, text):
+    def write(self, text, mode=_SimpleConsoleOutputDevice_WriteMode.Normal):
+
+        if mode is not self.__current_message_mode:
+            if not self.__message_buffer:
+                self.flush()
+            self.__current_message_mode = mode
+
         self.__message_buffer += text
 
     def flush(self):
+
+        if not self.__message_buffer:
+            return
 
         self.__message_buffer = \
             self.__message_buffer.replace('\\', '\\\\').replace('"', '\\"')
@@ -302,7 +318,20 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
         self.__message_buffer = ''
 
     def __printMsg(self, text):
-        self.sendMessage(f'write "{text}"')
+
+        if self.__current_message_mode is \
+                SimpleConsoleOutputDevice.WriteMode.Normal:
+            cmd = 'write'
+        elif self.__current_message_mode is \
+                SimpleConsoleOutputDevice.WriteMode.Static:
+            cmd = 'static-write'
+        elif self.__current_message_mode is \
+                SimpleConsoleOutputDevice.WriteMode.Push:
+            cmd = 'push-write'
+        else:
+            cmd = 'write'
+
+        self.sendMessage(f'{cmd} "{text}"')
 
 Device._DEVICE_TYPE_MAP['console-text-display'] = SimpleConsoleOutputDevice
 

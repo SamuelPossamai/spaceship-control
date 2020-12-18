@@ -280,7 +280,7 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __writeBase(self, text: str) -> int:
+    def __writeBase(self, text: str, push: bool = False) -> int:
 
         pos = self.__row*self.__total_cols + self.__col
 
