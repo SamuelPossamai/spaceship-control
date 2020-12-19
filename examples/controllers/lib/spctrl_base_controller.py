@@ -296,6 +296,7 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
     def flush(self):
 
         if not self.__message_buffer:
+            self.sendMessage('update')
             return
 
         self.__message_buffer = \
