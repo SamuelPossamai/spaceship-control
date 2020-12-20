@@ -4,6 +4,7 @@ import sys
 import time
 
 import collections
+from enum import Enum
 
 from abc import ABC, abstractmethod
 
@@ -270,7 +271,7 @@ class TextOutputDevice(Device):
     def flush(self):
         pass
 
-_SimpleConsoleOutputDevice_WriteMode = collections.namedtuple(
+_SimpleConsoleOutputDevice_WriteMode = Enum(
     'WriteMode', ('Normal', 'Push', 'Static'))
 
 class SimpleConsoleOutputDevice(TextOutputDevice):
@@ -285,9 +286,8 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
             SimpleConsoleOutputDevice.WriteMode.Normal;
 
     def write(self, text, mode=_SimpleConsoleOutputDevice_WriteMode.Normal):
-
         if mode is not self.__current_message_mode:
-            if not self.__message_buffer:
+            if self.__message_buffer:
                 self.flush()
             self.__current_message_mode = mode
 

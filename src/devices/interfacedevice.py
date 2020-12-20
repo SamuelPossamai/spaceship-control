@@ -280,7 +280,8 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
-    def __writeBase(self, text: str, push: bool = False) -> int:
+    def __writeBase(self, text: str, push: bool = False,
+                    update_pos: bool = True) -> None:
 
         pos = self.__row*self.__total_cols + self.__col
 
@@ -295,18 +296,18 @@ class ConsoleDevice(InterfaceDevice):
         if len(self.__text) > total_size:
             self.__text = self.__text[: total_size]
 
-        return pos
+        if update_pos is True:
+            pos += len(text)
+            self.__row = pos//self.__total_cols
+            self.__col = pos%self.__total_cols
 
     def __staticWrite(self, text: str) -> str:
-        self.__writeBase(text)
+        self.__writeBase(text, update_pos=False)
 
         return '<<ok>>'
 
     def __write(self, text: str) -> str:
-
-        pos = self.__writeBase(text) + len(text)
-        self.__row = pos//self.__total_cols
-        self.__col = pos%self.__total_cols
+        self.__writeBase(text)
 
         return ret
 
@@ -314,7 +315,6 @@ class ConsoleDevice(InterfaceDevice):
         self.__writeBase(text, push=True)
 
         return '<<ok>>'
-
 
     def __update(self) -> str:
 
