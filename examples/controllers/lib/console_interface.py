@@ -31,8 +31,11 @@ class ConsoleInterface:
         key_list = self.__istream.readline()
 
         input_chars = []
+        enter_pressed = False
         for key in key_list:
-            if key.code == Qt.Key_Backspace:
+            if key.char == '\n':
+                enter_pressed = True
+            elif key.code == Qt.Key_Backspace:
                 if self.__cur_command:
                     self.__ostream.sendMessage('BS')
                     self.__ostream.write(' ', mode=SCOD.WriteMode.Static)
@@ -88,15 +91,15 @@ class ConsoleInterface:
                     len(self.__cur_command) - self.__cur_column_offset
                 self.__cur_command = self.__cur_command[:index_pos] + output + \
                     self.__cur_command[index_pos:]
-                debug(self.__cur_command, index_pos)
 
         new_line = False
-        if self.__cur_command and self.__cur_command[-1] == '\n':
-            cur_command = self.__cur_command[:-1]
-            tokens = shlex.split(cur_command, comments=True)
+        if enter_pressed:
+            output += '\n'
+
+            tokens = shlex.split(self.__cur_command, comments=True)
 
             if tokens:
-                self.__history.append(cur_command)
+                self.__history.append(self.__cur_command)
                 self.__cur_cmd_history_index = None
 
                 cmd = tokens[0]
@@ -114,6 +117,7 @@ class ConsoleInterface:
                         output += f'Error running command \'{cmd}\''
 
                 output += '\n'
+                self.__cur_column_offset = 0
 
             new_line = True
             output += '> '
