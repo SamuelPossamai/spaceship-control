@@ -38,9 +38,18 @@ class ConsoleInterface:
             elif key.code == Qt.Key_Backspace:
                 if self.__cur_command:
                     self.__ostream.sendMessage('BS')
-                    self.__ostream.write(' ', mode=SCOD.WriteMode.Static)
-                    self.__ostream.flush()
-                    self.__cur_command = self.__cur_command[:-1]
+                    if self.__cur_column_offset == 0:
+                        self.__ostream.write(' ', mode=SCOD.WriteMode.Static)
+                        self.__ostream.flush()
+                        self.__cur_command = self.__cur_command[:-1]
+                    else:
+                        cur_column = -self.__cur_column_offset - 1
+                        cur_cmd_after = self.__cur_command[cur_column + 1:]
+                        self.__ostream.write(cur_cmd_after + ' ',
+                                             mode=SCOD.WriteMode.Static)
+                        self.__ostream.flush()
+                        self.__cur_command = self.__cur_command[:cur_column] + \
+                            cur_cmd_after
             elif key.code == Qt.Key_Up:
                 if self.__cur_cmd_history_index is None:
                     self.__cur_cmd_history_index = len(self.__history) - 1
