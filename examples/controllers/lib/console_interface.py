@@ -88,6 +88,11 @@ class ConsoleInterface:
                     self.__ostream.flush()
                 elif key.char == 'u' or key.char == 'U':
                     self.__replace_string('')
+                elif key.char == 'k' or key.char == 'K':
+                    if self.__cur_column_offset != 0:
+                        self.__replace_string(
+                            self.__cur_command[:-self.__cur_column_offset])
+                        self.__cur_column_offset = 0
             elif key.char is not None:
                 input_chars.append(key.char)
 
