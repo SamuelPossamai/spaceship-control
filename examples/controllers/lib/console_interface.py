@@ -50,6 +50,13 @@ class ConsoleInterface:
                         self.__ostream.flush()
                         self.__cur_command = self.__cur_command[:cur_column] + \
                             cur_cmd_after
+            elif key.code == Qt.Key_Home:
+                self.__cur_column_offset = len(self.__cur_command) - 1
+                self.__ostream.sendMessage(
+                    f'set-cursor-pos 2 {self.__cur_start_console_line}')
+            elif key.code == Qt.Key_End:
+                self.__cur_column_offset = 0
+                self.__replace_string(self.__cur_command)
             elif key.code == Qt.Key_Up:
                 if self.__cur_cmd_history_index is None:
                     self.__cur_cmd_history_index = len(self.__history) - 1
