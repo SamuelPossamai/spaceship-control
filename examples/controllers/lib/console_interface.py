@@ -22,6 +22,7 @@ class ConsoleInterface:
         self.__history = []
         self.__cur_cmd_history_index = None
         self.__cur_column_offset = 0
+        self.__cur_device = ship.device
 
         self.__ostream.write('> ')
         self.__ostream.flush()
@@ -134,7 +135,6 @@ class ConsoleInterface:
                     try:
                         output += str(cmd_function(self, cmd, cmd_args))
                     except Exception:
-                        raise
                         output += f'Error running command \'{cmd}\''
 
                 output += '\n'
@@ -179,10 +179,14 @@ class ConsoleInterface:
     def __cmd_show_angular_speed(self, cmd, cmd_args):
         return self.__ship.angular_speed
 
+    def __list_device(self, cmd, cmd_args):
+        return str(self.__cur_device)
+
     __COMMANDS = {
         'echo': __cmd_echo,
         'show-position': __cmd_show_position,
         'show-angle': __cmd_show_angle,
         'show-speed': __cmd_show_speed,
-        'show-angular-speed': __cmd_show_angular_speed
+        'show-angular-speed': __cmd_show_angular_speed,
+        'device': __list_device
     }

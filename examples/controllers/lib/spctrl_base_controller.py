@@ -300,7 +300,8 @@ class SimpleConsoleOutputDevice(TextOutputDevice):
             return
 
         self.__message_buffer = \
-            self.__message_buffer.replace('\\', '\\\\').replace('"', '\\"')
+            self.__message_buffer.replace('\\', '\\\\').replace('"', '\\"')\
+                .replace('\t', ' ').replace('-', '−')
 
         messages = iter(self.__message_buffer.split('\n'))
 
