@@ -224,6 +224,12 @@ class ConsoleDevice(InterfaceDevice):
     def __getPos(self) -> str:
         return f'{self.__col}-{self.__row}'
 
+    def __getColumns(self) -> int:
+        return self.__total_cols
+
+    def __getRows(self) -> int:
+        return self.__total_rows
+
     def __newline(self) -> str:
 
         if self.__row >= self.__total_rows - 1:
@@ -277,6 +283,18 @@ class ConsoleDevice(InterfaceDevice):
 
     def __columnstart(self) -> str:
         self.__col = 0
+
+        return '<<ok>>'
+
+    def __pushUp(self) -> str:
+
+        if self.__row <= 0:
+            self.__col = 0
+            self.__row = 0
+        else:
+            self.__row -= 1
+
+        self.__text = self.__text[self.__total_cols:] + ' '*self.__total_cols
 
         return '<<ok>>'
 
@@ -358,12 +376,15 @@ class ConsoleDevice(InterfaceDevice):
         'get-cursor-pos-x': __getPosX,
         'get-cursor-pos-y': __getPosY,
         'get-cursor-pos': __getPos,
+        'get-columns': __getColumns,
+        'get-rows': __getRows,
         'column-dec': __columndec,
         'column-inc': __columninc,
         'advance-cursor': __advCursor,
         'LF': __newline,
         'BS': __backspace,
         'CR': __columnstart,
+        'push-up': __pushUp,
         'update': __update,
         'clear': __clear
     }

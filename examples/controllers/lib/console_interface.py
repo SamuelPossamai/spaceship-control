@@ -23,7 +23,8 @@ class ConsoleInterface:
         self.__cur_cmd_history_index = None
         self.__cur_column_offset = 0
         self.__cur_device = ship.device
-
+        self.__console_size = (int(self.__ostream.sendMessage('get-columns')),
+                               int(self.__ostream.sendMessage('get-rows')))
         self.__ostream.write('> ')
         self.__ostream.flush()
 
@@ -145,6 +146,17 @@ class ConsoleInterface:
             self.__cur_command = ''
 
         if output:
+            columns = self.__console_size[0]
+            rows = self.__console_size[1]
+            remaining_chars = rows*columns - \
+                (self.__cur_start_console_line + 1)*columns - 2
+
+            output_size = output.count('\n')*columns + len(output) - \
+                output.rfind('\n')
+            if output_size > remaining_chars:
+                for i in range((output_size - remaining_chars)//columns + 1):
+                    self.__ostream.sendMessage('push-up')
+
             self.__ostream.write(output, mode=SCOD.WriteMode.Push)
             self.__ostream.flush()
 
