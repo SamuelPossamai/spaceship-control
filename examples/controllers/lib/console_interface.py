@@ -25,6 +25,8 @@ class ConsoleInterface:
         self.__cur_device = ship.device
         self.__console_size = (int(self.__ostream.sendMessage('get-columns')),
                                int(self.__ostream.sendMessage('get-rows')))
+
+        self.__ostream.sendMessage('show-cursor')
         self.__ostream.write('> ')
         self.__ostream.flush()
 

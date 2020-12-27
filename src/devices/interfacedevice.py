@@ -134,6 +134,7 @@ class ConsoleDevice(InterfaceDevice):
         self.__total_cols = columns
         self.__total_rows = rows
         self.__text = ' '*(self.__total_cols*self.__total_rows)
+        self.__show_cursor = False
 
         text.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         text.setFocusPolicy(Qt.NoFocus)
@@ -269,6 +270,14 @@ class ConsoleDevice(InterfaceDevice):
 
         return '<<ok>>'
 
+    def __hideCursor(self) -> str:
+        self.__show_cursor = False
+        return '<<ok>>'
+
+    def __showCursor(self) -> str:
+        self.__show_cursor = True
+        return '<<ok>>'
+
     def __backspace(self) -> str:
         if self.__col == 0 and self.__row == 0:
             return '<<err>>'
@@ -347,14 +356,18 @@ class ConsoleDevice(InterfaceDevice):
         if last_space <= pos:
             last_space = pos + 1
 
-        pos_text = self.__text[pos]
-        text_before = html.escape(self.__text[:pos]).replace(' ', '&nbsp;')
-        text_after = html.escape(self.__text[pos+1:last_space+1]).replace(
-            ' ', '&nbsp;')
+        if self.__show_cursor:
+            pos_text = html.escape(self.__text[pos]).replace(' ', '&nbsp;')
+            text_before = html.escape(self.__text[:pos]).replace(' ', '&nbsp;')
+            text_after = html.escape(self.__text[pos+1:last_space+1]).replace(
+                ' ', '&nbsp;')
 
-        text = (
-            f'{text_before}<font color="black" style="background-color: '
-            f'white;">{pos_text}</font>{text_after}')
+            text = (
+                f'{text_before}<font color="black" style="background-color: '
+                f'white;">{pos_text}</font>{text_after}')
+        else:
+            text = html.escape(
+                self.__text[:last_space+1]).replace(' ', '&nbsp;')
 
         self.addAction(Action(QTextEdit.setHtml, self.__text_widget, text))
 
@@ -381,6 +394,8 @@ class ConsoleDevice(InterfaceDevice):
         'column-dec': __columndec,
         'column-inc': __columninc,
         'advance-cursor': __advCursor,
+        'hide-cursor': __hideCursor,
+        'show-cursor': __showCursor,
         'LF': __newline,
         'BS': __backspace,
         'CR': __columnstart,
