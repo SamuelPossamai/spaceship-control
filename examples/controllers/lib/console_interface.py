@@ -196,11 +196,38 @@ class ConsoleInterface:
     def __list_device(self, cmd, cmd_args):
         return str(self.__cur_device)
 
+    def __use_device(self, cmd, cmd_args):
+
+        if len(cmd_args) < 1:
+            return 'Missing positional argument \'device\''
+
+        child_id = cmd_args[0]
+        children = self.__cur_device.children
+
+        try:
+            child_id = int(child_id)
+            if child_id < len(children):
+                self.__cur_device = children[child_id]
+                return 'Device changed'
+
+            return 'Device not found'
+
+        except ValueError:
+            pass
+
+        for child_device in children:
+            if child_device.name == child_id:
+                self.__cur_device = child_device
+                return 'Device changed'
+
+        return 'Device not found'
+
     __COMMANDS = {
         'echo': __cmd_echo,
         'show-position': __cmd_show_position,
         'show-angle': __cmd_show_angle,
         'show-speed': __cmd_show_speed,
         'show-angular-speed': __cmd_show_angular_speed,
-        'device': __list_device
+        'device': __list_device,
+        'use': __use_device,
     }
