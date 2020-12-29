@@ -156,8 +156,14 @@ class ConsoleInterface:
             output_size = output.count('\n')*columns + len(output) - \
                 output.rfind('\n')
             if output_size > remaining_chars:
-                for i in range((output_size - remaining_chars)//columns + 1):
-                    self.__ostream.sendMessage('push-up')
+                rows_to_push = (output_size - remaining_chars)//columns + 1
+                if rows_to_push < rows:
+                    rows_to_push = rows
+                    self.__ostream.sendMessage('clear')
+                    output = '\n'.join(output.rsplit('\n', rows - 1)[1:])
+                else:
+                    for i in range(rows_to_push):
+                        self.__ostream.sendMessage('push-up')
 
             self.__ostream.write(output, mode=SCOD.WriteMode.Push)
             self.__ostream.flush()
