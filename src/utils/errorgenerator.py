@@ -28,7 +28,7 @@ class ErrorGenerator(ABC):
 
         return factor + random_func()*(1 - factor)
 
-    def toDict():
+    def toDict(self):
         return {}
 
 class UniformDistributionErrorGenerator(ErrorGenerator):
@@ -67,7 +67,7 @@ class UniformDistributionErrorGenerator(ErrorGenerator):
 
         return self._getRandom(self.__error_max)
 
-    def toDict():
+    def toDict(self):
         return {
             'max-offset': self.__offset_max,
             'max-error': self.__error_max_before,
@@ -100,7 +100,7 @@ class NormalDistributionErrorGenerator(ErrorGenerator):
 
         return self._getRandom(self.__error_sigma)
 
-    def toDict():
+    def toDict(self):
         return {
             'error-sigma': self.__base_error_sigma,
             'offset-sigma': self.__offset_sigma,
@@ -135,12 +135,12 @@ class TriangularDistributionErrorGenerator(ErrorGenerator):
 
     def _applyValError(self, val: float) -> float:
 
-        if self._real_max_error == 0:
+        if self.__left_error_max == 0 and self.__right_error_max == 0:
             return 0
 
         return self._getRandom(self.__left_error_max, self.__right_error_max)
 
-    def toDict():
+    def toDict(self):
         return {
             'max-offset': self.__offset_max,
             'left-max-offset': self.__left_error_max_before,

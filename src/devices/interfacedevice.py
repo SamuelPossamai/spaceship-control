@@ -336,7 +336,7 @@ class ConsoleDevice(InterfaceDevice):
     def __write(self, text: str) -> str:
         self.__writeBase(text)
 
-        return ret
+        return '<<ok>>'
 
     def __pushWrite(self, text: str) -> str:
         self.__writeBase(text, push=True)

@@ -10,9 +10,11 @@ from pymunk import Vec2d
 from .device import DefaultDevice
 
 if TYPE_CHECKING:
+    # pylint: disable=ungrouped-imports
     from typing import Any, List, Tuple, Dict, Callable
     from ..utils.errorgenerator import ErrorGenerator
     from .structure import StructuralPart
+    # pylint: enable=ungrouped-imports
 
 class CommunicationEngine:
 

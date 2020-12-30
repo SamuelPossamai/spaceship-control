@@ -1,6 +1,7 @@
 
-from simpleeval import simple_eval
 from typing import TYPE_CHECKING, MutableMapping
+
+from simpleeval import simple_eval
 
 if TYPE_CHECKING:
     from typing import Any, Optional, Tuple

@@ -7,8 +7,6 @@ from .errorloader import loadError
 
 from .. import configfilevariables
 
-from ...utils.errorgenerator import ErrorGenerator
-
 from ...devices.device import DeviceGroup
 from ...devices.structure import StructuralPart
 from ...devices.sensors import (
@@ -29,10 +27,10 @@ if TYPE_CHECKING:
     # pylint: disable=ungrouped-imports
     from typing import Sequence, Tuple, Any, MutableMapping, Iterable
     from PyQt5.QtWidgets import QWidget
+    from ...utils.errorgenerator import ErrorGenerator
     from ...devices.device import Device
     from ...devices.communicationdevices import CommunicationEngine
     # pylint: enable=ungrouped-imports
-
 
 class DeviceLoader(CustomLoader):
 
@@ -71,7 +69,7 @@ class DeviceLoader(CustomLoader):
     def __createCustomStaticDeviceFunction( # pylint: disable=no-self-use
             custom_device_info: 'MutableMapping[str, Any]',
             loader: 'DeviceLoader',
-            info: 'MutableMapping[str, Any]', part: 'StructuralPart',
+            _info: 'MutableMapping[str, Any]', part: 'StructuralPart',
             **kwargs: 'Any') \
                 -> 'Tuple[Device, Sequence[QWidget]]':
 
@@ -117,7 +115,7 @@ class DeviceLoader(CustomLoader):
 
         return device, widgets
 
-    def __loadErrorMutableMapping(
+    def __loadErrorMutableMapping( # pylint: disable=no-self-use
             self, errors: 'MutableMapping[str, MutableMapping[str, Any]]') \
                 -> 'MutableMapping[str, ErrorGenerator]':
 
@@ -332,7 +330,7 @@ class DeviceLoader(CustomLoader):
         return (BasicSender(part, engine, info['intensity'], info['frequency'],
                             **errors), ())
 
-    def __createConfReceiver(self, info: 'MutableMapping[str, Any]',
+    def __createConfReceiver(self, info: 'MutableMapping[str, Any]', # pylint: disable=no-self-use
                              part: StructuralPart,
                              engine: 'CommunicationEngine' = None,
                              **_kwargs: 'Any') \

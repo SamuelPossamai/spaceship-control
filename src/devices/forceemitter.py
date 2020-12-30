@@ -1,6 +1,7 @@
 
-from pymunk import Vec2d, ShapeFilter
 from typing import TYPE_CHECKING
+
+from pymunk import Vec2d, ShapeFilter
 
 from ..utils.interval import Interval, IntervalSet
 
