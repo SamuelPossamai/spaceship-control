@@ -228,6 +228,13 @@ class ConsoleInterface:
 
         return 'Device not found'
 
+    def __device_send(self, cmd, cmd_args):
+
+        if len(cmd_args) < 1:
+            return 'Missing positional argument \'command\''
+
+        return self.__cur_device.sendMessage(cmd_args[0])
+
     __COMMANDS = {
         'echo': __cmd_echo,
         'show-position': __cmd_show_position,
@@ -236,4 +243,5 @@ class ConsoleInterface:
         'show-angular-speed': __cmd_show_angular_speed,
         'device': __list_device,
         'use': __use_device,
+        'send': __device_send
     }
