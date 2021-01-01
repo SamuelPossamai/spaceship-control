@@ -41,15 +41,15 @@ class ObjectiveLoader(CustomLoader):
     def __createCustomStaticObjectiveFunction(
             objective_content: 'MutableMapping[str, Any]',
             loader: 'ObjectiveLoader',
-            custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
+            _custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
 
-        return loader.__createObjectiveGroup(objective_content)
+        return loader.__createObjectiveGroup(objective_content) # pylint: disable=protected-access
 
     @staticmethod
     def __createCustomDynamicObjectiveFunction(
             objective_content: 'MutableMapping[str, Any]',
             loader: 'ObjectiveLoader',
-            custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
+            _custom_objective_info: 'MutableMapping[str, Any]') -> 'Objective':
 
         variables = {variable['id']: variable['value'] for variable in
                      custom_objective_info.get('Variable', ())}
@@ -58,7 +58,7 @@ class ObjectiveLoader(CustomLoader):
                                          variables=variables,
                                          enabled=True)
 
-        return loader.__createObjectiveGroup(objective_content)
+        return loader.__createObjectiveGroup(objective_content) # pylint: disable=protected-access
 
     def load(self, objectives: 'Sequence[MutableMapping[str, Any]]') \
             -> 'Sequence[Objective]':
@@ -68,7 +68,7 @@ class ObjectiveLoader(CustomLoader):
         return tuple(create_functions[objective['type']](self, objective)
                      for objective in objectives)
 
-    def __createGoToObjective(self,
+    def __createGoToObjective(self, # pylint: disable=no-self-use
                               objective_content: 'MutableMapping[str, Any]') \
             -> 'GoToObjective':
 

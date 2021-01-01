@@ -38,7 +38,7 @@ class ShapeLoader(CustomLoader):
     @staticmethod
     def __createCustomStaticShapeFunction(
             shape_content: 'MutableMapping[str, Any]', loader,
-            custom_shape_info: 'MutableMapping[str, Any]',
+            _custom_shape_info: 'MutableMapping[str, Any]',
             default_elasticity: float = None,
             default_friction: float = None):
 
@@ -49,7 +49,7 @@ class ShapeLoader(CustomLoader):
     @staticmethod
     def __createCustomDynamicShapeFunction(
             shape_content: 'MutableMapping[str, Any]', loader,
-            custom_shape_info: 'MutableMapping[str, Any]',
+            _custom_shape_info: 'MutableMapping[str, Any]',
             default_elasticity: float = None,
             default_friction: float = None):
 
